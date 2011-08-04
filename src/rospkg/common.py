@@ -1,4 +1,4 @@
-# Software License Agreement (BSD License)
+P# Software License Agreement (BSD License)
 #
 # Copyright (c) 2011, Willow Garage, Inc.
 # All rights reserved.
@@ -33,6 +33,10 @@
 # Revision $Id: packages.py 14291 2011-07-13 03:24:43Z kwc $
 # $Author: kwc $
 
+import os
+import sys
+import re
+
 MANIFEST_FILE = 'manifest.xml'
 STACK_FILE = 'stack.xml'
 ROS_STACK = 'ros'
@@ -43,3 +47,338 @@ class RosPkgException(Exception):
     """
     pass
 
+class ResourceNotFound(RosPkgException):
+    pass
+
+def _compute_package_paths(ros_root, ros_package_path):
+    """
+    Get the paths to search for packages in reverse precedence order (i.e. last path wins).
+    """
+    if ros_package_path:
+        return list(reversed([x for x in ros_package_path.split(os.pathsep) if x])) + [ros_root]
+    else:
+        return [ros_root]
+
+def _read_rospack_cache(cache_name, cache, ros_root, ros_package_path):
+    """
+    Read in rospack/rosstack cache data into cache. On-disk cache
+    specifies a ROS_ROOT and ROS_PACKAGE_PATH, which must match the
+    requested environment.
+    
+    @param cache_name: name of cache file, e.g. rospack_cache
+    @param cache: empty dictionary to store package list in. 
+        The format of the cache is {package_name: file_path}.
+    @type  cache: {str: str, str, str}
+    @param ros_package_path: ROS_ROOT value to validate cache.
+    @type  ros_root: str
+    @param ros_package_path: ROS_PACKAGE_PATH value or '' if not specified
+    @type  ros_package_path: str
+    @return: True if on-disk cache matches and was loaded, false otherwise
+    @rtype: bool
+    """
+    try:
+        ros_root_validated = ros_package_path_validated = False
+        with open(os.path.join(get_ros_home(), cache_name)) as f:
+            for l in f.readlines():
+                l = l[:-1]
+                if not len(l):
+                    continue
+                if l[0] == '#':
+                    # check that the cache matches our env
+                    if l.startswith('#ROS_ROOT='):
+                        ros_root_validated = True
+                        if not l[len('#ROS_ROOT='):] == ros_root:
+                            return False
+                    elif l.startswith('#ROS_PACKAGE_PATH='):
+                        ros_package_path_validated = True
+                        if not l[len('#ROS_PACKAGE_PATH='):] == ros_package_path:
+                            return False
+                else:
+                    cache[os.path.basename(l)] = l
+                    
+        if not ros_root_validated or not ros_package_path_validated:
+            return False
+        return True
+    except Exception as e:
+        pass
+    
+def list_by_path(manifest_name, path, cache):
+    """
+    List ROS stacks or packages within the specified path.
+
+    The cache will be updated with the resource->path
+    mappings. list_by_path() does NOT returned cached results
+    -- it only updates the cache.
+    
+    @param manifest_name: MANIFEST_FILE or STACK_FILE
+    @type  manifest_name: str
+    @param path: path to list resources in
+    @type  path: str
+    @param cache: path cache to update. Maps resource name to directory path.
+    @type  cache: {str: str}
+    @return: complete list of resources in ROS environment.
+    @rtype: [str]
+    """
+    resources = []
+    path = os.path.abspath(path)
+    basename = os.path.basename
+    for d, dirs, files in os.walk(path, topdown=True):
+        if manifest_name in files:
+            resource_name = basename(d)
+            if resource_name not in resources:
+                resources.append(resource_name)
+                if cache is not None:
+                    cache[resource_stack] = d
+            del dirs[:]
+            continue #leaf
+        elif MANIFEST_FILE in files:
+            # noop if manifest_name==MANIFEST_FILE, but a good
+            # optimization for stacks.
+            del dirs[:]
+            continue #leaf     
+        elif 'rospack_nosubdirs' in files:
+            del dirs[:]
+            continue  #leaf
+        # remove hidden dirs (esp. .svn/.git)
+        [dirs.remove(di) for di in dirs if di[0] == '.']
+        for sub_d in dirs:
+            # followlinks=True only available in Python 2.6, so we
+            # have to implement manually
+            sub_p = os.path.join(d, sub_d)
+            if os.path.islink(sub_p):
+                resources.extend(list_by_path(sub_p, cache=cache))
+    return resources
+
+class ManifestManager(object):
+    """
+    Base class implementation for L{RosPack} and L{RosStack}.
+    NOTE: for performance reasons, _RosPack caches information about
+    packages.
+    """
+    
+    def __init__(self, manifest_name, cache_name,
+                 ros_root=None, ros_package_path=None):
+        """
+        ctor. subclasses are expected to use manifest_name,
+        cache_name, and list_by_path_fn to customize behavior of
+        ManifestManager.
+        
+        @param manifest_name: MANIFEST_FILE or STACK_FILE
+        @param cache_name: rospack_cache or rosstack_cache
+        @param ros_root: (optional) override ROS_ROOT.
+        @param ros_package_path: (optional) override ROS_PACKAGE_PATH.
+        To specify no ROS_PACKAGE_PATH, use the empty string.  An
+        assignment of None will use the default path.
+        """
+        self._manifest_name = manifest_name
+        self._cache_name = cache_name
+        
+        self._ros_root = ros_root or get_ros_root()
+        self._ros_package_path = ros_package_path
+        if self._ros_package_path is None:
+            self._ros_package_path = get_ros_package_path()
+            
+        self._package_paths = _compute_package_paths(ros_root, ros_package_path)
+        
+        self._manifests = {}
+        self._depends_cache = {}
+        self._rosdeps_cache = {}
+        self._location_cache = None
+
+    def get_ros_root(self):
+        return self._ros_root
+    ros_root = property(get_ros_root, doc="Get ROS_ROOT of this instance")
+
+    def get_ros_package_path(self):
+        return self._ros_package_path
+    ros_package_path = property(get_ros_package_path, doc="Get ROS_PACKAGE_PATH of this instance")
+
+    def get_manifest(self, name):
+        """
+        @raise InvalidManifest
+        """
+        if name in self._manifests:
+            return self._manifests[name]
+        else:
+            return self._load_manifest(name)
+            
+    def _update_location_cache(self):
+        if self._location_cache is not None:
+            return
+        # initialize cache
+        cache = self._location_cache = {}
+        # - first attempt to read .rospack_cache
+        if _read_rospack_cache(self._cache_name, cache, self._ros_root, self._ros_package_path):
+            return list(cache.keys()) #py3k
+        # - else, crawl paths using our own logic, in reverse order to get correct precedence
+        for path in _compute_package_paths(self._ros_root, self._ros_package_path):
+            list_by_path(self._manifest_name, path, cache)
+    
+    def list(self):
+        """
+        List resources.
+
+        @return: complete list of package names in ROS environment
+        @rtype: [str]
+        """
+        self._update_location_cache()
+        return self._location_cache.keys()
+
+    def get_path(self, name):
+        """
+        @param name: package name
+        @type  name: str
+        @return: filesystem path of package
+        @raise ResourceNotFound
+        """
+        self._update_location_cache()
+        if not name in self._location_cache:
+            raise ResourceNotFound(name)
+        else:
+            return self._location_cache[name]
+        
+    def _load_manifest(self, name):
+        """
+        @raise ResourceNotFound
+        """
+        retval = self._manifests[name] = parse_manifest_file(self.get_path(name), self_manifest_name)
+        return retval
+        
+    def get_direct_depends(self, name):
+        """
+        Get the explicit dependencies of a resource.
+        
+        @param name: resource name
+        @type  name: str
+        @return: list of names of direct dependencies
+        @rtype: str
+        @raise ResourceNotFound
+        @raise InvalidManifest
+        """
+        m = self.get_manifest(name)
+        return [d.name for d in m.depends]
+
+    def _invalidate_cache(self):
+        self._rospack_cache.clear()
+
+    def get_depends(self, name):
+        """
+        Get explicit and implicit dependencies of a resource.
+
+        @param name: resource name
+        @type  name: str
+        @return: list of names of dependencies.
+        @rtype: [str]
+
+        @raise InvalidManifest        
+        """
+        if name in self._depends_cache:
+            return self._depends_cache[name]
+
+        # assign key before recursive call to prevent infinite case
+        self._depends_cache[name] = s = set()
+        
+        # take the union of all dependencies
+        names = [p.name for p in self.get_manifest(name).depends]
+        for p in names:
+            s.update(self.get_depends(p))
+        # add in our own deps
+        s.update(names)
+        # cache the return value as a list
+        s = list(s)
+        self._depends_cache[name] = s
+        return s
+    
+class RosStack(ManifestManager):
+    
+    def __init__(self, ros_root=None, ros_package_path=None):
+        """
+        @param ros_root: (optional) override ROS_ROOT.
+        @param ros_package_path: (optional) override ROS_PACKAGE_PATH.
+        To specify no ROS_PACKAGE_PATH, use the empty string.  An
+        assignment of None will use the default path.
+        """
+        super(RosStack, self).__init__(STACK_FILE, 'rosstack_cache',
+                                       ros_root, ros_package_path)
+            
+    def packages_of(self, stack):
+        """
+        @return: name of packages that are part of stack
+        @rtype: [str]
+        @raise ResourceNotFound: if stack cannot be located
+        """
+        return list_by_path(MANIFEST_FILE, self.get_path(stack), {})
+
+    def get_stack_version(self, stack):
+        """
+        @param env: override environment variables
+        @type  env: {str: str}
+
+        @return: version number of stack, or None if stack is unversioned.
+        @rtype: str
+        """
+        return get_stack_version_by_dir(self.get_path(stack))
+
+# #2022
+def expand_to_packages(names, rospack, rosstack):
+    """
+    Expand names into a list of packages. Names can either be of packages or stacks.
+
+    @param names: names of stacks or packages
+    @type  names: [str]
+    @return: ([packages], [not_found]). expand_packages() returns two
+    lists. The first is of packages names. The second is a list of
+    names for which no matching stack or package was found. Lists may have duplicates.
+    @rtype: ([str], [str])
+    """
+    if type(names) not in (tuple, list):
+        raise ValueError("names must be a list of strings")
+
+    # do full package list first. This forces an entire tree
+    # crawl. This is less efficient for a small list of names, but
+    # much more efficient for many names.
+    package_list = rospack.list()
+    valid = []
+    invalid = []
+    for n in names:
+        if not n in package_list:
+            try:
+                valid.extend(rosstack.packages_of(n))
+            except ResourceNotFound as e:
+                invalid.append(n)
+        else:
+            valid.append(n)
+    return valid, invalid
+
+def get_stack_version_by_dir(stack_dir):
+    """
+    Get stack version where stack_dir points to root directory of stack.
+    
+    @param env: override environment variables
+    @type  env: {str: str}
+
+    @return: version number of stack, or None if stack is unversioned.
+    @rtype: str
+    """
+    # REP 109: check for <version> tag first, then CMakeLists.txt
+    manifest_filename = os.path.join(stack_dir, STACK_FILE)
+    if os.path.isfile(manifest_filename):
+        m = roslib.stack_manifest.parse_file(manifest_filename)
+        if m.version:
+            return m.version
+    
+    cmake_filename = os.path.join(stack_dir, 'CMakeLists.txt')
+    if os.path.isfile(cmake_filename):
+        with open(cmake_filename) as f:
+            return _get_cmake_version(f.read())
+    else:
+        return None
+
+def _get_cmake_version(text):
+    for l in text.split('\n'):
+        if l.strip().startswith('rosbuild_make_distribution'):
+            x_re = re.compile(r'[()]')
+            lsplit = x_re.split(l.strip())
+            if len(lsplit) < 2:
+                raise ReleaseException("couldn't find version number in CMakeLists.txt:\n\n%s"%l)
+            return lsplit[1]

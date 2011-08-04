@@ -37,13 +37,6 @@ import os
 
 from .common import RosPkgException
 
-class InvalidEnvironment(RosPkgException):
-    """
-    Exception that indicates that a ROS installation environment is
-    invalid (e.g. bad environment variables, missing executables).
-    """
-    pass
-
 ################################################################################
 # Enviroment
 
@@ -53,7 +46,6 @@ ROS_ROOT = 'ROS_ROOT'
 
 # Global, usually set in setup
 ROS_ROOT         = "ROS_ROOT"
-ROS_MASTER_URI   = "ROS_MASTER_URI"
 ROS_PACKAGE_PATH = "ROS_PACKAGE_PATH"
 ROS_HOME         = "ROS_HOME"
 
