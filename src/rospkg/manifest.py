@@ -39,12 +39,10 @@ Library for processing 'manifest' files, i.e. manifest.xml and
 stack.xml.  
 """
 
-import sys
 import os
+import sys
 import xml.dom
 import xml.dom.minidom as dom
-
-from .common import RosPkgException
 
 # stack.xml and manifest.xml have the same internal tags right now
 REQUIRED = ['author', 'license']
@@ -54,18 +52,19 @@ OPTIONAL = ['logo', 'url', 'brief', 'description', 'status',
             'versioncontrol', 'platform', 'version', 'rosbuild2']
 VALID = REQUIRED + OPTIONAL
 
-class InvalidManifest(RosPkgException): pass
+class InvalidManifest(Exception):
+    pass
 
-def get_nodes_by_name(n, name):
+def _get_nodes_by_name(n, name):
     return [t for t in n.childNodes if t.nodeType == t.ELEMENT_NODE and t.tagName == name]
     
-def check_optional(name, allowXHTML=False):
+def _check_optional(name, allowXHTML=False):
     """
     Validator for optional elements.
     @raise InvalidManifest: if validation fails
     """
     def check(n, filename):
-        n = get_nodes_by_name(n, name)
+        n = _get_nodes_by_name(n, name)
         if len(n) > 1:
             raise InvalidManifest("Invalid manifest file: must have a single '%s' element"%name)
         if n:
@@ -74,13 +73,13 @@ def check_optional(name, allowXHTML=False):
             return _get_text(n[0].childNodes).strip()
     return check
 
-def check_required(name, allowXHTML=False):
+def _check_required(name, allowXHTML=False):
     """
     Validator for required elements.
     @raise InvalidManifest: if validation fails
     """
     def check(n, filename):
-        n = get_nodes_by_name(n, name)
+        n = _get_nodes_by_name(n, name)
         if not n:
             #print >> sys.stderr, "Invalid manifest file[%s]: missing required '%s' element"%(filename, name)
             return ''
@@ -91,24 +90,24 @@ def check_required(name, allowXHTML=False):
         return _get_text(n[0].childNodes).strip()
     return check
 
-def check_platform(n, filename):
+def _check_platform(n, filename):
     """
     Validator for manifest platform.
     @raise InvalidManifest: if validation fails
     """
-    platforms = get_nodes_by_name(n, 'platform')
+    platforms = _get_nodes_by_name(n, 'platform')
     try:
         vals = [(p.attributes['os'].value, p.attributes['version'].value, p.getAttribute('notes')) for p in platforms]
     except KeyError as e:
         raise InvalidManifest("<platform> tag is missing required '%s' attribute"%str(e))
     return [Platform(*v) for v in vals]
 
-def check_depends(type_, n, filename):
+def _check_depends(type_, n, filename):
     """
     Validator for manifest depends.
     @raise InvalidManifest: if validation fails
     """
-    nodes = get_nodes_by_name(n, name)
+    nodes = _get_nodes_by_name(n, name)
     # TDS 20110419:  this is a hack.
     # rosbuild2 has a <depend thirdparty="depname"/> tag,
     # which is confusing this subroutine with 
@@ -122,12 +121,12 @@ def check_depends(type_, n, filename):
 
     return [Depend(name, type_) for name in depend_names]
 
-def check_rosdeps(name):
+def _check_rosdeps(name):
     """
     Validator for stack rosdeps.    
     @raise InvalidManifest: if validation fails
     """
-    nodes = get_nodes_by_name(n, 'rosdep')
+    nodes = _get_nodes_by_name(n, 'rosdep')
     rosdeps = [e.attributes for e in nodes]
     names = [d['name'].value for d in rosdeps]
     return [RosDep(n) for n in names]
@@ -138,25 +137,25 @@ def _attrs(node):
         attrs[k] = node.attributes.get(k).value
     return attrs
     
-def check_exports(name):
+def _check_exports(name):
     ret_val = []
-    for e in get_nodes_by_name(n, 'export'):
+    for e in _get_nodes_by_name(n, 'export'):
         elements = [c for c in e.childNodes if c.nodeType == c.ELEMENT_NODE]
         ret_val.extend([Export(t.tagName, _attrs(t), _get_text(t.childNodes)) for t in elements])
     return ret_val 
 
-def check(name, type_):
+def _check(name, type_):
     """
     Generic validator for text-based tags.
     """
     if name in REQUIRED:
         if name in ALLOWXHTML:
-            return check_required(name, True)
-        return check_required(name)            
+            return _check_required(name, True)
+        return _check_required(name)            
     elif name in OPTIONAL:
         if name in ALLOWXHTML:
-            return check_optional(name, True)
-        return check_optional(name)
+            return _check_optional(name, True)
+        return _check_optional(name)
     
 class Export(object):
     """
@@ -421,49 +420,49 @@ def parse_manifest(type_, string, filename='string'):
         raise InvalidManifest("[%s] invalid XML: %s"%(filename, e))
     
     m = Manifest(type_)
-    p = get_nodes_by_name(d, type_)
+    p = _get_nodes_by_name(d, type_)
     if len(p) != 1:
         raise InvalidManifest("manifest [%s] must have a single '%s' element"%(filename, type_))
     p = p[0]
-    m.description = check('description')(p, filename)
+    m.description = _check('description')(p, filename)
     m.brief = ''
     try:
-        tag = get_nodes_by_name(p, 'description')[0]
+        tag = _get_nodes_by_name(p, 'description')[0]
         m.brief = tag.getAttribute('brief') or ''
     except:
         # means that 'description' tag is missing
         pass
     
-    m.depends = check_depends(type_, p, filename)
-    m.rosdeps = check_rosdeps(p, filename)    
-    m.platforms = check_platform(p, filename)    
-    m.exports = check_exports(p, filename)
-    m.license = check('license')(p, filename)
+    m.depends = _check_depends(type_, p, filename)
+    m.rosdeps = _check_rosdeps(p, filename)    
+    m.platforms = _check_platform(p, filename)    
+    m.exports = _check_exports(p, filename)
+    m.license = _check('license')(p, filename)
     m.license_url = ''
     try:
-        tag = get_nodes_by_name(p, 'license')[0]
+        tag = _get_nodes_by_name(p, 'license')[0]
         m.license_url = tag.getAttribute('url') or ''
     except:
         pass #manifest is missing required 'license' tag
   
     m.status='unreviewed'
     try:
-        tag = get_nodes_by_name(p, 'review')[0]
+        tag = _get_nodes_by_name(p, 'review')[0]
         m.status = tag.getAttribute('status') or ''
     except:
         pass #manifest is missing optional 'review status' tag
 
     m.notes = ''
     try:
-        tag = get_nodes_by_name(p, 'review')[0]
+        tag = _get_nodes_by_name(p, 'review')[0]
         m.notes = tag.getAttribute('notes') or ''
     except:
         pass #manifest is missing optional 'review notes' tag
 
-    m.author = check('author')(p, filename)
-    m.url = check('url')(p, filename)
-    m.version = check('version')(p, filename)
-    m.logo = check('logo')(p, filename)
+    m.author = _check('author')(p, filename)
+    m.url = _check('url')(p, filename)
+    m.version = _check('version')(p, filename)
+    m.logo = _check('logo')(p, filename)
 
     # do some validation on what we just parsed
     if type_ == 'stack':
