@@ -44,6 +44,8 @@ import sys
 import xml.dom
 import xml.dom.minidom as dom
 
+from .common import MANIFEST_FILE, STACK_FILE
+
 # stack.xml and manifest.xml have the same internal tags right now
 REQUIRED = ['author', 'license']
 ALLOWXHTML = ['description']
@@ -107,7 +109,7 @@ def _check_depends(type_, n, filename):
     Validator for manifest depends.
     @raise InvalidManifest: if validation fails
     """
-    nodes = _get_nodes_by_name(n, name)
+    nodes = _get_nodes_by_name(n, 'depend')
     # TDS 20110419:  this is a hack.
     # rosbuild2 has a <depend thirdparty="depname"/> tag,
     # which is confusing this subroutine with 
@@ -121,7 +123,7 @@ def _check_depends(type_, n, filename):
 
     return [Depend(name, type_) for name in depend_names]
 
-def _check_rosdeps(name):
+def _check_rosdeps(n, filename):
     """
     Validator for stack rosdeps.    
     @raise InvalidManifest: if validation fails
@@ -137,14 +139,14 @@ def _attrs(node):
         attrs[k] = node.attributes.get(k).value
     return attrs
     
-def _check_exports(name):
+def _check_exports(n, filename):
     ret_val = []
     for e in _get_nodes_by_name(n, 'export'):
         elements = [c for c in e.childNodes if c.nodeType == c.ELEMENT_NODE]
         ret_val.extend([Export(t.tagName, _attrs(t), _get_text(t.childNodes)) for t in elements])
     return ret_val 
 
-def _check(name, type_):
+def _check(name):
     """
     Generic validator for text-based tags.
     """
@@ -376,14 +378,14 @@ def _get_text(nodes):
     """
     return "".join([n.data for n in nodes if n.nodeType == n.TEXT_NODE])
 
-def parse_manifest_file(dirpath, filename):
+def parse_manifest_file(dirpath, manifest_name):
     """
-    Parse manifest file (package, stack).  Type will be inferred from filename.
+    Parse manifest file (package, stack).  Type will be inferred from manifest_name.
     
     @param dirpath: directory of manifest file
     @type  dirpath: str
-    @param filename: MANIFEST_FILE or STACK_FILE
-    @type  filename: str
+    @param manifest_name: MANIFEST_FILE or STACK_FILE
+    @type  manifest_name: str
     
     @return: return m, populated with parsed fields
     @rtype: L{Manifest}
@@ -391,27 +393,29 @@ def parse_manifest_file(dirpath, filename):
     @raise InvalidManifest
     @raise IOError
     """
-    filepath = os.path.join(dirpath, filename)
-    if not os.path.isfile(filepath):
-        raise IOError("Invalid/non-existent manifest file: %s"%(filepath))
+    filename = os.path.join(dirpath, manifest_name)
+    if not os.path.isfile(filename):
+        raise IOError("Invalid/non-existent manifest file: %s"%(filename))
     
-    with open(filepath, 'r') as f:
-        return parse(filename, text, f.read())
+    with open(filename, 'r') as f:
+        return parse_manifest(manifest_name, f.read(), filename)
 
-def parse_manifest(type_, string, filename='string'):
+def parse_manifest(manifest_name, string, filename='string'):
     """
     Parse manifest string contents.
 
-    @param filename: MANIFEST_FILE or STACK_FILE
-    @type  filename: str
+    @param manifest_name: MANIFEST_FILE or STACK_FILE
+    @type  manifest_name: str
     @param string: manifest.xml contents
     @type  string: str
+    @param filename: full file path for debugging
+    @type  filename: str
     @return: return parsed Manifest
     @rtype: L{Manifest}
     """
-    if filename == MANIFEST_FILE:
+    if manifest_name == MANIFEST_FILE:
         type_ = 'package'
-    elif filename == STACK_FILE:
+    elif manifest_name == STACK_FILE:
         type_ = 'stack'
         
     try:
@@ -462,7 +466,6 @@ def parse_manifest(type_, string, filename='string'):
     m.author = _check('author')(p, filename)
     m.url = _check('url')(p, filename)
     m.version = _check('version')(p, filename)
-    m.logo = _check('logo')(p, filename)
 
     # do some validation on what we just parsed
     if type_ == 'stack':

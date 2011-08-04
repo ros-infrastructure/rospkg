@@ -35,8 +35,6 @@
 
 import os
 
-from .common import RosPkgException
-
 ################################################################################
 # Enviroment
 
@@ -162,21 +160,36 @@ def get_test_results_dir(env=None):
     else:
         return os.path.join(get_ros_home(env), 'test_results')
 
-# this is a copy of the roslogging utility. it's been moved here as it is a common
-# routine for programs using accessing ROS directories
-def on_ros_path(p):
+def compute_package_paths(ros_root, ros_package_path):
+    """
+    Get the paths to search for packages in reverse precedence order (i.e. last path wins).
+
+    @param ros_root: value of ROS_ROOT parameter
+    @type  ros_root: str
+    @param ros_package_path: value of ROS_PACKAGE_PATH parameter
+    @type  ros_package_path: str
+    @return: paths to search in reverse order of precedence
+    @rtype: [str]
+    """
+    if ros_package_path:
+        return list(reversed([x for x in ros_package_path.split(os.pathsep) if x])) + [ros_root]
+    else:
+        return [ros_root]
+
+def on_ros_path(p, env=None):
     """
     Check to see if filesystem path is on paths specified in ROS
     environment (ROS_ROOT, ROS_PACKAGE_PATH).
 
-    New in ROS 1.2.
-    
     @param p: path
     @type  p: str
     @return: True if p is on the ROS path (ROS_ROOT, ROS_PACKAGE_PATH)
     """
+    if env is None:
+        env = os.environ
+        
     package = os.path.realpath(_resolve_path(p))
-    paths = [p for p in get_package_paths()]
+    paths = [p for p in compute_package_paths(get_ros_root(env), get_ros_package_path(env))]
     paths = [os.path.realpath(_resolve_path(x)) for x in paths]
     return bool([x for x in paths if package == x or package.startswith(x + os.sep)])
 

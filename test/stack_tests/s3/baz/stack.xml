@@ -1,0 +1,11 @@
+<stack>
+  <description brief="bar">
+     bar
+  </description>
+  <author>Ken Conley</author>
+  <license>BSD</license>
+  <depend stack="foo" />
+  <depend stack="bar" />
+</stack>
+
+

@@ -35,26 +35,33 @@ from __future__ import print_function
 import os
 import sys
 import time
+import subprocess
   
-def test_RosPack_constructor():
-    from rospkg import RosPack
+def test_ManifestManager_constructor():
+    from rospkg import RosPack, RosStack
 
     r = RosPack()
-    assert r.ros_root == os.environ.get('ROS_ROOT', None)
-    assert r.ros_package_path == os.environ.get('ROS_PACKAGE_PATH', None)
+    assert r._manifest_name == 'manifest.xml'
+    assert r._cache_name == 'rospack_cache'
+    r = RosStack()
+    assert r._manifest_name == 'stack.xml'
+    assert r._cache_name == 'rosstack_cache'
+    for c in [RosPack, RosStack]:
+        r = c()
+        assert r.ros_root == os.environ.get('ROS_ROOT', None)
+        assert r.ros_package_path == os.environ.get('ROS_PACKAGE_PATH', None)
 
-    import tempfile
-    tmp = tempfile.gettempdir()
+        import tempfile
+        tmp = tempfile.gettempdir()
 
-    r = RosPack(ros_root=tmp)
-    assert r.ros_root == tmp
-    assert r.ros_package_path == os.environ.get('ROS_PACKAGE_PATH', None)
-    
-    r = RosPack(ros_package_path=tmp)
-    assert r.ros_root == os.environ.get('ROS_ROOT', None)
-    assert r.ros_package_path == tmp
+        r = c(ros_root=tmp)
+        assert r.ros_root == tmp
+        assert r.ros_package_path == os.environ.get('ROS_PACKAGE_PATH', None)
 
-import subprocess
+        r = c(ros_package_path=tmp)
+        assert r.ros_root == os.environ.get('ROS_ROOT', None)
+        assert r.ros_package_path == tmp
+
 def rospackexec(args):
     rospack_bin = os.path.join(os.environ['ROS_ROOT'], 'bin', 'rospack')
     val = (subprocess.Popen([rospack_bin] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0] or '').strip()
@@ -72,23 +79,23 @@ def rospack_depends(package):
 def rospack_depends1(package):
     return unicode(rospackexec(['depends1', package])).split()
 
-def test_RosPack_list_packages():
+def test_RosPack_list():
     from rospkg import RosPack
     r = RosPack()
 
     pkgs = rospack_list()
-    retval = r.list_packages()
-    assert set(pkgs) == set(retval), "%s vs %s"%(pkg, retval)
+    retval = r.list()
+    assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
     
     # test twice for caching
-    retval = r.list_packages()
+    retval = r.list()
     assert set(pkgs) == set(retval), "%s vs %s"%(pkg, retval)
 
 def get_package_test_path():
     return os.path.abspath(os.path.join(sys.path[0], 'package_tests'))
 
 def test_RosPack_get_path():
-    from rospkg import RosPack, PackageNotFound, InvalidPackage
+    from rospkg import RosPack, ResourceNotFound
 
     path = get_package_test_path()
     foo_path = os.path.join(path, 'p1', 'foo')
@@ -105,7 +112,7 @@ def test_RosPack_get_path():
     try:
         r.get_path('fake')
         assert False
-    except PackageNotFound:
+    except ResourceNotFound:
         pass
     
     # divide tree in half to test precedence
@@ -124,7 +131,7 @@ def test_RosPack_get_path():
         assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
 
 def test_RosPackage_get_depends():
-    from rospkg import RosPack, PackageNotFound, InvalidPackage
+    from rospkg import RosPack, ResourceNotFound
     path = get_package_test_path()
     r = RosPack(ros_root=path, ros_package_path='')
 
@@ -135,15 +142,38 @@ def test_RosPackage_get_depends():
 
     # stress test: test default environment against rospack
     r = RosPack()
-    m = r.get_manifest('xmlrpcpp')
-    
     for p in rospack_list():
         retval = set(r.get_depends(p))
         rospackval = set(rospack_depends(p))
         assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
     
+def get_stack_test_path():
+    return os.path.abspath(os.path.join(sys.path[0], 'stack_tests'))
+
+def test_stack_of():
+    from rospkg import RosPack, ResourceNotFound
+    path = os.path.join(get_stack_test_path(), 's1')
+    r = RosPack(ros_root=path, ros_package_path='')
+
+    # test with actual stacks
+    assert r.stack_of('foo_pkg') == 'foo'
+    assert r.stack_of('foo_pkg_2') == 'foo'    
+    assert r.stack_of('bar_pkg') == 'bar'
+
+    try:
+        r.stack_of('fake')
+        assert False, "should have raised ResourceNotFound"
+    except ResourceNotFound:
+        pass
+    
+    path = os.path.join(get_package_test_path(), 'p1')
+    r = RosPack(ros_root=path, ros_package_path='')
+
+    # test with actual not stacked-packages
+    assert r.stack_of('foo') == None
+
 def test_RosPackage_get_direct_depends():
-    from rospkg import RosPack, PackageNotFound, InvalidPackage
+    from rospkg import RosPack, ResourceNotFound
     path = get_package_test_path()
     r = RosPack(ros_root=path, ros_package_path='')
 

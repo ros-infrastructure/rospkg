@@ -33,8 +33,10 @@
 # Revision $Id: packages.py 14291 2011-07-13 03:24:43Z kwc $
 # $Author: kwc $
 
-import os
-import sys
+MANIFEST_FILE = 'manifest.xml'
+STACK_FILE = 'stack.xml'
+ROS_STACK = 'ros'
 
-from .common import RosPkgException, STACK_FILE, MANIFEST_FILE, list_by_path
+class ResourceNotFound(Exception):
+    pass
 
