@@ -57,8 +57,12 @@ def _read_rospack_cache(cache_name, cache, ros_root, ros_package_path):
     @return: True if on-disk cache matches and was loaded, false otherwise
     @rtype: bool
     """
+    cache_path = os.path.join(get_ros_home(), cache_name)
+    if not os.path.exists(cache_path):
+        return False
+
     ros_root_validated = ros_package_path_validated = False
-    with open(os.path.join(get_ros_home(), cache_name)) as f:
+    with open(cache_path) as f:
         for l in f.readlines():
             l = l[:-1]
             if not len(l):

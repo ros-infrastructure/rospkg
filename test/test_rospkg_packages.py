@@ -79,6 +79,12 @@ def rospack_depends(package):
 def rospack_depends1(package):
     return unicode(rospackexec(['depends1', package])).split()
 
+def delete_cache():
+    from rospkg import get_ros_home
+    p = os.path.join(get_ros_home(), 'rospack_cache')
+    if os.path.exists(p):
+        os.remove(p)
+    
 def test_RosPack_list():
     from rospkg import RosPack
     r = RosPack()
@@ -89,7 +95,13 @@ def test_RosPack_list():
     
     # test twice for caching
     retval = r.list()
-    assert set(pkgs) == set(retval), "%s vs %s"%(pkg, retval)
+    assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
+
+    # make sure stress test works with rospack_cache invalidated
+    delete_cache()
+    r = RosPack()
+    retval = r.list()
+    assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
 
 def get_package_test_path():
     return os.path.abspath(os.path.join(sys.path[0], 'package_tests'))

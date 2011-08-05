@@ -3,15 +3,6 @@ rospkg documentation
 
 .. moduleauthor:: Ken Conley <kwc@willowgarage.com>
 
-Contents:
-
-.. toctree::
-   :maxdepth: 2
-
-   packages
-   stacks
-   environment
-
 The :mod:`rospkg` module provides basic utilities for querying
 information about ROS packages and stacks.  There are several basic
 APIs: environment, :class:`RosPack`/:class:`RosStack`, and
@@ -22,6 +13,13 @@ The :class:`RosPack` and :class:`RosStack` APIs are similar to the
 information about dependency, location, and other package/stack
 metadata.  The :class:`Manifest` class provides access to a specific
 package/stack's manifest information.
+
+.. toctree::
+   :maxdepth: 2
+
+   packages
+   stacks
+   environment
 
 Example::
 

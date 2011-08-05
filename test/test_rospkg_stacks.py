@@ -55,6 +55,12 @@ def rosstack_depends(package):
 def rosstack_depends1(package):
     return unicode(rosstackexec(['depends1', package])).split()
 
+def delete_cache():
+    from rospkg import get_ros_home
+    p = os.path.join(get_ros_home(), 'rosstack_cache')
+    if os.path.exists(p):
+        os.remove(p)
+    
 def test_RosStack_list():
     from rospkg import RosStack
     r = RosStack()
@@ -64,6 +70,12 @@ def test_RosStack_list():
     assert set(l) == set(retval), "%s vs %s"%(l, retval)
     
     # test twice for caching
+    retval = r.list()
+    assert set(l) == set(retval), "%s vs %s"%(l, retval)
+
+    # make sure stress test works with rospack_cache invalidated
+    delete_cache()
+    r = RosStack()
     retval = r.list()
     assert set(l) == set(retval), "%s vs %s"%(l, retval)
 
@@ -107,7 +119,16 @@ def test_RosStack_get_path():
 
     # stresstest against rospack
     r = RosStack()
-    for p in rosstack_list():
+    listval = rosstack_list()
+    for p in listval:
+        retval = r.get_path(p)
+        rospackval = rosstack_find(p)
+        assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+
+    # stresstest with cache invalidated
+    delete_cache()
+    r = RosStack() 
+    for p in listval:
         retval = r.get_path(p)
         rospackval = rosstack_find(p)
         assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
@@ -124,7 +145,7 @@ def test_RosStack_get_depends():
     assert r.get_depends('bar') == ['foo']
     assert r.get_depends('foo') == []
 
-    # stress test: test default environment against rospack
+    # stress test: test default environment against rosstack
     r = RosStack()
     
     for p in rosstack_list():
