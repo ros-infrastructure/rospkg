@@ -38,10 +38,6 @@ import os
 ################################################################################
 # Enviroment
 
-# aliases
-ROS_PACKAGE_PATH = 'ROS_PACKAGE_PATH'
-ROS_ROOT = 'ROS_ROOT'
-
 # Global, usually set in setup
 ROS_ROOT         = "ROS_ROOT"
 ROS_PACKAGE_PATH = "ROS_PACKAGE_PATH"
