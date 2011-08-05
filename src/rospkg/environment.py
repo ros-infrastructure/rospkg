@@ -30,8 +30,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# Revision $Id: packages.py 14291 2011-07-13 03:24:43Z kwc $
-# $Author: kwc $
+# Revision $Id$
+# $Author$
 
 import os
 

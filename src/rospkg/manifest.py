@@ -31,8 +31,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 #
-# Revision $Id: manifestlib.py 14522 2011-08-02 23:02:48Z kwc $
-# $Author: kwc $
+# Revision $Id$
+# $Author$
 
 """
 Library for processing 'manifest' files, i.e. manifest.xml and
@@ -47,9 +47,9 @@ import xml.dom.minidom as dom
 from .common import MANIFEST_FILE, STACK_FILE
 
 # stack.xml and manifest.xml have the same internal tags right now
-REQUIRED = ['author', 'license']
+REQUIRED = ['license']
 ALLOWXHTML = ['description']
-OPTIONAL = ['logo', 'url', 'brief', 'description', 'status',
+OPTIONAL = ['author', 'logo', 'url', 'brief', 'description', 'status',
             'notes', 'depend', 'rosdep', 'export', 'review',
             'versioncontrol', 'platform', 'version', 'rosbuild2']
 VALID = REQUIRED + OPTIONAL
@@ -185,40 +185,29 @@ class Export(object):
         """
         return self.attrs.get(attr, None)
 
-    def xml(self):
-        """
-        @return: export instance represented as manifest XML
-        @rtype: str
-        """        
-        attrs = ' '.join([' %s="%s"'%(k,v) for k,v in self.attrs.iteritems()])
-        if self.str:
-            return '<%s%s>%s</%s>'%(self.tag, attrs, self.str, self.tag)
-        else:
-            return '<%s%s />'%(self.tag, attrs)
-        
 class Platform(object):
     """
     Manifest 'platform' tag
     """
     __slots__ = ['os', 'version', 'notes']
 
-    def __init__(self, os, version, notes=None):
+    def __init__(self, os_, version, notes=None):
         """
         Create new depend instance.
-        @param os: OS name. must be non-empty
-        @type  os: str
+        @param os_: OS name. must be non-empty
+        @type  os_: str
         @param version: OS version. must be non-empty
         @type  version: str
         @param notes: (optional) notes about platform support
         @type  notes: str
         """
-        if not os or not isinstance(os, basestring):
+        if not os_:
             raise ValueError("bad 'os' attribute")
-        if not version or not isinstance(version, basestring):
+        if not version:
             raise ValueError("bad 'version' attribute")
-        if notes and not isinstance(notes, basestring):
+        if notes:
             raise ValueError("bad 'notes' attribute")            
-        self.os = os
+        self.os = os_
         self.version = version
         self.notes = notes
         
@@ -235,16 +224,6 @@ class Platform(object):
         if not isinstance(obj, Platform):
             return False
         return self.os == obj.os and self.version == obj.version and self.notes == obj.notes 
-
-    def xml(self):
-        """
-        @return: instance represented as manifest XML
-        @rtype: str
-        """
-        if self.notes is not None:
-            return '<platform os="%s" version="%s" notes="%s"/>'%(self.os, self.version, self.notes)
-        else:
-            return '<platform os="%s" version="%s"/>'%(self.os, self.version)
 
 class Depend(object):
     """
@@ -274,13 +253,6 @@ class Depend(object):
             return False
         return self.name == obj.name and self.type == obj.type
 
-    def xml(self):
-        """
-        @return: depend instance represented as manifest XML
-        @rtype: str
-        """
-        return '<depend %s="%s" />'%(self.type, self.name)
-        
 class RosDep(object):
     """
     Manifest 'rosdep' tag    
@@ -293,15 +265,9 @@ class RosDep(object):
         @param name: dependency name. Must be non-empty.
         @type  name: str
         """
-        if not name or not isinstance(name, basestring):
+        if not name:
             raise ValueError("bad 'name' attribute")
         self.name = name
-    def xml(self):
-        """
-        @return: rosdep instance represented as manifest XML
-        @rtype: str
-        """        
-        return '<rosdep name="%s" />'%self.name
 
 class Manifest(object):
     """
@@ -312,8 +278,7 @@ class Manifest(object):
                  'depends', 'rosdeps','platforms',\
                  'exports', 'version',\
                  'status', 'notes',\
-                 'unknown_tags',\
-                 '_type']
+                 'unknown_tags', '_type']
     def __init__(self, _type='package'):
         self.description = self.brief = self.author = \
                            self.license = self.license_url = \
@@ -328,49 +293,12 @@ class Manifest(object):
         # store unrecognized tags during parsing
         self.unknown_tags = []
         
-    def __str__(self):
-        return self.xml()
-
     def get_export(self, tag, attr):
         """
         @return: exports that match the specified tag and attribute, e.g. 'python', 'path'
         @rtype: [L{Export}]
         """
         return [e.get(attr) for e in self.exports if e.tag == tag if e.get(attr) is not None]
-
-    def xml(self):
-        """
-        @return: Manifest instance as ROS XML manifest
-        @rtype: str
-        """
-        if not self.brief:
-            desc = "  <description>%s</description>"%self.description
-        else:
-            desc = '  <description brief="%s">%s</description>'%(self.brief, self.description) 
-        author  = "  <author>%s</author>"%self.author
-        if self.license_url:
-            license = '  <license url="%s">%s</license>'%(self.license_url, self.license)
-        else:
-            license = "  <license>%s</license>"%self.license
-        url = logo = exports = version = ""
-        if self.url:
-            url     = "  <url>%s</url>"%self.url
-        if self.version:
-            version = "  <version>%s</version>"%self.version
-        if self.logo:
-            logo    = "  <logo>%s</logo>"%self.logo
-        depends = '\n'.join(["  %s"%d.xml() for d in self.depends])
-        rosdeps = '\n'.join(["  %s"%rd.xml() for rd in self.rosdeps])
-        platforms = '\n'.join(["  %s"%p.xml() for p in self.platforms])
-        if self.exports:
-            exports = '  <export>\n' + '\n'.join(["  %s"%e.xml() for e in self.exports]) + '  </export>'
-        if self.status or self.notes:
-            review = '  <review status="%s" notes="%s" />'%(self.status, self.notes)
-
-        fields = filter(lambda x: x,
-                        [desc, author, license, review, url, logo, depends,
-                         rosdeps, platforms, exports, version])
-        return "<%s>\n"%self._type + "\n".join(fields) + "\n</%s>"%self._type
 
 def _get_text(nodes):
     """
