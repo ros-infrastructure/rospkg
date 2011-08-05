@@ -9,6 +9,7 @@ Contents:
    :maxdepth: 2
 
    packages
+   stacks
    environment
 
 The :mod:`rospkg` module provides basic utilities for querying
@@ -31,6 +32,15 @@ Example::
     r = rospkg.RosPack()
     m = r.get_manifest('roscpp')
 
+Common API
+==========
+
+.. exception:: ResourceNotFound
+
+   Requested resource (e.g. package/stack) could not be found.
+
+Using rospkg
+============
 
 In order to support a bootstrap role, the :mod:`rospkg` module is not
 part of a ROS package itself.  It should not be declared as a ROS
