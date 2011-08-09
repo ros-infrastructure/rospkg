@@ -80,7 +80,7 @@ def test_RosStack_list():
     assert set(l) == set(retval), "%s vs %s"%(l, retval)
 
 def get_stack_test_path():
-    return os.path.abspath(os.path.join(sys.path[0], 'stack_tests'))
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), 'stack_tests'))
 
 def test_RosStack_get_path():
     from rospkg import RosStack, ResourceNotFound

@@ -104,7 +104,7 @@ def test_RosPack_list():
     assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
 
 def get_package_test_path():
-    return os.path.abspath(os.path.join(sys.path[0], 'package_tests'))
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), 'package_tests'))
 
 def test_RosPack_get_path():
     from rospkg import RosPack, ResourceNotFound

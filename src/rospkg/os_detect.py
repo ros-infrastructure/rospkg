@@ -46,23 +46,26 @@ def _read_stdout(cmd):
     except:
         return None
     
+# for test mocking
+_lsb_release = 'lsb_release'
+
 def lsb_get_os():
     """
     Linux: wrapper around lsb_release to get the current OS
     """
-    return _read_stdout(['lsb_release', '-si'])
+    return _read_stdout([_lsb_release, '-si'])
     
 def lsb_get_codename():
     """
     Linux: wrapper around lsb_release to get the current OS codename
     """
-    return _read_stdout(['lsb_release', '-sc'])
+    return _read_stdout([_lsb_release, '-sc'])
     
 def lsb_get_version():
     """
     Linux: wrapper around lsb_release to get the current OS version
     """
-    return _read_stdout(['lsb_release', '-sr'])
+    return _read_stdout([_lsb_release, '-sr'])
 
 def uname_get_machine():
     """
@@ -70,7 +73,7 @@ def uname_get_machine():
     """
     return _read_stdout(['uname', '-m'])
 
-def read_issue(issue_file="/etc/issue"):
+def read_issue(filename="/etc/issue"):
     """
     @return: list of strings in issue file, or None if issue file cannot be read/split
     """
@@ -78,9 +81,9 @@ def read_issue(issue_file="/etc/issue"):
         if os.path.exists(filename):
             with open(filename, 'r') as f:
                 return f.read().split()
-    except: pass
+    except:
+        pass
     return None
-    
 
 class OsNotDetected(Exception): pass
 
@@ -124,7 +127,7 @@ class OpenSuse(OsDetector):
     Detect OpenSuse OS.
     """
     def __init__(self, brand_file="/etc/SuSE-brand"):
-        self._brand_file = "/etc/SuSE-brand"
+        self._brand_file = brand_file
         
     def is_os(self):
         os_list = read_issue(self._brand_file)
@@ -152,12 +155,13 @@ class Fedora(OsDetector):
         
     def is_os(self):
         os_list = read_issue(self._release_file)
-        return os_list and os_list[0] == "Fedora" and os_list[1] == "release"
+        return os_list and os_list[0] == "Fedora" 
 
     def get_version(self):
         os_list = read_issue(self._issue_file)
-        if os_list and os_list[0] == "Fedora" and os_list[1] == "release":
-            return os_list[2]
+        idx = os_list.index('release')
+        if idx > 0:
+            return os_list[idx+1]
         else:
             return False
 
@@ -175,10 +179,10 @@ class Rhel(Fedora):
 
     def get_version(self):
         os_list = read_issue(self._issue_file)
-        if os_list and os_list[2] == "Enterprise":
+        if os_list[2] == "Enterprise":
             return os_list[6]
         else:
-            return False
+            raise OsNotDetected("cannot determine RHEL version")
 
 class OSX(OsDetector):
     """
@@ -214,8 +218,11 @@ class Arch(OsDetector):
     """
     Detect Arch Linux.
     """
+    def __init__(self, release_file='/etc/arch-release'):
+        self._release_file = release_file
+
     def is_os(self):
-        return os.path.exists("/etc/arch-release")
+        return os.path.exists(self._release_file)
 
     def get_version(self):
         return ""
@@ -228,10 +235,7 @@ class Cygwin(OsDetector):
         return os.path.exists("/usr/bin/cygwin1.dll")
     
     def get_version(self):
-        cmd = ['uname','-r'];
-        pop = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        (std_out, std_err) = pop.communicate()
-        return std_out.strip()
+        return _read_stdout(['uname','-r'])
 
 class Gentoo(OsDetector):
     """

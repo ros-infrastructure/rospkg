@@ -1,6 +1,8 @@
 ROS package access
 ==================
 
+.. currentmodule:: rospkg
+
 The :class:`RosPack` class provides APIs similar to the ``rospack``
 command-line tool distributed with ROS.  Like ``rospack``, its
 provides information about package and stack dependency information,
@@ -17,7 +19,7 @@ other optimizations for repeated querying.
    Query information about ROS packages on the local filesystem. This
    includes information about dependencies, retrieving stack
    :class:`Manifest` instances, and determining the parent stack of a
-   package.  See parent class :class:`ManifestManager` for base API.
+   package.  
 
    ``RosPack`` can be initialized with the default environment, or
    its environment configuration can be overridden with alternate
@@ -100,6 +102,7 @@ other optimizations for repeated querying.
       :returns: list of rosdep names.
         
    .. method:: stack_of(package) -> str
-        :param package: package name, ``str``
-        :returns: name of stack that package is in, or None if package is not part of a stack
-        :raises: :exc:`ResourceNotFound`: if package cannot be located
+   
+      :param package: package name, ``str``
+      :returns: name of stack that *package* is in, or ``None`` if *package* is not part of a stack
+      :raises: :exc:`ResourceNotFound`: if *package* cannot be located

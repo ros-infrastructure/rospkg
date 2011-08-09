@@ -1,6 +1,7 @@
 rospkg documentation
 ====================
 
+.. module:: rospkg
 .. moduleauthor:: Ken Conley <kwc@willowgarage.com>
 
 The :mod:`rospkg` module provides basic utilities for querying
@@ -44,6 +45,7 @@ In order to support a bootstrap role, the :mod:`rospkg` module is not
 part of a ROS package itself.  It should not be declared as a ROS
 dependency.  Instead, it is installed via ``pip``, ``easy_install``,
 ``apt-get`` or other standard installation mechanisms.
+
 
 Indices and tables
 ==================

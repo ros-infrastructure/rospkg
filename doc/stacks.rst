@@ -1,6 +1,8 @@
 ROS stack access
 ================
 
+.. currentmodule:: rospkg
+
 The :class:`RosStack` classes provides APIs similar to the
 ``rosstack`` command-line tool distributed with ROS.  Like
 ``rosstack``, it provides information about stack dependency
@@ -17,7 +19,7 @@ caching and other optimizations for repeated querying.
    Query information about ROS stacks on the local filesystem. This
    includes information about dependencies, retrieving stack
    :class:`Manifest` instances, and determining the contents of
-   stacks.  See parent class :class:`ManifestManager` for base API.
+   stacks.  
 
    ``RosStack`` can be initialized with the default environment, or
    its environment configuration can be overridden with alternate
