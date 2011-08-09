@@ -272,15 +272,10 @@ class FreeBSD(OsDetector):
     def get_version(self):
         try:
             if os.path.exists(self._uname_file):
-               pop = subprocess.Popen([self._uname_file, "-r"], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-               (std_out, std_err) = pop.communicate()
-               return std_out.strip()
+               return _read_stdout([self._uname_file, "-r"])
             else:
                return False
-        except:
-            sys.stderr.write("FreeBSD failed to get version\n")
-            return False
-
+        except: pass
         return False
 
 class OsDetect:
