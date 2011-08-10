@@ -160,7 +160,7 @@ def test_RosPackage_get_depends():
         assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
     
 def get_stack_test_path():
-    return os.path.abspath(os.path.join(sys.path[0], 'stack_tests'))
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), 'stack_tests'))
 
 def test_stack_of():
     from rospkg import RosPack, ResourceNotFound
