@@ -153,21 +153,22 @@ def test_RosStack_get_depends():
         rospackval = set(rosstack_depends(p))
         assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
     
-def test_RosStack_get_direct_depends():
+def test_RosStack_get_depends_explicit():
     from rospkg import RosStack, ResourceNotFound
     path = get_stack_test_path()
     s1 = os.path.join(path, 's1')
     s3 = os.path.join(path, 's3')
     r = RosStack(ros_root=s1, ros_package_path=s3)
 
-    assert set(r.get_direct_depends('baz')) == set(['bar', 'foo'])
-    assert r.get_direct_depends('bar') == ['foo']
-    assert r.get_direct_depends('foo') == []
+    implicit = False
+    assert set(r.get_depends('baz', implicit)) == set(['bar', 'foo'])
+    assert r.get_depends('bar', implicit) == ['foo']
+    assert r.get_depends('foo', implicit) == []
 
     # stress test: test default environment against rospack
     r = RosStack()
     for p in rosstack_list():
-        retval = set(r.get_direct_depends(p))
+        retval = set(r.get_depends(p, implicit))
         rospackval = set(rosstack_depends1(p))
         assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
 

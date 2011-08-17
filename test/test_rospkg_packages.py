@@ -184,19 +184,20 @@ def test_stack_of():
     # test with actual not stacked-packages
     assert r.stack_of('foo') == None
 
-def test_RosPackage_get_direct_depends():
+def test_RosPackage_get_depends_explicit():
     from rospkg import RosPack, ResourceNotFound
     path = get_package_test_path()
     r = RosPack(ros_root=path, ros_package_path='')
 
-    assert set(r.get_direct_depends('baz')) == set(['bar', 'foo'])
-    assert r.get_direct_depends('bar') == ['foo']
-    assert r.get_direct_depends('foo') == []
+    implicit=False
+    assert set(r.get_depends('baz', implicit)) == set(['bar', 'foo'])
+    assert r.get_depends('bar', implicit) == ['foo']
+    assert r.get_depends('foo', implicit) == []
 
     # stress test: test default environment against rospack
     r = RosPack()
     for p in rospack_list():
-        retval = set(r.get_direct_depends(p))
+        retval = set(r.get_depends(p, implicit))
         rospackval = set(rospack_depends1(p))
         assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
 

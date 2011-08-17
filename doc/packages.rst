@@ -34,7 +34,7 @@ other optimizations for repeated querying.
         packages = rp.list_packages()
         path = rp.get_path('rospy')
         depends = rp.get_depends('roscpp')
-        depends1 = rp.get_direct_depends('roscpp')
+        depends1 = rp.get_depends('roscpp', implicit=False)
     
    :param ros_root: override :envvar:`ROS_ROOT`.
    :param ros_package_path: override :envvar:`ROS_PACKAGE_PATH`.  To
@@ -76,24 +76,16 @@ other optimizations for repeated querying.
       :returns: filesystem path of package
       :raises: :exc:`ResourceNotFound`
         
-   .. method:: get_direct_depends(name) -> [str]
-
-      Get the explicit dependencies of a package.
-        
-      :param name: package name, ``str``
-      :returns: list of names of direct dependencies
-      :raises: :exc:`ResourceNotFound`
-      :raises: :exc:`InvalidManifest`
-
-   .. method::  get_depends(name) -> [str]
+   .. method::  get_depends(name, [implicit=True]) -> [str]
 
       Get explicit and implicit dependencies of a package.
 
       :param name: package name, ``str``
+      :param implicit: include implicit (recursive) dependencies, ``bool``
       :returns: list of names of dependencies.
       :raises: :exc:`InvalidManifest`        
 
-   .. method:: get_rosdeps(package, [implicit=False]) -> [str]
+   .. method:: get_rosdeps(package, [implicit=True]) -> [str]
 
       Collect rosdeps of specified package into a dictionary.
         

@@ -38,5 +38,20 @@ STACK_FILE = 'stack.xml'
 ROS_STACK = 'ros'
 
 class ResourceNotFound(Exception):
-    pass
+    """
+    A ROS filesystem resource was not found.
+    """
+
+    def __init__(self, msg, ros_root=None, ros_package_path=None):
+        super(ResourceNotFound, self).__init__(msg)
+        self.ros_root = ros_root
+        self.ros_package_path = ros_package_path
+
+    def __str__(self):
+        s = self.message
+        if self.ros_root:
+            s = s + '\nROS_ROOT=%s'%(self.ros_root)
+        if self.ros_package_path:
+            s = s + '\nROS_PACKAGE_PATH=%s'%(self.ros_package_path)
+        return s
 

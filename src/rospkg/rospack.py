@@ -185,6 +185,7 @@ class ManifestManager(object):
         cache = self._location_cache = {}
         # - first attempt to read .rospack_cache
         if _read_rospack_cache(self._cache_name, cache, self._ros_root, self._ros_package_path):
+            print "READ_CACHE", self._manifest_name
             return list(cache.keys()) #py3k
         # - else, crawl paths using our own logic, in reverse order to get correct precedence
         for path in compute_package_paths(self._ros_root, self._ros_package_path):
@@ -209,7 +210,7 @@ class ManifestManager(object):
         """
         self._update_location_cache()
         if not name in self._location_cache:
-            raise ResourceNotFound(name)
+            raise ResourceNotFound(name, ros_root=self._ros_root, ros_package_path=self._ros_package_path)
         else:
             return self._location_cache[name]
         
@@ -220,50 +221,44 @@ class ManifestManager(object):
         retval = self._manifests[name] = parse_manifest_file(self.get_path(name), self._manifest_name)
         return retval
         
-    def get_direct_depends(self, name):
-        """
-        Get the explicit dependencies of a resource.
-        
-        @param name: resource name
-        @type  name: str
-        @return: list of names of direct dependencies
-        @rtype: str
-        @raise ResourceNotFound
-        @raise InvalidManifest
-        """
-        m = self.get_manifest(name)
-        return [d.name for d in m.depends]
-
     def _invalidate_cache(self):
         self._rospack_cache.clear()
 
-    def get_depends(self, name):
+    def get_depends(self, name, implicit=True):
         """
-        Get explicit and implicit dependencies of a resource.
+        Get dependencies of a resource.  If implicit is True, this
+        includes implicit (recursive) dependencies.
 
         @param name: resource name
         @type  name: str
+        @param implicit: include implicit (recursive) dependencies
+        @type  implicit: bool
+
         @return: list of names of dependencies.
         @rtype: [str]
 
         @raise InvalidManifest        
         """
-        if name in self._depends_cache:
-            return self._depends_cache[name]
+        if not implicit:
+            m = self.get_manifest(name)
+            return [d.name for d in m.depends]
+        else:
+            if name in self._depends_cache:
+                return self._depends_cache[name]
 
-        # assign key before recursive call to prevent infinite case
-        self._depends_cache[name] = s = set()
-        
-        # take the union of all dependencies
-        names = [p.name for p in self.get_manifest(name).depends]
-        for p in names:
-            s.update(self.get_depends(p))
-        # add in our own deps
-        s.update(names)
-        # cache the return value as a list
-        s = list(s)
-        self._depends_cache[name] = s
-        return s
+            # assign key before recursive call to prevent infinite case
+            self._depends_cache[name] = s = set()
+
+            # take the union of all dependencies
+            names = [p.name for p in self.get_manifest(name).depends]
+            for p in names:
+                s.update(self.get_depends(p, implicit))
+            # add in our own deps
+            s.update(names)
+            # cache the return value as a list
+            s = list(s)
+            self._depends_cache[name] = s
+            return s
     
 class RosPack(ManifestManager):
     """
@@ -279,7 +274,7 @@ class RosPack(ManifestManager):
       packages = rp.list_packages()
       path = rp.get_path('rospy')
       depends = rp.get_depends('roscpp')
-      depends1 = rp.get_depends1('roscpp')
+      direct_depends = rp.get_depends('roscpp', implicit=False)
     """
     
     def __init__(self, ros_root=None, ros_package_path=None):
@@ -294,7 +289,7 @@ class RosPack(ManifestManager):
                                       ros_root, ros_package_path)
         self._rosdeps_cache = {}
 
-    def get_rosdeps(self, package, implicit=False):
+    def get_rosdeps(self, package, implicit=True):
         """
         Collect rosdeps of specified package into a dictionary.
         
@@ -329,7 +324,7 @@ class RosPack(ManifestManager):
         self._rosdeps_cache[package] = s = set()
 
         # take the union of all dependencies
-        packages = self.get_depends(package)
+        packages = self.get_depends(package, implicit=True)
         for p in pkgs:
             s.update(self._rosdeps(p))
         # add in our own deps
