@@ -37,7 +37,6 @@ import os
 import sys
 import subprocess
 
-####### Linux Helper Functions #####
 def _read_stdout(cmd):
     try:
         pop = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
@@ -344,16 +343,28 @@ class OsDetect:
             not self.detect_os()
         return self._os_version
 
-OsDetect.register_default("debian", LsbDetect("Debian", lsb_get_codename))
-OsDetect.register_default("ubuntu", LsbDetect("Ubuntu", lsb_get_codename))
-OsDetect.register_default("mint", LsbDetect("Mint", lsb_get_version))
-OsDetect.register_default("mandriva", LsbDetect("MandrivaLinux", mandriva_version))
-OsDetect.register_default("osx", OSX())
-OsDetect.register_default("arch", Arch())
-OsDetect.register_default("opensuse", OpenSuse())
-OsDetect.register_default("fedora", Fedora())
-OsDetect.register_default("rhel", Rhel())
-OsDetect.register_default("gentoo", Gentoo())
-OsDetect.register_default("cygwin", Cygwin())
-OsDetect.register_default("freebsd", FreeBSD())
+OS_DEBIAN='debian'
+OS_UBUNTU='ubuntu'
+OS_MINT='mint'
+OS_MANDRIVA='mandriva'
+OS_OSX='osx'
+OS_ARCH='arch'
+OS_OPENSUSE='opensuse'
+OS_RHEL='rhel'
+OS_GENTOO='gentoo'
+OS_CYGWIN='cygwin'
+OS_FREEBSD='freebsd'
+
+OsDetect.register_default(OS_DEBIAN, LsbDetect("Debian", lsb_get_codename))
+OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu", lsb_get_codename))
+OsDetect.register_default(OS_MINT, LsbDetect("Mint", lsb_get_version))
+OsDetect.register_default(OS_MANDRIVA, LsbDetect("MandrivaLinux", mandriva_version))
+OsDetect.register_default(OSX, OSX())
+OsDetect.register_default(OS_ARCH, Arch())
+OsDetect.register_default(OS_OPENSUSE, OpenSuse())
+OsDetect.register_default(OS_FEDORA, Fedora())
+OsDetect.register_default(OS_RHEL, Rhel())
+OsDetect.register_default(OS_GENTOO, Gentoo())
+OsDetect.register_default(OS_CYGWIN, Cygwin())
+OsDetect.register_default(OS_FREEBSD, FreeBSD())
     
