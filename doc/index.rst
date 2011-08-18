@@ -21,6 +21,7 @@ package/stack's manifest information.
    packages
    stacks
    environment
+   os_detect
 
 Example::
 
