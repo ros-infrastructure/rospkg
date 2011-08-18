@@ -1,6 +1,12 @@
 Developer's Guide
 =================
 
+Bug reports and feature requests
+--------------------------------
+
+- `Submit a bug report <https://code.ros.org/trac/ros/newticket?component=rospkg&type=defect&&rospkg>`_
+- `Submit a feature request <https://code.ros.org/trac/ros/newticket?component=rospkg&type=enhancement&rospkg>`_
+
 Developing new OsDetectors
 --------------------------
 
@@ -20,15 +26,15 @@ If you submit a new detector, the documentation in
 Testing
 -------
 
-rospkg uses `Python nose
-<http://readthedocs.org/docs/nose/en/latest/>` for testing, which is a
-fairly simple and straightfoward test framework.  You just have to
-write a function start with the name ``test`` and use normal
-``assert`` statements for your tests.  
+rospkg uses `Python nose <http://readthedocs.org/docs/nose/en/latest/>`_ 
+for testing, which is a fairly simple and straightfoward test
+framework.  You just have to write a function start with the name
+``test`` and use normal ``assert`` statements for your tests.
 
 You can run the tests, including coverage, as follows:
 
 ::
+
     cd rospkg
     nosetests test/*.py --with-coverage --cover-package=rospkg
 

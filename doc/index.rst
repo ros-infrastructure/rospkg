@@ -63,6 +63,15 @@ module.  After it has been installed, you can ``import`` it normally
 and do not need to declare as a ROS package dependency.
 
 
+Advanced: rospkg developers/contributors
+========================================
+
+.. toctree::
+   :maxdepth: 2
+
+   developers_guide
+
+
 Indices and tables
 ==================
 
