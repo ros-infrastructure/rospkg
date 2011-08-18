@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='rospkg',
-      version= '0.0.1',
+      version= '0.1.0',
       packages=['rospkg'],
       package_dir = {'':'src'},
       scripts = [],
@@ -13,7 +13,7 @@ setup(name='rospkg',
       classifiers = [
         "Programming Language :: Python", 
         "License :: OSI Approved :: BSD License" ],
-      description = "The installer for ROS", 
+      description = "ROS package library", 
       long_description = """\
 Library for retrieving information about ROS packages and stacks.
 """,
