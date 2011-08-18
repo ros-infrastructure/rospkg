@@ -1,6 +1,14 @@
 Developer's Guide
 =================
 
+REP 114: rospkg standalone library
+----------------------------------
+
+The rospkg library is being developed using the ROS REP process.  It
+was introduced in `REP 114: rospkg standalone library
+<http://www.ros.org/reps/rep-0114.html>`_.  Please read REP 114 to
+better understand the motivation and goals of the rospkg library.
+
 Bug reports and feature requests
 --------------------------------
 
