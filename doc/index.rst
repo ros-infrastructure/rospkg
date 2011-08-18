@@ -6,8 +6,8 @@ rospkg documentation
 
 The :mod:`rospkg` module provides basic utilities for querying
 information about ROS packages and stacks.  There are several basic
-APIs: environment, :class:`RosPack`/:class:`RosStack`, and
-:class:`Manifest`.  The environment APIs enable access to environment
+APIs: :doc:`ROS environment <environment>`, :class:`RosPack`/:class:`RosStack`, and
+:doc:`OS detection <os_detect>`.  The environment APIs enable access to environment
 settings that defines the ROS package/stack filesystem configuration.
 The :class:`RosPack` and :class:`RosStack` APIs are similar to the
 ``rospack`` and ``rosstack`` command-line tools and provide
@@ -30,7 +30,9 @@ Example::
     ros_root = rospkg.get_ros_root()
     
     r = rospkg.RosPack()
-    m = r.get_manifest('roscpp')
+    depends = r.get_depends('roscpp')
+    path = r.get_path('rospy')
+    
 
 Common API
 ==========
@@ -39,13 +41,26 @@ Common API
 
    Requested resource (e.g. package/stack) could not be found.
 
+Installation
+============
+
+rospkg is available on pypi and can be installed via ``pip``
+::
+
+    pip install rospkg
+
+or ``easy_install``:
+
+::
+
+    easy_install rospkg
+
 Using rospkg
 ============
 
-In order to support a bootstrap role, the :mod:`rospkg` module is not
-part of a ROS package itself.  It should not be declared as a ROS
-dependency.  Instead, it is installed via ``pip``, ``easy_install``,
-``apt-get`` or other standard installation mechanisms.
+The :mod:`rospkg` module is meant to be used as a normal Python
+module.  After it has been installed, you can ``import`` it normally
+and do not need to declare as a ROS package dependency.
 
 
 Indices and tables

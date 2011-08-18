@@ -91,7 +91,7 @@ Currently supported OSes:
 
 
 OS name definitions
-===================
+-------------------
 
 .. data:: OS_ARCH
 
@@ -139,7 +139,7 @@ OS name definitions
 
 
 Linux helper methods
-====================
+--------------------
 
 .. method:: lsb_get_os() -> str
 
