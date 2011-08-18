@@ -34,10 +34,21 @@ If you submit a new detector, the documentation in
 Testing
 -------
 
+Setup
+
+::
+
+    pip install nose
+    pip install mock
+
+
 rospkg uses `Python nose <http://readthedocs.org/docs/nose/en/latest/>`_ 
 for testing, which is a fairly simple and straightfoward test
 framework.  You just have to write a function start with the name
 ``test`` and use normal ``assert`` statements for your tests.
+
+rospkg also uses `mock <http://www.voidspace.org.uk/python/mock/>`_ to
+create mocks for testing.
 
 You can run the tests, including coverage, as follows:
 
