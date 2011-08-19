@@ -185,7 +185,6 @@ class ManifestManager(object):
         cache = self._location_cache = {}
         # - first attempt to read .rospack_cache
         if _read_rospack_cache(self._cache_name, cache, self._ros_root, self._ros_package_path):
-            print "READ_CACHE", self._manifest_name
             return list(cache.keys()) #py3k
         # - else, crawl paths using our own logic, in reverse order to get correct precedence
         for path in compute_package_paths(self._ros_root, self._ros_package_path):
