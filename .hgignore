@@ -1,0 +1,11 @@
+syntax: glob
+*.orig
+*.swp
+*.pyc
+*.DS_Store
+*~
+*.log
+
+syntax: regexp
+(target|build|dist)/.*
+
