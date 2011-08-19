@@ -42,6 +42,7 @@ import string
 from .distro import DistroException, InvalidDistro, Distro, DistroStack, Variant
 from .rosinstall_convert import stack_to_rosinstall, variant_to_rosinstall, \
      extended_variant_to_rosinstall, distro_to_rosinstall
+from .vcs_config import BzrConfig, HgConfig, GitConfig, SvnConfig
 
 def distro_uri(distro_name):
     """
@@ -53,16 +54,3 @@ def distro_uri(distro_name):
     """
     return "https://code.ros.org/svn/release/trunk/distros/%s.rosdistro"%(distro_name)
     
-def distro_version(version_val):
-    """Parse distro version value, converting SVN revision to version value if necessary"""
-    version_val = str(version_val)
-    m = re.search('\$Revision:\s*([0-9]*)\s*\$', version_val)
-    if m is not None:
-        version_val = 'r'+m.group(1)
-
-    # Check that is a valid version string
-    valid = string.ascii_letters + string.digits + '.+~'
-    if False in (c in valid for c in version_val):
-        raise DistroException("Version string %s not valid"%version_val)
-    return version_val
-

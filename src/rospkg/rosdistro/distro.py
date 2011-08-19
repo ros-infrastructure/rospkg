@@ -57,17 +57,13 @@ def expand_rule(rule, stack_name, stack_ver, release_name, revision=None):
 class DistroStack(object):
     """Stores information about a stack release"""
 
-    def __init__(self, stack_name, rules, stack_version, release_name, release_version):
+    def __init__(self, stack_name, rules, stack_version):
         self.name = stack_name
-        self.release_name = release_name
-        self.release_version = release_version        
-
         self._rules = rules
-        
-        self.update_version(stack_version)
+        self._update_version(stack_version)
         self.repo = rules.get('repo', None)
 
-    def update_version(self, stack_version):
+    def _update_version(self, stack_version):
         rules = self._rules
         self.version = stack_version
         self.vcs_config = load_vcs_config(rules, self._expand_rule)
@@ -113,12 +109,12 @@ class Variant(object):
         # stack_names accumulates the full expanded list
         self.stack_names = list(props.get('stacks', []))
         # stack_names_explicit is only the stack names directly specified
-        self.stack_names_explicit = self.stack_names
+        self.stack_names_explicit = self.stack_names[:]
         
         # check to see if we extend another distro, in which case we prepend their props
         if 'extends' in props:
             extends = props['extends']
-            if type(extends) == str:
+            if type(extends) == type('str'):
                 extends = [extends]
             # store parents property for debian metapackages
             self.parents = extends
@@ -126,7 +122,7 @@ class Variant(object):
             for e in extends:
                 parent_variant = Variant(e, variants_props)
                 self.stack_names = parent_variant.stack_names + self.stack_names
-        self.props = props
+        self._props = props
       
 class Distro(object):
     """
@@ -143,22 +139,21 @@ class Distro(object):
         self.version = version
         self.raw_data = raw_data
 
-    @property
-    stack_names = (get_stack_names)
     def get_stack_names(self, released=False):
         if released:
             return get_released_stacks().keys()
         else:
             return self.stacks.keys()
 
-    @property
-    released_stacks = (get_released_stacks, None)
     def get_released_stacks(self):
         retval = {}
-        for s, obj in self.stacks.iteritems():
+        for s, obj in self.stacks.items(): #py3k
             if obj.version:
                 retval[s] = obj
         return retval
+
+    released_stacks = property(get_released_stacks)
+    stack_names = property(get_stack_names)
 
 def load_distro(source_uri):
     """
@@ -178,7 +173,7 @@ def load_distro(source_uri):
     try:
         stack_props = y['stacks']
         stack_names = [x for x in stack_props.keys() if not x[0] == '_']
-        version = distro_version(raw_data.get('version', '0'))
+        version = _distro_version(raw_data.get('version', '0'))
         release_name = raw_data['release']
 
         variants = {}
@@ -188,14 +183,56 @@ def load_distro(source_uri):
                 raise InvalidDistro("invalid variant spec: %s"%props)
             n = props.keys()[0]
             variant_props[n] = props[n]
+            #TODO: process variant props here, instead of in constructor
 
     except KeyError as e:
         raise InvalidDistro("distro is missing required '%s' key"%(str(e)))
 
-    stacks = load_distro_stacks(raw_data, self.stack_names, release_name=release_name, version=version)
+    stacks = _load_distro_stacks(raw_data, stack_names, release_name=release_name, version=version)
     for v, variant_props in variant_props.keys():
         variants[v] = Variant(v, variants)
 
-    distro = Distro(stacks, variants, release_name, version, raw_data)
-    return distro
-    
+    return Distro(stacks, variants, release_name, version, raw_data)
+
+def _load_distro_stacks(distro_doc, stack_names):
+    """
+    @param distro_doc: dictionary form of rosdistro file
+    @type distro_doc: dict
+    @param stack_names: names of stacks to load
+    @type  stack_names: [str]
+    @return: dictionary of stack names to DistroStack instances
+    @rtype: {str : DistroStack}
+    @raise DistroException: if distro_doc format is invalid
+    """
+
+    # load stacks and expand out uri rules
+    stacks = {}
+    try:
+        stack_props = distro_doc['stacks']
+    except KeyError:
+        raise DistroException("distro is missing required 'stacks' key")
+    for stack_name in stack_names:
+        # ignore private keys like _rules
+        if stack_name[0] == '_':
+            continue
+
+        stack_version = stack_props[stack_name].get('version', None)
+        rules = get_rules(distro_doc, stack_name)
+        stacks[stack_name] = DistroStack(stack_name, rules, stack_version)
+    return stacks
+
+def _distro_version(version_val):
+    """
+    Parse distro version value, converting SVN revision to version value if necessary
+    """
+    version_val = str(version_val)
+    m = re.search('\$Revision:\s*([0-9]*)\s*\$', version_val)
+    if m is not None:
+        version_val = 'r'+m.group(1)
+
+    # Check that is a valid version string
+    valid = string.ascii_letters + string.digits + '.+~'
+    if False in (c in valid for c in version_val):
+        raise InvalidDistro("Version string %s not valid"%version_val)
+    return version_val
+

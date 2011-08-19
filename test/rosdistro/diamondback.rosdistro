@@ -1,0 +1,397 @@
+_rules:
+  alufr-ros-pkg:
+    svn: {dev: 'https://alufr-ros-pkg.googlecode.com/svn/trunk/$STACK_NAME', distro-tag: 'https://alufr-ros-pkg.googlecode.com/svn/tags/distros/$RELEASE_NAME/stacks/$STACK_NAME',
+      release-tag: 'https://alufr-ros-pkg.googlecode.com/svn/tags/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION'}
+  arm_navigation_0_3:
+    repo: wg-ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/branches/arm_navigation_0_3',
+      distro-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  bosch-ros-pkg:
+    repo: bosch-ros-pkg
+    svn: {dev: 'https://bosch-ros-pkg.svn.sourceforge.net/svnroot/bosch-ros-pkg/trunk/stacks/$STACK_NAME',
+      distro-tag: 'https://bosch-ros-pkg.svn.sourceforge.net/svnroot/bosch-ros-pkg/tags/distros/$RELEASE_NAME/stacks/$STACK_NAME',
+      release-tag: 'https://bosch-ros-pkg.svn.sourceforge.net/svnroot/bosch-ros-pkg/tags/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION'}
+  cart_pushing:
+    repo: wg-ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/branches/cart_branch',
+      distro-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  cob:
+    git: {anon-uri: 'https://github.com/ipa320/$STACK_NAME.git', dev-branch: release,
+      distro-tag: $RELEASE_NAME, release-tag: $STACK_NAME-$STACK_VERSION, uri: 'git@github.com:ipa320/$STACK_NAME.git'}
+    repo: care-o-bot
+  kul-ros-pkg:
+    repo: kul-ros-pkg
+    svn: {anon-dev: 'http://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/trunk',
+      anon-distro-tag: 'http://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      anon-release-tag: 'http://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION',
+      dev: 'https://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/trunk',
+      distro-tag: 'https://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  linux_networking:
+    repo: ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/trunk', distro-tag: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  manipulation-0.2:
+    repo: wg-ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/branches/$STACK_NAME-0.2.0-branch',
+      distro-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  manipulation-0.3:
+    repo: wg-ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/branches/$STACK_NAME-0.3.0-branch',
+      distro-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  motion_planners_unstable_prerelease:
+    repo: wg-ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/branches/into_unstable',
+      distro-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  orocos_toolchain_ros:
+    git: {anon-uri: 'http://git.mech.kuleuven.be/robotics/orocos_toolchain_ros.git',
+      dev-branch: unstable_next, distro-tag: $RELEASE_NAME, release-tag: $STACK_NAME-$STACK_VERSION,
+      uri: 'git@git.mech.kuleuven.be:robotics/orocos_toolchain_ros.git'}
+    repo: kul-ros-pkg
+  ros-1.2:
+    repo: ros
+    svn: {dev: 'https://code.ros.org/svn/ros/stacks/$STACK_NAME/branches/$STACK_NAME-1.2',
+      distro-tag: 'https://code.ros.org/svn/ros/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/ros/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  ros-pkg-1.2:
+    repo: ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/branches/$STACK_NAME-1.2',
+      distro-tag: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  ros-pkg-1.4:
+    repo: ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/branches/$STACK_NAME-1.4',
+      distro-tag: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  ros-pkg-trunk:
+    repo: ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/trunk', distro-tag: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  ros-pkg-unstable:
+    repo: ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/branches/unstable-branch',
+      distro-tag: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  ros-trunk:
+    repo: ros
+    svn: {dev: 'https://code.ros.org/svn/ros/stacks/$STACK_NAME/trunk', distro-tag: 'https://code.ros.org/svn/ros/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/ros/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  ros_lib_fix:
+    repo: wg-ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/branches/ros_lib_fix',
+      distro-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  ua-ros-pkg:
+    repo: ua-ros-pkg
+    svn: {dev: 'https://ua-ros-pkg.googlecode.com/svn/stacks/$STACK_NAME/trunk', distro-tag: 'https://ua-ros-pkg.googlecode.com/svn/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://ua-ros-pkg.googlecode.com/svn/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  utexas-art-ros-pkg:
+    repo: utexax-ros-pkg
+    svn: {dev: 'https://utexas-art-ros-pkg.googlecode.com/svn/trunk/stacks/$STACK_NAME',
+      distro-tag: 'https://utexas-art-ros-pkg.googlecode.com/svn/tags/distros/$RELEASE_NAME/stacks/$STACK_NAME',
+      release-tag: 'https://utexas-art-ros-pkg.googlecode.com/svn/tags/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION'}
+  wg-ros-pkg-1.2:
+    repo: wg-ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/branches/$STACK_NAME-1.2',
+      distro-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  wg-ros-pkg-1.3:
+    repo: wg-ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/branches/$STACK_NAME-1.3',
+      distro-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+  wg-ros-pkg-trunk:
+    repo: wg-ros-pkg
+    svn: {dev: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/trunk', distro-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+      release-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+release: diamondback
+stacks:
+  _rules: ros-pkg-trunk
+  arm_navigation: {_rules: wg-ros-pkg-trunk, version: 0.3.0}
+  art_vehicle: {_rules: utexas-art-ros-pkg, version: 0.3.2}
+  articulation: {_rules: alufr-ros-pkg, version: 0.1.1}
+  bosch_drivers: {_rules: bosch-ros-pkg, version: 0.1.1}
+  bosch_skin: {_rules: bosch-ros-pkg, version: null}
+  camera_drivers: {version: 1.3.2}
+  cart_pushing: {_rules: wg-ros-pkg-trunk, version: 0.1.1}
+  client_rosjava:
+    _rules:
+      git: {anon-uri: 'git://code.in.tum.de/git/client-rosjava.git', dev-branch: master,
+        distro-tag: $RELEASE_NAME_released, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'indefero@code.in.tum.de:client-rosjava'}
+      repo: ros-pkg
+    version: 0.1.2
+  cob_apps: {_rules: cob, version: 0.1.0}
+  cob_common: {_rules: cob, version: 0.1.0}
+  cob_driver: {_rules: cob, version: null}
+  cob_extern: {_rules: cob, version: 0.1.0}
+  cob_simulation: {_rules: cob, version: null}
+  collision_environment: {_rules: motion_planners_unstable_prerelease, version: 0.3.1}
+  common: {version: 1.3.3}
+  common_msgs: {version: 1.3.5}
+  common_tutorials: {_rules: ros-pkg-trunk, version: 0.1.2}
+  continuous_ops:
+    _rules:
+      hg: {dev-branch: default, distro-tag: $RELEASE_NAME, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'https://continuous-ops.hg-ros-pkg.googlecode.com/hg/'}
+      repo: wg-ros-pkg
+    version: 0.1.0
+  control:
+    _rules:
+      hg: {anon-uri: 'https://bitbucket.org/sglaser/control', dev-branch: default,
+        distro-tag: $RELEASE_NAME, release-tag: $STACK_NAME-$STACK_VERSION, uri: 'ssh://hg@bitbucket.org/sglaser/control'}
+      repo: ros-pkg
+      version: null
+    version: 0.1.0
+  cram_pl:
+    _rules:
+      git: {anon-uri: 'git://code.in.tum.de/git/cram-pl', dev-branch: master, distro-tag: $RELEASE_NAME_released,
+        release-tag: $STACK_NAME-$STACK_VERSION, uri: 'indefero@code.in.tum.de:cram-pl'}
+      repo: tum-ros-pkg
+    version: 0.1.1
+  diagnostics: {version: 1.2.5}
+  documentation: {_rules: ros-trunk, version: 1.3.0}
+  driver_common: {version: 1.2.3}
+  erratic_robot: {_rules: ua-ros-pkg, version: 0.1.0}
+  ethzasl_aseba:
+    _rules:
+      git: {anon-uri: 'https://github.com/ethz-asl/ros-aseba.git', dev-branch: master,
+        distro-tag: $RELEASE_NAME_released, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'git@github.com:ethz-asl/ros-aseba.git'}
+    version: 0.8.0
+  ethzasl_message_transport:
+    _rules:
+      git: {anon-uri: 'https://github.com/ethz-asl/ros-message-transport.git', dev-branch: master,
+        distro-tag: $RELEASE_NAME_released, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'git@github.com:ethz-asl/ros-message-transport.git'}
+    version: 0.7.0
+  executive_smach: {version: 1.0.0}
+  exploration: {_rules: bosch-ros-pkg, version: 0.2.0}
+  freiburg_tools: {_rules: alufr-ros-pkg, version: 0.1.2}
+  geometry:
+    _rules:
+      hg: {dev-branch: tf_rework, distro-tag: $RELEASE_NAME, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'https://ros-geometry.googlecode.com/hg/'}
+      repo: ros-pkg
+    version: 1.3.1
+  geometry_experimental:
+    _rules:
+      hg: {dev-branch: non_optimized, distro-tag: $RELEASE_NAME, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'https://ros-geometry-experimental.googlecode.com/hg/'}
+      repo: ros-pkg
+    version: 0.1.0
+  geometry_tutorials: {_rules: ros-pkg-trunk, version: 0.1.1}
+  graph_mapping: {_rules: ros-pkg-unstable, version: null}
+  ias_common:
+    _rules:
+      git: {anon-uri: 'git://code.in.tum.de/git/ias-common.git', dev-branch: master,
+        distro-tag: $RELEASE_NAME_released, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'indefero@code.in.tum.de:ias-common.git'}
+      repo: tum-ros-pkg
+    version: 0.1.0
+  image_common: {version: 1.3.1}
+  image_pipeline: {version: 1.3.0}
+  image_transport_plugins: {version: 1.3.1}
+  imu_drivers: {version: 1.2.1}
+  joystick_drivers: {version: 1.2.2}
+  joystick_drivers_tutorials: {version: 1.2.2}
+  kinect:
+    _rules:
+      git: {anon-uri: 'https://github.com/ros-pkg-git/kinect.git', dev-branch: master,
+        distro-tag: $RELEASE_NAME_released, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'git@github.com:ros-pkg-git/kinect.git'}
+      repo: ros-pkg
+    version: 0.1.6
+  kinematics: {_rules: wg-ros-pkg-trunk, version: 0.3.0}
+  knowrob:
+    _rules:
+      repo: tum-ros-pkg
+      svn: {anon-dev: 'http://code.in.tum.de/pubsvn/knowrob/branches/release', anon-distro-tag: 'http://code.in.tum.de/pubsvn/knowrob/tags/$RELEASE_NAME',
+        anon-release-tag: 'http://code.in.tum.de/pubsvn/knowrob/tags/$STACK_NAME-$STACK_VERSION',
+        dev: 'http://code.in.tum.de/svn/knowrob/branches/release', distro-tag: 'http://code.in.tum.de/svn/knowrob/tags/$RELEASE_NAME',
+        release-tag: 'http://code.in.tum.de/svn/knowrob/tags/$STACK_NAME-$STACK_VERSION'}
+    version: null
+  laser_drivers: {version: 1.2.2}
+  laser_pipeline: {version: 1.0.2}
+  linux_networking: {_rules: linux_networking, version: 0.1.6}
+  mapping:
+    _rules:
+      git: {anon-uri: 'git://code.in.tum.de/git/mapping.git', dev-branch: master,
+        distro-tag: $RELEASE_NAME_released, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'indefero@code.in.tum.de:mapping.git'}
+      repo: tum-ros-pkg
+    version: null
+  motion_planners: {_rules: wg-ros-pkg-trunk, version: 0.3.1}
+  motion_planning_common: {_rules: motion_planners_unstable_prerelease, version: 0.3.1}
+  motion_planning_environment: {_rules: motion_planners_unstable_prerelease, version: 0.3.1}
+  motion_planning_visualization: {_rules: motion_planners_unstable_prerelease, version: 0.3.1}
+  mpi: {_rules: wg-ros-pkg-trunk, version: null}
+  multimaster_experimental: {_rules: ros-trunk, version: 0.1.0}
+  navigation: {_rules: ros-pkg-trunk, version: 1.3.1}
+  navigation_experimental: {version: 0.1.4}
+  nxt:
+    _rules:
+      hg: {dev-branch: default, distro-tag: $RELEASE_NAME, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'https://stack-nxt.foote-ros-pkg.googlecode.com/hg'}
+      repo: foote-ros-pkg
+    version: 0.1.1
+  nxt_apps:
+    _rules:
+      hg: {dev-branch: default, distro-tag: $RELEASE_NAME, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'https://stack-nxt-apps.foote-ros-pkg.googlecode.com/hg'}
+      repo: foote-ros-pkg
+      version: 0.1.0
+    version: 0.1.1
+  nxt_robots:
+    _rules:
+      hg: {dev-branch: default, distro-tag: $RELEASE_NAME, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'https://stack-nxt-robots.foote-ros-pkg.googlecode.com/hg'}
+      repo: foote-ros-pkg
+      version: 0.1.0
+    version: 0.1.2
+  object_manipulation: {_rules: arm_navigation_0_3, version: 0.3.0}
+  ocr: {_rules: bosch-ros-pkg, version: null}
+  octomap_mapping: {_rules: alufr-ros-pkg, version: 0.1.2}
+  orocos_toolchain_ros: {_rules: orocos_toolchain_ros, version: 0.1.9}
+  pano: {_rules: ros-pkg-trunk, version: null}
+  people: {_rules: wg-ros-pkg-trunk, version: null}
+  perception_pcl: {version: 0.7.1}
+  perception_pcl_addons: {version: 0.2.0}
+  physics_ode: {version: 1.2.8}
+  point_cloud_perception: {version: 0.5.2}
+  pr2_apps: {_rules: wg-ros-pkg-trunk, version: 0.3.0}
+  pr2_arm_navigation: {_rules: motion_planners_unstable_prerelease, version: 0.3.1}
+  pr2_arm_navigation_apps: {_rules: motion_planners_unstable_prerelease, version: 0.3.1}
+  pr2_arm_navigation_tests: {_rules: wg-ros-pkg-trunk, version: 0.3.0}
+  pr2_calibration: {_rules: wg-ros-pkg-trunk, version: 0.5.0}
+  pr2_cockpit: {_rules: wg-ros-pkg-trunk, version: 0.2.3}
+  pr2_common: {_rules: wg-ros-pkg-trunk, version: 1.3.1}
+  pr2_common_actions: {_rules: wg-ros-pkg-trunk, version: 0.3.2}
+  pr2_common_alpha: {_rules: wg-ros-pkg-trunk, version: 0.1.2}
+  pr2_controllers: {_rules: wg-ros-pkg-trunk, version: 1.3.1}
+  pr2_doors: {_rules: wg-ros-pkg-trunk, version: 0.3.9}
+  pr2_ethercat_drivers: {_rules: wg-ros-pkg-1.3, version: 1.3.2}
+  pr2_exploration: {_rules: bosch-ros-pkg, version: 0.1.0}
+  pr2_gui: {_rules: wg-ros-pkg-trunk, version: 1.0.2}
+  pr2_kinematics: {_rules: motion_planners_unstable_prerelease, version: 0.3.1}
+  pr2_kinematics_with_constraints: {_rules: motion_planners_unstable_prerelease, version: 0.3.1}
+  pr2_mechanism: {_rules: wg-ros-pkg-trunk, version: 1.4.0}
+  pr2_navigation:
+    _rules:
+      repo: wg-ros-pkg
+      svn: {dev: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/branches/cturtle_branch',
+        distro-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAME',
+        release-tag: 'https://code.ros.org/svn/wg-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSION'}
+    version: 0.1.5
+  pr2_navigation_apps: {_rules: wg-ros-pkg-trunk, version: 0.1.1}
+  pr2_object_manipulation: {_rules: arm_navigation_0_3, version: 0.3.0}
+  pr2_plugs: {_rules: wg-ros-pkg-trunk, version: 0.3.11}
+  pr2_power_drivers: {_rules: wg-ros-pkg-trunk, version: 1.0.8}
+  pr2_robot: {_rules: wg-ros-pkg-trunk, version: 1.1.0}
+  pr2_self_test: {_rules: wg-ros-pkg-trunk, version: 0.3.1}
+  pr2_simulator: {_rules: wg-ros-pkg-trunk, version: 1.3.2}
+  pr2_tabletop_manipulation_apps: {_rules: arm_navigation_0_3, version: 0.3.0}
+  pr2_web_apps: {_rules: wg-ros-pkg-trunk, version: 0.3.11}
+  robot_calibration: {version: 0.3.2}
+  robot_model: {_rules: ros-pkg-1.4, version: 1.4.0}
+  ros: {_rules: ros-trunk, version: 1.4.0}
+  ros_applications:
+    _rules:
+      hg: {dev-branch: default, distro-tag: $RELEASE_NAME, release-tag: $STACK_NAME-$STACK_VERSION,
+        uri: 'https://ros-applications.hg-ros-pkg.googlecode.com/hg/'}
+      repo: wg-ros-pkg
+    version: 0.1.0
+  ros_comm: {_rules: ros-trunk, version: 1.3.4}
+  ros_realtime: {_rules: ros-trunk, version: 0.5.1}
+  ros_release: {_rules: ros-trunk, version: 0.1.7}
+  ros_tutorials: {_rules: ros-trunk, version: 0.2.3}
+  roshpit: {_rules: ros-trunk, version: 0.2.3}
+  roslisp_common: {_rules: ros-pkg-trunk, version: 0.1.2}
+  roslisp_support: {_rules: ros-trunk, version: 0.2.11}
+  rx: {_rules: ros-trunk, version: 1.4.0}
+  simulator_gazebo: {version: 1.2.8}
+  simulator_stage: {version: 1.2.2}
+  slam_gmapping: {version: 1.2.2}
+  slam_karto: {_rules: ros-pkg-trunk, version: null}
+  sound_drivers: {version: 1.2.1}
+  sql_database: {_rules: manipulation-0.2, version: 0.2.2}
+  tabletop_object_perception: {_rules: manipulation-0.3, version: 0.3.1}
+  topological_navigation: {_rules: wg-ros-pkg-trunk, version: null}
+  trajectory_filters: {_rules: wg-ros-pkg-trunk, version: 0.3.0}
+  velodyne: {_rules: utexas-art-ros-pkg, version: 0.2.5}
+  vision_opencv: {version: 1.3.6}
+  visualization: {_rules: ros-pkg-1.4, version: 1.3.2}
+  visualization_common: {version: 1.3.2}
+  visualization_tutorials: {version: 0.2.2}
+  vslam: {version: 0.2.2}
+  web_interface: {_rules: wg-ros-pkg-trunk, version: 0.4.3}
+  wg_common: {_rules: wg-ros-pkg-trunk, version: 0.1.3}
+  wg_hardware_test: {_rules: wg-ros-pkg-trunk, version: null}
+  wg_pr2_apps: {_rules: wg-ros-pkg-trunk, version: 0.1.2}
+  wg_robots_gazebo: {_rules: wg-ros-pkg-trunk, version: 0.1.0}
+  wifi_drivers: {_rules: wg-ros-pkg-trunk, version: 0.1.3}
+variants:
+- ros-base:
+    stacks: [ros, ros_comm]
+- ros-full:
+    extends: ros-base
+    stacks: [rx, documentation]
+- viz:
+    stacks: [visualization_common, visualization]
+- robot:
+    extends: ros-base
+    stacks: [common_msgs, common, diagnostics, driver_common, geometry, 
+      robot_model, executive_smach]
+- simulators:
+    extends: [robot]
+    stacks: [simulator_stage, simulator_gazebo, physics_ode]
+- mobile:
+    extends: [robot]
+    stacks: [navigation, slam_gmapping]
+- perception:
+    extends: [ros-base]
+    stacks: [image_common, image_transport_plugins, image_pipeline, laser_pipeline, perception_pcl, vision_opencv]
+- desktop:
+    extends: [robot, viz]
+    stacks: [ros_tutorials, common_tutorials, geometry_tutorials, visualization_tutorials]
+- desktop-full:
+    extends: [desktop, mobile, perception, simulators]
+- move-arm:
+    stacks: [arm_navigation, kinematics, motion_planners, motion_planning_common,
+      object_manipulation, trajectory_filters]
+- pr2-base:
+    extends: [mobile, perception, move-arm]
+    stacks: [pr2_common, pr2_controllers, pr2_mechanism, pr2_robot, web_interface, pr2_calibration, pr2_navigation, pr2_kinematics, pr2_arm_navigation, pr2_arm_navigation_tests, pr2_object_manipulation, pr2_tabletop_manipulation_apps, tabletop_object_perception, sql_database]
+- pr2:
+    extends: [pr2-base]
+    stacks: [pr2_ethercat_drivers, 
+      pr2_power_drivers, camera_drivers, laser_drivers, sound_drivers, wifi_drivers]
+- pr2-desktop:
+    extends: [desktop-full, pr2-base]
+    stacks: [pr2_gui, pr2_simulator]
+- pr2-applications:
+    extends: pr2
+    stacks: [pr2_apps, pr2_common_actions, pr2_doors, pr2_navigation_apps,
+      pr2_plugs, pr2_self_test, pr2_web_apps]
+- wg-pr2:
+    extends: [pr2, pr2-applications]
+    stacks: [wg_common, wg_pr2_apps]
+- care-o-bot:
+    stacks: [cob_extern, cob_common, cob_driver, cob_simulation, cob_apps]
+- bosch:
+    stacks: [bosch_drivers, bosch_skin, exploration, ocr, pr2_exploration]
+- nxtall:
+    stacks: [nxt, nxt_apps, nxt_robots]
+- alufr:
+    stacks: [freiburg_tools, articulation, octomap_mapping]
+- utexas-art:
+    extends: [ros-base]
+    stacks: [art_vehicle, velodyne]
+- tum:
+    stacks: [cram_pl, mapping]
+version: '$Revision: 8596 $'

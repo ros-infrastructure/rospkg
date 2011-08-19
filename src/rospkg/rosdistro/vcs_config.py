@@ -57,7 +57,7 @@ class DVCSConfig(object):
     def load(self, rules, rule_eval):
         self.repo_uri = rule_eval(rules['uri'])
 
-        if 'anon-uri' in r:
+        if 'anon-uri' in rules:
             self.anon_repo_uri = rule_eval(rules['anon-uri'])
         else:
             self.anon_repo_uri = self.repo_uri
@@ -87,23 +87,23 @@ class DVCSConfig(object):
                self.release_tag == other.release_tag and \
                self.distro_tag == other.distro_tag
     
-class GITConfig(DVCSConfig):
+class GitConfig(DVCSConfig):
     """
     Configuration information about an GIT repository
     """
 
     def __init__(self):
-        super(GITConfig, self).__init__('git')
+        super(GitConfig, self).__init__('git')
 
-class HGConfig(DVCSConfig):
+class HgConfig(DVCSConfig):
     """
     Configuration information about a Mercurial repository.
     """
 
     def __init__(self):
-        super(HGConfig, self).__init__('bzr')
+        super(HgConfig, self).__init__('bzr')
 
-class BZRConfig(DVCSConfig):
+class BzrConfig(DVCSConfig):
     """
     Configuration information about an BZR repository.
     
@@ -114,9 +114,9 @@ class BZRConfig(DVCSConfig):
      """
 
     def __init__(self):
-        super(BZRConfig, self).__init__('bzr')
+        super(BzrConfig, self).__init__('bzr')
 
-class SVNConfig(object):
+class SvnConfig(object):
     """
     Configuration information about an SVN repository.
 
@@ -187,10 +187,10 @@ class SVNConfig(object):
             self.anon_release_tag == other.anon_release_tag
 
 _vcs_configs = {
-    'svn': SVNConfig,
-    'git': GITConfig,
-    'hg': HGConfig,    
-    'bzr': BZRConfig,    
+    'svn': SvnConfig,
+    'git': GitConfig,
+    'hg': HgConfig,    
+    'bzr': BzrConfig,    
     }
 
 def get_vcs_configs():
