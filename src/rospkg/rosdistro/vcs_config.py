@@ -101,7 +101,7 @@ class HgConfig(DVCSConfig):
     """
 
     def __init__(self):
-        super(HgConfig, self).__init__('bzr')
+        super(HgConfig, self).__init__('hg')
 
 class BzrConfig(DVCSConfig):
     """

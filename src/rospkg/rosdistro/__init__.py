@@ -42,7 +42,7 @@ import string
 from .distro import DistroException, InvalidDistro, Distro, DistroStack, Variant
 from .rosinstall_convert import stack_to_rosinstall, variant_to_rosinstall, \
      extended_variant_to_rosinstall, distro_to_rosinstall
-from .vcs_config import BzrConfig, HgConfig, GitConfig, SvnConfig
+from .vcs_config import load_vcs_config, get_vcs_configs, BzrConfig, HgConfig, GitConfig, SvnConfig
 
 def distro_uri(distro_name):
     """

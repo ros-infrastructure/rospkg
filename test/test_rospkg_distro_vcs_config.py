@@ -33,6 +33,20 @@
 import os
 import sys
 
+default_rules = {}
+default_rules['git'] = {'git': {'anon-uri': 'https://github.com/ipa320/$STACK_NAME.git',
+                                'dev-branch': 'release_electric',
+                                'distro-tag': '$RELEASE_NAME',
+                                'release-tag': '$STACK_NAME-$STACK_VERSION',
+                                'uri': 'git@github.com:ipa320/$STACK_NAME.git'}}
+default_rules['svn'] = {'svn': {'dev': 'https://alufr-ros-pkg.googlecode.com/svn/trunk/$STACK_NAME',
+                                'distro-tag': 'https://alufr-ros-pkg.googlecode.com/svn/tags/distros/$RELEASE_NAME/stacks/$STACK_NAME',
+                                'release-tag': 'https://alufr-ros-pkg.googlecode.com/svn/tags/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION'}}
+default_rules['hg'] = {'hg': {'dev-branch': 'default',
+                              'distro-tag': '$RELEASE_NAME',
+                              'release-tag': '$STACK_NAME-$STACK_VERSION',
+                              'uri': 'https://kforge.ros.org/navigation/navigation'}}
+
 def test_BZRConfig():
     pass
 
@@ -45,12 +59,7 @@ def test_HgConfig():
         'anon-uri': 'https://kforge.ros.org/navigation/navigation',
         'uri': 'ssh://user@kforge.ros.org/navigation/navigation'
         }
-    rules = {
-        'dev-branch': 'default',
-        'distro-tag': '$RELEASE_NAME',
-        'release-tag': '$STACK_NAME-$STACK_VERSION',
-        'uri': 'https://kforge.ros.org/navigation/navigation'
-        }
+    rules = default_rules['hg']['hg'] 
 
     config = HgConfig()
     anon_config = HgConfig()
@@ -94,15 +103,19 @@ def test_HgConfig():
     anon_config2.load(anon_rules, lambda x: x+'evaled')
     assert anon_config == anon_config2
 
+    # test eq
+    config_check = HgConfig()
+    config_check_eq = HgConfig()
+    config_check_neq = HgConfig()
+    config_check.load(rules, lambda x: x+'evaled')
+    config_check_eq.load(rules, lambda x: x+'evaled')
+    config_check_neq.load(anon_rules, lambda x: x+'evaled')
+    assert config_check == config_check_eq
+    assert config_check != config_check_neq
+
 def test_GitConfig():
     from rospkg.rosdistro import GitConfig
-    anon_rules = {
-        'anon-uri': 'https://github.com/ipa320/$STACK_NAME.git',
-        'dev-branch': 'release_electric',
-        'distro-tag': '$RELEASE_NAME',
-        'release-tag': '$STACK_NAME-$STACK_VERSION',
-        'uri': 'git@github.com:ipa320/$STACK_NAME.git'
-        }
+    anon_rules = default_rules['git']['git']
     rules = anon_rules.copy()
     del rules['anon-uri']
 
@@ -152,9 +165,7 @@ def test_SvnConfig():
     from rospkg.rosdistro import SvnConfig
     config = SvnConfig()
     required = ['dev', 'distro-tag', 'release-tag']
-    rules = {'dev': 'https://alufr-ros-pkg.googlecode.com/svn/trunk/$STACK_NAME',
-             'distro-tag': 'https://alufr-ros-pkg.googlecode.com/svn/tags/distros/$RELEASE_NAME/stacks/$STACK_NAME',
-             'release-tag': 'https://alufr-ros-pkg.googlecode.com/svn/tags/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION'}
+    rules = default_rules['svn']['svn']
 
     anon_rules = {
         'anon-dev': 'http://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/trunk',
@@ -183,6 +194,16 @@ def test_SvnConfig():
     assert config.anon_distro_tag == 'https://alufr-ros-pkg.googlecode.com/svn/tags/distros/$RELEASE_NAME/stacks/$STACK_NAMEevaled'
     assert config.anon_release_tag == 'https://alufr-ros-pkg.googlecode.com/svn/tags/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSIONevaled'
 
+    # test eq
+    config_check = SvnConfig()
+    config_check_eq = SvnConfig()
+    config_check_neq = SvnConfig()
+    config_check.load(rules, lambda x: x+'evaled')
+    config_check_eq.load(rules, lambda x: x+'evaled')
+    config_check_neq.load(anon_rules, lambda x: x+'evaled')
+    assert config_check == config_check_eq
+    assert config_check != config_check_neq
+    
     # load w anon rules
     config2 = SvnConfig()
     config.load(anon_rules, lambda x: x+'evaled')
@@ -194,3 +215,20 @@ def test_SvnConfig():
         assert c.dev == 'https://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/trunkevaled'
         assert c.distro_tag == 'https://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAMEevaled'
         assert c.release_tag == 'https://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSIONevaled'
+
+    # test get_branch
+    assert c.get_branch('devel', True) == ('http://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/trunkevaled', None)
+    assert c.get_branch('distro', True) == ('http://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAMEevaled', None)
+    assert c.get_branch('release', True) == ('http://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSIONevaled', None)
+    assert c.get_branch('devel', False) == ('https://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/trunkevaled', None)
+    assert c.get_branch('distro', False) == ('https://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAMEevaled', None)
+    assert c.get_branch('release', False) == ('https://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSIONevaled', None)
+
+def test_load_vcs_config():
+    from rospkg.rosdistro import load_vcs_config, get_vcs_configs
+    #TODO: bzr
+    for t in ['svn', 'git', 'hg']:
+        assert t in get_vcs_configs()
+        config = load_vcs_config(default_rules[t], lambda x: x+'evaled')
+        assert config.type == t, t
+
