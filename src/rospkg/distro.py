@@ -133,6 +133,8 @@ class Distro(object):
     
     def __init__(self, stacks, variants, release_name, version, raw_data):
         """
+        @param stacks: dictionary mapping stack names to L{DistroStack} instances
+        @param variants: dictionary mapping variant names to L{Variant} instances
         @param release_name: name of release, e.g. 'diamondback'
         @param version: version number of release
         @param raw_data: raw dictionary representation of a distro
@@ -146,9 +148,11 @@ class Distro(object):
     def get_stacks(self, released=False):
         """
         @param released: only included released stacks
+        @return: dictionary of stack names to DistroStack instances in
+        this distro.
         """
         if released:
-            return _get_released_stacks()
+            return self._get_released_stacks()
         else:
             return self._stacks.copy()
 
@@ -159,7 +163,9 @@ class Distro(object):
                 retval[s] = obj
         return retval
 
+    # gets map of all stacks
     stacks = property(get_stacks)
+    # gets maps of released stacks
     released_stacks = property(_get_released_stacks)
 
 def load_distro(source_uri):
