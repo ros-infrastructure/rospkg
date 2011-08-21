@@ -39,9 +39,21 @@ import sys
 import urllib2
 import yaml
 
+TARBALL_URI_EVAL ='https://code.ros.org/svn/release/download/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION/$STACK_NAME-$STACK_VERSION.tar.bz2'
+
 class DistroException(Exception): pass
 
 class InvalidDistro(DistroException): pass
+
+def distro_uri(distro_name):
+    """
+    Get distro URI of main ROS distribution files.
+    
+    @param distro_name: name of distro, e.g. 'diamondback'
+    @return: the SVN/HTTP URL of the specified distro.  This function should only be used
+    with the main distros.
+    """
+    return "https://code.ros.org/svn/release/trunk/distros/%s.rosdistro"%(distro_name)
 
 def expand_rule(rule, stack_name, stack_ver, release_name, revision=None):
     s = rule.replace('$STACK_NAME', stack_name)
@@ -59,14 +71,10 @@ class DistroStack(object):
 
     def __init__(self, stack_name, rules, stack_version):
         self.name = stack_name
-        self._rules = rules
-        self._update_version(stack_version)
-        self.repo = rules.get('repo', None)
-
-    def _update_version(self, stack_version):
-        rules = self._rules
         self.version = stack_version
-        self.vcs_config = load_vcs_config(rules, self._expand_rule)
+        self._rules = rules
+        self.repo = rules.get('repo', None)
+        self.vcs_config = load_vcs_config(self._rules, self._expand_rule)
 
     def _expand_rule(self, rule):
         """
@@ -88,42 +96,31 @@ class Variant(object):
     another variant.
     """
 
-    def __init__(self, variant_name, variants_props):
+    def __init__(self, variant_name, stack_names_implicit, raw_data):
         """
         @param variant_name: name of variant to load from distro file
         @type  variant_name: str
-        @param variants_props: dictionary mapping variant names to the rosdistro map for that variant
+        @param stack_names_implicit: full list of stacks implicitly included in this variant
+        @type  stack_names_implicit: [str]
+        @param raw_data: raw rosdistro data for this variant
 
         @raise InvalidDistro
         """
         self.name = variant_name
-        self.parents = []
-        
-        # save the properties for our particular variant
-        props = variants_props[variant_name]
+        self.raw_data = raw_data
 
-        # load in variant properties from distro spec
-        if not 'stacks' in props and not 'extends' in props:
-            raise InvalidDistro("variant properties must define 'stacks' or 'extends':\n%s"%(props))
+    def get_parent_names(self):
+        return self.raw_data.get('extends', [])
 
-        # stack_names accumulates the full expanded list
-        self.stack_names = list(props.get('stacks', []))
-        # stack_names_explicit is only the stack names directly specified
-        self.stack_names_explicit = self.stack_names[:]
-        
-        # check to see if we extend another distro, in which case we prepend their props
-        if 'extends' in props:
-            extends = props['extends']
-            if type(extends) == type('str'):
-                extends = [extends]
-            # store parents property for debian metapackages
-            self.parents = extends
-
-            for e in extends:
-                parent_variant = Variant(e, variants_props)
-                self.stack_names = parent_variant.stack_names + self.stack_names
-        self._props = props
-      
+    def get_stack_names(self, implicit=True):
+        if implicit:
+            return self._stack_names_implicit
+        else:
+            return self.raw_data.get('stacks', [])
+    
+    parent_names = property(get_parent_names)
+    stack_names  = property(get_stack_names)
+    
 class Distro(object):
     """
     Store information in a rosdistro file.
@@ -131,28 +128,44 @@ class Distro(object):
     
     def __init__(self, stacks, variants, release_name, version, raw_data):
         """
-        @param source_uri: source URI of distro file, or path to distro file
+        @param release_name: name of release, e.g. 'diamondback'
+        @param version: version number of release
+        @param raw_data: raw dictionary representation of a distro
         """
-        self.stacks = stacks
+        self._stacks = stacks
         self.variants = variants
         self.release_name = release_name
         self.version = version
         self.raw_data = raw_data
 
     def get_stack_names(self, released=False):
+        """
+        @param released: only included released stacks        
+        """
         if released:
             return get_released_stacks().keys()
         else:
-            return self.stacks.keys()
+            return self._stacks.keys()
 
-    def get_released_stacks(self):
+    def get_stacks(self, released=False):
+        """
+        @param released: only included released stacks
+        """
+        if released:
+            return _get_released_stacks()
+        else:
+            return self._stacks.copy()
+
+    def _get_released_stacks(self):
         retval = {}
-        for s, obj in self.stacks.items(): #py3k
+        for s, obj in self._stacks.items(): #py3k
             if obj.version:
                 retval[s] = obj
         return retval
 
-    released_stacks = property(get_released_stacks)
+    variants = property(get_variants)
+    stacks = property(get_stacks)
+    released_stacks = property(_get_released_stacks)
     stack_names = property(get_stack_names)
 
 def load_distro(source_uri):
@@ -177,23 +190,36 @@ def load_distro(source_uri):
         release_name = raw_data['release']
 
         variants = {}
-        variant_props = {}
         for props in y['variants']:
             if len(props.keys()) != 1:
                 raise InvalidDistro("invalid variant spec: %s"%props)
             n = props.keys()[0]
-            variant_props[n] = props[n]
-            #TODO: process variant props here, instead of in constructor
+            variants[n] = _load_variant(v, varaint_props)
 
+        stacks = _load_distro_stacks(raw_data, stack_names, release_name=release_name, version=version)
+        return Distro(stacks, variants, release_name, version, raw_data)
     except KeyError as e:
         raise InvalidDistro("distro is missing required '%s' key"%(str(e)))
 
-    stacks = _load_distro_stacks(raw_data, stack_names, release_name=release_name, version=version)
-    for v, variant_props in variant_props.keys():
-        variants[v] = Variant(v, variants)
+def _load_variant(variant_name, variants_raw_data):
+    # save the properties for this variant
+    raw_data = variants_raw_data[variant_name]
+    if not 'stacks' in raw_data and not 'extends' in raw_data:
+        raise InvalidDistro("variant properties must define 'stacks' or 'extends':\n%s"%(raw_data))
 
-    return Distro(stacks, variants, release_name, version, raw_data)
+    # stack_names accumulates the full expanded list
+    stack_names_implicit = list(raw_data.get('stacks', []))
+    if 'extends' in raw_data:
+        extends = raw_data['extends']
+        if type(extends) == type('str'):
+            extends = [extends]
 
+        for e in extends:
+            parent_variant = _load_variant(e, variants_raw_data)
+            stack_names_implicit = parent_variant.get_stack_names(implicit=True) + stack_names_implicit
+
+    return Variant(variant_name, stack_names_implicit, raw_data)
+    
 def _load_distro_stacks(distro_doc, stack_names):
     """
     @param distro_doc: dictionary form of rosdistro file
@@ -236,3 +262,233 @@ def _distro_version(version_val):
         raise InvalidDistro("Version string %s not valid"%version_val)
     return version_val
 
+def distro_to_rosinstall(distro, branch, variant_name=None, implicit=True, released_only=True, anonymous=True):
+    """
+    @param branch: branch to convert for
+    @param variant_name: if not None, only include stacks in the specified variant.
+    @param implicit: if variant_name is provided, include full (recursive) dependencies of variant, default True
+    @param released_only: only included released stacks, default True.
+    @param anonymous: create for anonymous access rules
+
+    @raise KeyError: if branch is invalid or if distro is mis-configured
+    """
+    variant = distro.variants.get(variant_name, None)
+    if variant_name:
+        if implicit:
+            stack_names = set(variant.stack_names)
+        else:
+            stack_names = set(variant.stack_names_explicit)
+    else:
+        stack_names = distro.released_stacks.keys()
+    rosinstall_data = []
+    for s in stack_names:
+        if released_only and not s in distro.released_stacks:
+            continue
+        rosinstall_data.extend(distro.stacks[s].vcs_config.to_rosinstall(branch, anonymous))
+    return rosinstall_data
+
+
+class _VcsConfig():
+
+    def __init__(self, type_):
+        self.type = type_
+        self.tarball_url   = None
+        
+    def to_rosinstall(self, branch, anonymous):
+        uri, version_tag = self.get_branch(branch, anonymous)
+        if branch == 'release-tar':
+            type_ = 'tar'
+        else:
+            type_ = self.type
+        if version_tag:
+            return [{type_: {"uri": uri, 'local-name': stack.name, 'version': version_tag} } ]
+        else:
+            return [({type_: {"uri": uri, 'local-name': stack.name} } )]
+        
+    def load(self, rules, rule_eval):
+        self.tarball_url = rule_eval(TARBALL_URI_EVAL)
+        
+    def get_branch(self, branch, anonymous):
+        if branch == 'release-tar':
+            return self.tarball_url, None
+        else:
+            raise KeyError(branch)
+
+    def __eq__(self, other):
+        return self.type == other.type and \
+               self.tarball_url == other.tarball_url
+
+class _DvcsConfig(_VcsConfig):
+    """
+    Configuration information for a distributed VCS-style repository.
+
+     * repo_uri: base URI of repo
+     * dev_branch: git branch the code is developed
+     * distro_tag: a tag of the latest released code for a specific ROS distribution
+     * release_tag: a tag of the code for a specific release
+    """
+
+    def __init__(self, type_):
+        super(_DvcsConfig, self).__init__(type_)
+        self.repo_uri = self.anon_repo_uri = None
+        self.dev_branch = self.distro_tag = self.release_tag   = None
+
+    def load(self, rules, rule_eval):
+        super(_DvcsConfig, self).load(rules, rule_eval)
+
+        self.repo_uri = rule_eval(rules['uri'])
+        if 'anon-uri' in rules:
+            self.anon_repo_uri = rule_eval(rules['anon-uri'])
+        else:
+            self.anon_repo_uri = self.repo_uri
+        self.dev_branch  = rule_eval(rules['dev-branch'])
+        self.distro_tag  = rule_eval(rules['distro-tag'])
+        self.release_tag = rule_eval(rules['release-tag'])
+        
+    def get_branch(self, branch, anonymous):
+        """
+        @raise KeyError: invalid branch parameter 
+        """
+        if branch == 'release-tar':
+            return super(_DvcsConfig, self).get_branch(branch, anonymous)            
+        elif branch == 'devel':
+            version_tag = self.dev_branch
+        elif branch == 'distro':
+            version_tag = self.distro_tag
+        elif branch == 'release':
+            version_tag = self.release_tag
+        else:
+            raise KeyError("invalid branch spec [%s]"%(branch))
+        # occurs, for example, with unreleased stacks.  Only devel is valid
+        if version_tag is None:
+            raise KeyError("branch [%s] is not available for this config"%(branch))
+        if anonymous:
+            return self.anon_repo_uri, version_tag
+        else:
+            return self.repo_uri, version_tag            
+        
+    def __eq__(self, other):
+        return super(_DvcsConfig, self).__eq__(other) and \
+               self.repo_uri == other.repo_uri and \
+               self.anon_repo_uri == other.anon_repo_uri and \
+               self.dev_branch == other.dev_branch and \
+               self.release_tag == other.release_tag and \
+               self.distro_tag == other.distro_tag
+    
+class GitConfig(_DvcsConfig):
+    """
+    Configuration information about an GIT repository
+    """
+
+    def __init__(self):
+        super(GitConfig, self).__init__('git')
+
+class HgConfig(_DvcsConfig):
+    """
+    Configuration information about a Mercurial repository.
+    """
+
+    def __init__(self):
+        super(HgConfig, self).__init__('hg')
+
+class BzrConfig(_DvcsConfig):
+    """
+    Configuration information about an BZR repository.
+    
+     * repo_uri: base URI of repo
+     * dev_branch: hg branch the code is developed
+     * distro_tag: a tag of the latest released code for a specific ROS distribution
+     * release_tag: a tag of the code for a specific release
+     """
+
+    def __init__(self):
+        super(BzrConfig, self).__init__('bzr')
+
+class SvnConfig(_VcsConfig):
+    """
+    Configuration information about an SVN repository.
+
+     * dev: where the code is developed
+     * distro_tag: a tag of the code for a specific ROS distribution
+     * release_tag: a tag of the code for a specific release
+    """
+    
+    def __init__(self):
+        super(SvnConfig, self).__init__('svn')
+        self.dev = None
+        self.distro_tag = None
+        self.release_tag = None
+
+        # anonymously readable version of URLs above. Some repos have
+        # separate URLs for read-only vs. writable versions of repo
+        # and many tools need to be able to read repos without
+        # providing credentials.
+        self.anon_dev         = None
+        self.anon_distro_tag  = None
+        self.anon_release_tag = None
+        
+    def load(self, rules, rule_eval):
+        super(SvnConfig, self).load(rules, rule_eval)
+        for k in ['dev', 'distro-tag', 'release-tag']:
+            if not k in rules:
+                raise KeyError("svn rules missing required %s key: %s"%(k, rules))
+        self.dev = rule_eval(rules['dev'])
+        self.distro_tag  = rule_eval(rules['distro-tag'])
+        self.release_tag = rule_eval(rules['release-tag'])
+
+        # specify urls that are safe to anonymously read
+        # from. Users must supply a complete set.
+        if 'anon-dev' in rules:
+            self.anon_dev = rule_eval(rules['anon-dev'])
+            self.anon_distro_tag = rule_eval(rules['anon-distro-tag'])                
+            self.anon_release_tag = rule_eval(rules['anon-release-tag'])
+        else:
+            # if no login credentials, assume that anonymous is
+            # same as normal keys.
+            self.anon_dev = self.dev
+            self.anon_distro_tag = self.distro_tag
+            self.anon_release_tag = self.release_tag
+        
+    def get_branch(self, branch, anonymous):        
+        if branch == 'release-tar':
+            return super(_SvnConfig, self).get_branch(branch, anonymous)
+        else:
+            key_map = dict(devel='dev', distro='distro_tag', release='release_tag')
+            if not branch in key_map:
+                raise KeyError("invalid branch spec [%s]"%(branch))
+            attr_name = key_map[branch]
+            if anonymous:
+                attr_name = 'anon_'+attr_name
+            uri = getattr(self, attr_name)
+        # occurs, for example, with unreleased stacks.  Only devel is valid
+        if uri is None:
+            raise KeyError("branch [%s] is not available for this config"%(branch))
+        return uri, None
+        
+    def __eq__(self, other):
+        return super(_SvnConfig, self).__eq__(other) and \
+               self.dev == other.dev and \
+               self.distro_tag == other.distro_tag and \
+               self.release_tag == other.release_tag and \
+               self.anon_dev == other.anon_dev and \
+               self.anon_distro_tag == other.anon_distro_tag and \
+               self.anon_release_tag == other.anon_release_tag
+
+_vcs_configs = {
+    'svn': SvnConfig,
+    'git': GitConfig,
+    'hg': HgConfig,    
+    'bzr': BzrConfig,    
+    }
+
+def get_vcs_configs():
+    return _vcs_configs.copy()
+
+def load_vcs_config(rules, rule_eval):
+    vcs_config = None
+    for k, clazz in _vcs_configs.items():
+        if k in rules:
+            vcs_config = clazz()
+            vcs_config.load(rules[k], rule_eval)
+            break
+    return vcs_config
