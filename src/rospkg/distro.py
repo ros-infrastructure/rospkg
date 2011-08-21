@@ -55,23 +55,26 @@ def distro_uri(distro_name):
     """
     return "https://code.ros.org/svn/release/trunk/distros/%s.rosdistro"%(distro_name)
 
-def expand_rule(rule, stack_name, stack_ver, release_name, revision=None):
+def expand_rule(rule, stack_name, stack_ver, release_name):
     s = rule.replace('$STACK_NAME', stack_name)
     if stack_ver:
         s = s.replace('$STACK_VERSION', stack_ver)
-    s =    s.replace('$RELEASE_NAME', release_name)
-    if s.find('$REVISION') > 0 and not revision:
-        raise DistroException("revision specified but not supplied by build_release")
-    elif revision:
-        s = s.replace('$REVISION', revision)
+    s = s.replace('$RELEASE_NAME', release_name)
     return s
 
 class DistroStack(object):
     """Stores information about a stack release"""
 
-    def __init__(self, stack_name, rules, stack_version):
+    def __init__(self, stack_name, stack_version, release_name, rules):
+        """
+        @param stack_name: Name of stack
+        @param stack_version: Version number of stack.
+        @param release_name: name of distribution release.  Necessary for rule expansion.
+        @param rules: raw '_rules' data.  Will be converted into appropriate vcs config instance.
+        """
         self.name = stack_name
         self.version = stack_version
+        self.release_name = release_name
         self._rules = rules
         self.repo = rules.get('repo', None)
         self.vcs_config = load_vcs_config(self._rules, self._expand_rule)
@@ -83,8 +86,6 @@ class DistroStack(object):
         return expand_rule(rule, self.name, self.version, self.release_name)
         
     def __eq__(self, other):
-        if not isinstance(other, DistroStack):
-            return False
         return self.name == other.name and \
             self.version == other.version and \
             self.vcs_config == other.vcs_config
@@ -108,6 +109,7 @@ class Variant(object):
         """
         self.name = variant_name
         self.raw_data = raw_data
+        self._stack_names_implicit = stack_names_implicit
 
     def get_parent_names(self):
         return self.raw_data.get('extends', [])
@@ -119,6 +121,9 @@ class Variant(object):
             return self.raw_data.get('stacks', [])
     
     parent_names = property(get_parent_names)
+
+    # stack_names includes implicit stack names. Use get_stack_names()
+    # to get explicit only
     stack_names  = property(get_stack_names)
     
 class Distro(object):
@@ -138,15 +143,6 @@ class Distro(object):
         self.version = version
         self.raw_data = raw_data
 
-    def get_stack_names(self, released=False):
-        """
-        @param released: only included released stacks        
-        """
-        if released:
-            return get_released_stacks().keys()
-        else:
-            return self._stacks.keys()
-
     def get_stacks(self, released=False):
         """
         @param released: only included released stacks
@@ -163,10 +159,8 @@ class Distro(object):
                 retval[s] = obj
         return retval
 
-    variants = property(get_variants)
     stacks = property(get_stacks)
     released_stacks = property(_get_released_stacks)
-    stack_names = property(get_stack_names)
 
 def load_distro(source_uri):
     """
@@ -196,7 +190,7 @@ def load_distro(source_uri):
             n = props.keys()[0]
             variants[n] = _load_variant(v, varaint_props)
 
-        stacks = _load_distro_stacks(raw_data, stack_names, release_name=release_name, version=version)
+        stacks = _load_distro_stacks(raw_data, stack_names, release_name)
         return Distro(stacks, variants, release_name, version, raw_data)
     except KeyError as e:
         raise InvalidDistro("distro is missing required '%s' key"%(str(e)))
@@ -220,7 +214,7 @@ def _load_variant(variant_name, variants_raw_data):
 
     return Variant(variant_name, stack_names_implicit, raw_data)
     
-def _load_distro_stacks(distro_doc, stack_names):
+def _load_distro_stacks(distro_doc, stack_names, release_name):
     """
     @param distro_doc: dictionary form of rosdistro file
     @type distro_doc: dict
@@ -244,7 +238,7 @@ def _load_distro_stacks(distro_doc, stack_names):
 
         stack_version = stack_props[stack_name].get('version', None)
         rules = get_rules(distro_doc, stack_name)
-        stacks[stack_name] = DistroStack(stack_name, rules, stack_version)
+        stacks[stack_name] = DistroStack(stack_name, stack_version, release_name, rules)
     return stacks
 
 def _distro_version(version_val):
@@ -284,35 +278,37 @@ def distro_to_rosinstall(distro, branch, variant_name=None, implicit=True, relea
     for s in stack_names:
         if released_only and not s in distro.released_stacks:
             continue
-        rosinstall_data.extend(distro.stacks[s].vcs_config.to_rosinstall(branch, anonymous))
+        rosinstall_data.extend(distro.stacks[s].vcs_config.to_rosinstall(s, branch, anonymous))
     return rosinstall_data
 
-
-class _VcsConfig():
+class _VcsConfig(object):
 
     def __init__(self, type_):
         self.type = type_
-        self.tarball_url   = None
+        self.tarball_url = None
         
-    def to_rosinstall(self, branch, anonymous):
+    def to_rosinstall(self, local_name, branch, anonymous):
         uri, version_tag = self.get_branch(branch, anonymous)
         if branch == 'release-tar':
             type_ = 'tar'
         else:
             type_ = self.type
         if version_tag:
-            return [{type_: {"uri": uri, 'local-name': stack.name, 'version': version_tag} } ]
+            return [{type_: {"uri": uri, 'local-name': local_name, 'version': version_tag} } ]
         else:
-            return [({type_: {"uri": uri, 'local-name': stack.name} } )]
+            return [({type_: {"uri": uri, 'local-name': local_name} } )]
         
     def load(self, rules, rule_eval):
         self.tarball_url = rule_eval(TARBALL_URI_EVAL)
         
     def get_branch(self, branch, anonymous):
+        """
+        @raise ValueError: if branch is invalid
+        """
         if branch == 'release-tar':
             return self.tarball_url, None
         else:
-            raise KeyError(branch)
+            raise ValueError(branch)
 
     def __eq__(self, other):
         return self.type == other.type and \
@@ -358,10 +354,10 @@ class _DvcsConfig(_VcsConfig):
         elif branch == 'release':
             version_tag = self.release_tag
         else:
-            raise KeyError("invalid branch spec [%s]"%(branch))
+            raise ValueError("invalid branch spec [%s]"%(branch))
         # occurs, for example, with unreleased stacks.  Only devel is valid
         if version_tag is None:
-            raise KeyError("branch [%s] is not available for this config"%(branch))
+            raise ValueError("branch [%s] is not available for this config"%(branch))
         if anonymous:
             return self.anon_repo_uri, version_tag
         else:
@@ -450,8 +446,11 @@ class SvnConfig(_VcsConfig):
             self.anon_release_tag = self.release_tag
         
     def get_branch(self, branch, anonymous):        
+        """
+        @raise ValueError: if branch is invalid
+        """
         if branch == 'release-tar':
-            return super(_SvnConfig, self).get_branch(branch, anonymous)
+            return super(SvnConfig, self).get_branch(branch, anonymous)
         else:
             key_map = dict(devel='dev', distro='distro_tag', release='release_tag')
             if not branch in key_map:
@@ -462,11 +461,11 @@ class SvnConfig(_VcsConfig):
             uri = getattr(self, attr_name)
         # occurs, for example, with unreleased stacks.  Only devel is valid
         if uri is None:
-            raise KeyError("branch [%s] is not available for this config"%(branch))
+            raise ValueError("branch [%s] is not available for this config"%(branch))
         return uri, None
         
     def __eq__(self, other):
-        return super(_SvnConfig, self).__eq__(other) and \
+        return super(SvnConfig, self).__eq__(other) and \
                self.dev == other.dev and \
                self.distro_tag == other.distro_tag and \
                self.release_tag == other.release_tag and \

@@ -34,24 +34,147 @@ import os
 import sys
 
 default_rules = {}
+rosinstalls = {}
 default_rules['git'] = {'git': {'anon-uri': 'https://github.com/ipa320/$STACK_NAME.git',
                                 'dev-branch': 'release_electric',
                                 'distro-tag': '$RELEASE_NAME',
                                 'release-tag': '$STACK_NAME-$STACK_VERSION',
                                 'uri': 'git@github.com:ipa320/$STACK_NAME.git'}}
+rosinstalls['git'] = {}
+rosinstalls['git']['release-tar'] = [{'tar': {'local-name': 'local_name',
+                                              'uri': 'https://code.ros.org/svn/release/download/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION/$STACK_NAME-$STACK_VERSION.tar.bz2evaled'}}]
+rosinstalls['git']['devel'] = [{'git': {'local-name': 'local_name',
+                                        'version': 'release_electricevaled',
+                                        'uri': 'https://github.com/ipa320/$STACK_NAME.gitevaled'}}]
+rosinstalls['git']['release'] = [{'git': {'local-name': 'local_name',
+                                          'version': '$STACK_NAME-$STACK_VERSIONevaled',
+                                          'uri': 'https://github.com/ipa320/$STACK_NAME.gitevaled'}}]
+rosinstalls['git']['distro'] = [{'git': {'local-name': 'local_name',
+                                         'version': '$RELEASE_NAMEevaled',
+                                         'uri': 'https://github.com/ipa320/$STACK_NAME.gitevaled'}}]
 default_rules['svn'] = {'svn': {'dev': 'https://alufr-ros-pkg.googlecode.com/svn/trunk/$STACK_NAME',
                                 'distro-tag': 'https://alufr-ros-pkg.googlecode.com/svn/tags/distros/$RELEASE_NAME/stacks/$STACK_NAME',
                                 'release-tag': 'https://alufr-ros-pkg.googlecode.com/svn/tags/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION'}}
+rosinstalls['svn'] = {}
+rosinstalls['svn']['release-tar'] = rosinstalls['git']['release-tar']
+rosinstalls['svn']['devel'] = [{'svn': {'local-name': 'local_name',
+                                        'uri': 'https://alufr-ros-pkg.googlecode.com/svn/trunk/$STACK_NAMEevaled',
+                                        }}]
+rosinstalls['svn']['release'] = [{'svn': {'local-name': 'local_name',
+                                          'uri': 'https://alufr-ros-pkg.googlecode.com/svn/tags/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSIONevaled',
+                                          }}]
+rosinstalls['svn']['distro'] = [{'svn': {'local-name': 'local_name',
+                                          'uri': 'https://alufr-ros-pkg.googlecode.com/svn/tags/distros/$RELEASE_NAME/stacks/$STACK_NAMEevaled',
+                                          }}]
 default_rules['hg'] = {'hg': {'dev-branch': 'default',
                               'distro-tag': '$RELEASE_NAME',
                               'release-tag': '$STACK_NAME-$STACK_VERSION',
                               'uri': 'https://kforge.ros.org/navigation/navigation'}}
+default_rules['bzr'] = {'bzr': {'anon-uri': 'lp:sr-ros-interface',
+                                'dev-branch': 'stable',
+                                'distro-tag': '$RELEASE_NAME',
+                                'release-tag': '$STACK_NAME-$STACK_VERSION',
+                                'uri': 'bzr+ssh://bazaar.launchpad.net/~shadowrobot/sr-ros-interface'}}
 
+def test_to_rosinstall():
+    from rospkg.distro import load_vcs_config
+    rule_eval = lambda x: x+'evaled'
+    anonymous = True
+    #TODO: for branch in ['devel', 'release', 'distro']:
+    for vcs in ['git', 'svn']:
+        vcs_config = load_vcs_config(default_rules[vcs], rule_eval)
+        for branch in ['release', 'distro', 'release-tar', 'devel']:
+            retval = vcs_config.to_rosinstall('local_name', branch, anonymous)
+            assert retval == rosinstalls[vcs][branch], "%s %s:\n%s\nvs.\n%s"%(vcs, branch, retval, rosinstalls[vcs][branch])
+    
+def test__VcsConfig():
+    from rospkg.distro import _VcsConfig
+    vcs_config = _VcsConfig('fake')
+    vcs_config.tarball_url = 'http://foo'
+    assert 'fake' == vcs_config.type
+    for b in ['devel', 'release', 'distro']:
+        try:
+            vcs_config.get_branch(b, False)
+            assert False, "should have raised"+b
+        except ValueError: pass
+    for anon in [True, False]:
+        assert ('http://foo', None) == vcs_config.get_branch('release-tar', anon)
+    
 def test_BZRConfig():
-    pass
+    from rospkg.distro import BzrConfig
+    anon_rules = default_rules['bzr']['bzr']
+    rules = anon_rules.copy()
+    rules['uri'] = rules['anon-uri']
+    del rules['anon-uri']
+
+    config = BzrConfig()
+    anon_config = BzrConfig()
+
+    required = ['dev-branch', 'distro-tag', 'release-tag', 'uri']
+    for r in required:
+        bad_copy = rules.copy()
+        del bad_copy[r]
+        try:
+            config.load(bad_copy, lambda x: x)
+            assert False, "should have raised"
+        except KeyError: pass
+    
+    config.load(rules, lambda x: x+'evaled')
+    anon_config.load(anon_rules, lambda x: x+'evaled')
+
+    repo_uri = anon_rules['uri']+'evaled'
+    anon_repo_uri = anon_rules['anon-uri']+'evaled'
+    assert config.repo_uri == anon_repo_uri, config.repo_uri
+    assert config.anon_repo_uri == anon_repo_uri, config.anon_repo_uri
+    assert anon_config.repo_uri == repo_uri, anon_config.repo_uri
+    for c in [config, anon_config]:
+        assert c.dev_branch == 'stableevaled'
+        assert c.distro_tag == '$RELEASE_NAMEevaled'
+        assert c.release_tag == '$STACK_NAME-$STACK_VERSIONevaled'
+        assert c.anon_repo_uri == anon_repo_uri
+
+    c = anon_config
+    assert c.get_branch('devel', False) == (repo_uri, 'stableevaled')
+    assert c.get_branch('devel', True) == (anon_repo_uri, 'stableevaled')
+    assert c.get_branch('distro', False) == (repo_uri, '$RELEASE_NAMEevaled')
+    assert c.get_branch('distro', True) == (anon_repo_uri, '$RELEASE_NAMEevaled')
+    assert c.get_branch('release', False) == (repo_uri, '$STACK_NAME-$STACK_VERSIONevaled')
+    assert c.get_branch('release', True) == (anon_repo_uri, '$STACK_NAME-$STACK_VERSIONevaled')
+    try:
+        c.get_branch('foo', True)
+        assert False
+    except ValueError:
+        pass
+    # setup for coverage -- invalidate release branch
+    rel_tag = c.release_tag
+    c.release_tag = None
+    try:
+        assert c.get_branch('release', False)
+        assert False
+    except ValueError:
+        pass
+    c.release_tag = rel_tag
+    
+    # test equals
+    config2 = BzrConfig()
+    config2.load(rules, lambda x: x+'evaled')
+    assert config == config2
+    anon_config2 = BzrConfig()    
+    anon_config2.load(anon_rules, lambda x: x+'evaled')
+    assert anon_config == anon_config2
+
+    # test eq
+    config_check = BzrConfig()
+    config_check_eq = BzrConfig()
+    config_check_neq = BzrConfig()
+    config_check.load(rules, lambda x: x+'evaled')
+    config_check_eq.load(rules, lambda x: x+'evaled')
+    config_check_neq.load(anon_rules, lambda x: x+'evaled')
+    assert config_check == config_check_eq
+    assert config_check != config_check_neq
 
 def test_HgConfig():
-    from rospkg.rosdistro import HgConfig
+    from rospkg.distro import HgConfig
     anon_rules = {
         'dev-branch': 'default',
         'distro-tag': '$RELEASE_NAME',
@@ -114,7 +237,7 @@ def test_HgConfig():
     assert config_check != config_check_neq
 
 def test_GitConfig():
-    from rospkg.rosdistro import GitConfig
+    from rospkg.distro import GitConfig
     anon_rules = default_rules['git']['git']
     rules = anon_rules.copy()
     del rules['anon-uri']
@@ -162,7 +285,7 @@ def test_GitConfig():
     assert anon_config == anon_config2
 
 def test_SvnConfig():
-    from rospkg.rosdistro import SvnConfig
+    from rospkg.distro import SvnConfig
     config = SvnConfig()
     required = ['dev', 'distro-tag', 'release-tag']
     rules = default_rules['svn']['svn']
@@ -224,11 +347,25 @@ def test_SvnConfig():
     assert c.get_branch('distro', False) == ('https://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/tags/$RELEASE_NAMEevaled', None)
     assert c.get_branch('release', False) == ('https://svn.mech.kuleuven.be/repos/orocos/trunk/kul-ros-pkg/stacks/$STACK_NAME/tags/$STACK_NAME-$STACK_VERSIONevaled', None)
 
+    # get full coverage on get_branch()
+    try:
+        c.get_branch('fake', False)
+        assert False
+    except KeyError:
+        pass
+    # setup for coverage -- invalidate release branch
+    rel_tag = c.release_tag
+    c.release_tag = None
+    try:
+        assert c.get_branch('release', False)
+        assert False
+    except ValueError:
+        pass
+    c.release_tag = rel_tag
+
 def test_load_vcs_config():
-    from rospkg.rosdistro import load_vcs_config, get_vcs_configs
-    #TODO: bzr
-    for t in ['svn', 'git', 'hg']:
+    from rospkg.distro import load_vcs_config, get_vcs_configs
+    for t in ['svn', 'git', 'hg', 'bzr']:
         assert t in get_vcs_configs()
         config = load_vcs_config(default_rules[t], lambda x: x+'evaled')
         assert config.type == t, t
-
