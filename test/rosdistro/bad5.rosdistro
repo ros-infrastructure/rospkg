@@ -1,0 +1,11 @@
+_rules:
+  rules1:
+    svn: 
+      bad-key: 'https://alufr-ros-pkg.googlecode.com/svn/trunk/$STACK_NAME'
+release: diamondback
+stacks:
+  stack1: {_rules: rules1, version: 0.3.0}
+variants:
+- base:
+    stacks: [stack1]
+version: 1

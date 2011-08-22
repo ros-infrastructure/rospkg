@@ -1,0 +1,11 @@
+_rules:
+  rules1:
+    svn: {dev: 'https://simple.com/svn/trunk/$STACK_NAME', distro-tag: 'https://simple.com/svn/tags/distros/$RELEASE_NAME/stacks/$STACK_NAME',
+      release-tag: 'https://simple.com/svn/tags/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION'}
+release: simple
+stacks:
+  stack1: {_rules: 1, version: 0.3.0}
+variants:
+- base:
+    stacks: [stack1]
+version: 1

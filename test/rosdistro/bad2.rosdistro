@@ -1,0 +1,9 @@
+_rules:
+  rules1:
+    svn: {dev: 'https://alufr-ros-pkg.googlecode.com/svn/trunk/$STACK_NAME', distro-tag: 'https://alufr-ros-pkg.googlecode.com/svn/tags/distros/$RELEASE_NAME/stacks/$STACK_NAME',
+      release-tag: 'https://alufr-ros-pkg.googlecode.com/svn/tags/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION'}
+release: diamondback
+stacks:
+  stack1: {_rules: rules1, version: 0.3.0}
+variants: string
+version: 1
