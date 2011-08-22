@@ -35,6 +35,8 @@ Representation/model of rosdistro format.
 """
 
 import os
+import re
+import string
 import sys
 import urllib2
 import yaml
@@ -42,7 +44,7 @@ import yaml
 TARBALL_URI_EVAL ='https://code.ros.org/svn/release/download/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION/$STACK_NAME-$STACK_VERSION.tar.bz2'
 
 class DistroException(Exception): pass
-
+class DistroNotFound(DistroException): pass
 class InvalidDistro(DistroException): pass
 
 def distro_uri(distro_name):
@@ -97,7 +99,7 @@ class Variant(object):
     another variant.
     """
 
-    def __init__(self, variant_name, stack_names_implicit, raw_data):
+    def __init__(self, variant_name, extends, stack_names, stack_names_implicit):
         """
         @param variant_name: name of variant to load from distro file
         @type  variant_name: str
@@ -108,19 +110,15 @@ class Variant(object):
         @raise InvalidDistro
         """
         self.name = variant_name
-        self.raw_data = raw_data
+        self.extends = extends
+        self._stack_names = stack_names
         self._stack_names_implicit = stack_names_implicit
-
-    def get_parent_names(self):
-        return self.raw_data.get('extends', [])
 
     def get_stack_names(self, implicit=True):
         if implicit:
             return self._stack_names_implicit
         else:
-            return self.raw_data.get('stacks', [])
-    
-    parent_names = property(get_parent_names)
+            return self._stack_names
 
     # stack_names includes implicit stack names. Use get_stack_names()
     # to get explicit only
@@ -170,7 +168,11 @@ class Distro(object):
 
 def load_distro(source_uri):
     """
-    @param source_uri: source URI of distro file, or path to distro file
+    @param source_uri: source URI of distro file, or path to distro
+    file.  Filename has precedence in resolution.
+
+    @raise InvalidDistro
+    @raise DistroNotFound
     """
     try:
         # parse rosdistro yaml
@@ -179,71 +181,72 @@ def load_distro(source_uri):
             with open(source_uri) as f:
                 raw_data = yaml.load(f.read())
         else:
-            raw_data = yaml.load(urllib2.urlopen(source_uri))
+            try:
+                raw_data = yaml.load(urllib2.urlopen(source_uri))
+            except ValueError:
+                raise DistroNotFound(source_uri)
+        if not type(raw_data) == dict:
+            raise InvalidDistro("Distro must be a dictionary: %s"%(source_uri))
     except yaml.YAMLError as e:
         raise InvalidDistro(str(e))
 
     try:
-        stack_props = y['stacks']
-        stack_names = [x for x in stack_props.keys() if not x[0] == '_']
         version = _distro_version(raw_data.get('version', '0'))
         release_name = raw_data['release']
-
-        variants = {}
-        for props in y['variants']:
-            if len(props.keys()) != 1:
-                raise InvalidDistro("invalid variant spec: %s"%props)
-            n = props.keys()[0]
-            variants[n] = _load_variant(v, varaint_props)
-
-        stacks = _load_distro_stacks(raw_data, stack_names, release_name)
+        stacks = _load_distro_stacks(raw_data, release_name)
+        variants = _load_variants(raw_data['variants'], stacks)
         return Distro(stacks, variants, release_name, version, raw_data)
     except KeyError as e:
         raise InvalidDistro("distro is missing required '%s' key"%(str(e)))
 
-def _load_variant(variant_name, variants_raw_data):
-    # save the properties for this variant
-    raw_data = variants_raw_data[variant_name]
-    if not 'stacks' in raw_data and not 'extends' in raw_data:
-        raise InvalidDistro("variant properties must define 'stacks' or 'extends':\n%s"%(raw_data))
-
-    # stack_names accumulates the full expanded list
-    stack_names_implicit = list(raw_data.get('stacks', []))
-    if 'extends' in raw_data:
-        extends = raw_data['extends']
-        if type(extends) == type('str'):
-            extends = [extends]
-
-        for e in extends:
-            parent_variant = _load_variant(e, variants_raw_data)
-            stack_names_implicit = parent_variant.get_stack_names(implicit=True) + stack_names_implicit
-
-    return Variant(variant_name, stack_names_implicit, raw_data)
+def _load_variants(raw_data, stacks):
+    all_variants_raw_data = {}
+    for v in raw_data:
+        if type(v) != dict or len(v.keys()) != 1:
+            raise InvalidDistro("invalid variant spec: %s"%v)
+        variant_name = v.keys()[0]
+        all_variants_raw_data[variant_name] = v[variant_name]
+    variants = {}
+    for variant_name in all_variants_raw_data.keys():
+        variants[variant_name] = _load_variant(variant_name, all_variants_raw_data)
+        # validate
+        for stack_name in variants[variant_name].get_stack_names(implicit=False):
+            if stack_name not in stacks:
+                raise InvalidDistro("variant [%s] refers to non-existent stack [%s]"%(variant_name, stack_name))
+    return variants
+        
+def _load_variant(variant_name, all_variants_raw_data):
+    variant_raw_data = all_variants_raw_data[variant_name]
+    stack_names_implicit = list(variant_raw_data.get('stacks', []))
+    extends = variant_raw_data.get('extends', [])
+    if type(extends) == type('str'):
+        extends = [extends]
+    for e in extends:
+        parent_variant = _load_variant(e, all_variants_raw_data)
+        stack_names_implicit = parent_variant.get_stack_names(implicit=True) + stack_names_implicit
+    return Variant(variant_name, extends, variant_raw_data.get('stacks', []), stack_names_implicit)
     
-def _load_distro_stacks(distro_doc, stack_names, release_name):
+def _load_distro_stacks(distro_doc, release_name):
     """
     @param distro_doc: dictionary form of rosdistro file
     @type distro_doc: dict
-    @param stack_names: names of stacks to load
-    @type  stack_names: [str]
     @return: dictionary of stack names to DistroStack instances
     @rtype: {str : DistroStack}
-    @raise DistroException: if distro_doc format is invalid
+    @raise InvalidDistro: if distro_doc format is invalid
     """
 
     # load stacks and expand out uri rules
     stacks = {}
     try:
         stack_props = distro_doc['stacks']
+        stack_names = [x for x in stack_props.keys() if not x[0] == '_']
     except KeyError:
-        raise DistroException("distro is missing required 'stacks' key")
+        raise InvalidDistro("distro is missing required 'stacks' key")
     for stack_name in stack_names:
-        # ignore private keys like _rules
-        if stack_name[0] == '_':
-            continue
-
         stack_version = stack_props[stack_name].get('version', None)
-        rules = get_rules(distro_doc, stack_name)
+        rules = _get_rules(distro_doc, stack_name)
+        if not rules:
+            raise InvalidDistro("no VCS rules for stack [%s]"%(stack_name))
         stacks[stack_name] = DistroStack(stack_name, stack_version, release_name, rules)
     return stacks
 
@@ -287,6 +290,42 @@ def distro_to_rosinstall(distro, branch, variant_name=None, implicit=True, relea
         rosinstall_data.extend(distro.stacks[s].vcs_config.to_rosinstall(s, branch, anonymous))
     return rosinstall_data
 
+################################################################################
+
+def _get_rules(distro_doc, stack_name):
+    """
+    Retrieve rules from distro_doc for specified stack.  This operates on
+    the raw distro dictionary document.
+
+    @param distro_doc: rosdistro document
+    @type  distro_doc: dict
+    @param stack_name: name of stack to get rules for
+    @type  stack_name: str
+    """
+    # top-level named section
+    named_rules_d = distro_doc.get('_rules', {})
+
+    # other rules to search
+    rules_d = [distro_doc.get('stacks', {}),
+               distro_doc.get('stacks', {}).get(stack_name, {})]
+    rules_d = [d for d in rules_d if '_rules' in d]
+
+    # last rules wins
+    if not rules_d:
+        return None
+    rules_d = rules_d[-1] 
+
+    update_r = rules_d.get('_rules', {})
+    if type(update_r) == str:
+        try:
+            update_r = named_rules_d[update_r]
+        except KeyError:
+            raise InvalidDistro("no _rules named [%s]"%(update_r))
+    if not type(update_r) == dict:
+        raise InvalidDistro("invalid rules: %s %s"%(d, type(d)))
+    return update_r
+        
+################################################################################
 class _VcsConfig(object):
 
     def __init__(self, type_):
