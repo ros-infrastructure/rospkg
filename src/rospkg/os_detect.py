@@ -76,12 +76,9 @@ def read_issue(filename="/etc/issue"):
     """
     @return: list of strings in issue file, or None if issue file cannot be read/split
     """
-    try:
-        if os.path.exists(filename):
-            with open(filename, 'r') as f:
-                return f.read().split()
-    except:
-        pass
+    if os.path.exists(filename):
+        with open(filename, 'r') as f:
+            return f.read().split()
     return None
 
 class OsNotDetected(Exception): pass
@@ -96,13 +93,13 @@ class OsDetector:
         detect is present.  Only one version of this class should
         return for any version.
         """
-        raise NotImplemented("is_os unimplemented")
+        raise NotImplementedError("is_os unimplemented")
 
     def get_version(self):
         """
         @return: standardized version for this OS. (ala Ubuntu Hardy Heron = "8.04")
         """
-        raise NotImplemented("get_version unimplemented")
+        raise NotImplementedError("get_version unimplemented")
 
 class LsbDetect(OsDetector):
     """
@@ -116,7 +113,10 @@ class LsbDetect(OsDetector):
         return lsb_get_os() == self.lsb_name
 
     def get_version(self):
-        return self.get_version_fn()
+        if self.is_os():
+            return self.get_version_fn()
+        else:
+            return False
         
 def mandriva_version():
     return lsb_get_version()+uname_get_machine()
@@ -133,15 +133,13 @@ class OpenSuse(OsDetector):
         return os_list and os_list[0] == "openSUSE"
 
     def get_version(self):
-        try:
-            if os.path.exists(self._brand_file):
-                with open(self._brand_file, 'r') as fh:
-                    os_list = fh.read().strip().split('\n')
-                    if len(os_list) == 2:
-                        os_list = os_list[1].split(' = ')
-                        if os_list[0] == "VERSION":
-                            return os_list[1]
-        except: pass
+        if self.is_os() and os.path.exists(self._brand_file):
+            with open(self._brand_file, 'r') as fh:
+                os_list = fh.read().strip().split('\n')
+                if len(os_list) == 2:
+                    os_list = os_list[1].split(' = ')
+                    if os_list[0] == "VERSION":
+                        return os_list[1]
         return False
 
 class Fedora(OsDetector):
@@ -157,12 +155,12 @@ class Fedora(OsDetector):
         return os_list and os_list[0] == "Fedora" 
 
     def get_version(self):
-        os_list = read_issue(self._issue_file)
-        idx = os_list.index('release')
-        if idx > 0:
-            return os_list[idx+1]
-        else:
-            return False
+        if self.is_os():
+            os_list = read_issue(self._issue_file)
+            idx = os_list.index('release')
+            if idx > 0:
+                return os_list[idx+1]
+        return False
 
 class Rhel(Fedora):
     """
@@ -177,12 +175,22 @@ class Rhel(Fedora):
         return os_list and os_list[2] == "Enterprise"
 
     def get_version(self):
-        os_list = read_issue(self._issue_file)
-        if os_list[2] == "Enterprise":
-            return os_list[6]
-        else:
-            raise OsNotDetected("cannot determine RHEL version")
+        if self.is_os():
+            os_list = read_issue(self._issue_file)
+            if os_list[2] == "Enterprise":
+                return os_list[6]
+        return False
 
+# Source: http://en.wikipedia.org/wiki/Mac_OS_X#Versions
+_osx_codename_map = {4: 'tiger',
+                     5:  'leopard',
+                     6: 'snow',
+                     7: 'lion'}
+def _osx_codename(major, minor):
+    if major != 10 or minor not in _osx_codename_map:
+        raise OsNotDetected("unrecognized version: %s.%s"%(major, minor))
+    return _osx_codename_map[minor]
+    
 class OSX(OsDetector):
     """
     Detect OS X 
@@ -194,24 +202,16 @@ class OSX(OsDetector):
         return os.path.exists(self._sw_vers_file)
     
     def get_version(self):
-        import distutils.version # To parse version numbers
-        # REP 111 this should be the code name (e.g., lion, snow, tiger) #3570
-        std_out = _read_stdout([self._sw_vers_file,'-productVersion'])
-        ver = distutils.version.StrictVersion(std_out).version
-        if len(ver) < 2:
-            raise OsNotDetected("invalid version string: %s"%(std_out))
-        major, minor = ver[0:2]
-        # Source: http://en.wikipedia.org/wiki/Mac_OS_X#Versions
-        if major == 10 and minor == 4:
-            return 'tiger'
-        elif major == 10 and minor == 5:
-            return 'leopard'
-        elif major == 10 and minor == 6:
-            return 'snow'
-        elif major == 10 and minor == 7:
-            return 'lion'
-        else:
-            raise OsNotDetected("unrecognized version: %s"%(std_out))
+        if self.is_os():
+            import distutils.version # To parse version numbers
+            # REP 111 this should be the code name (e.g., lion, snow, tiger) #3570
+            std_out = _read_stdout([self._sw_vers_file,'-productVersion'])
+            try:
+                ver = distutils.version.StrictVersion(std_out).version
+            except ValueError:
+                raise OsNotDetected("invalid version string: %s"%(std_out))
+            major, minor = ver[0:2]
+            return _osx_codename(major, minor)
 
 class Arch(OsDetector):
     """
@@ -234,7 +234,9 @@ class Cygwin(OsDetector):
         return os.path.exists("/usr/bin/cygwin1.dll")
     
     def get_version(self):
-        return _read_stdout(['uname','-r'])
+        if self.is_os():
+            return _read_stdout(['uname','-r'])
+        return False
 
 class Gentoo(OsDetector):
     """
@@ -248,11 +250,11 @@ class Gentoo(OsDetector):
         return os_list and os_list[0] == "Gentoo" and os_list[1] == "Base"
 
     def get_version(self):
-        os_list = read_issue(self._release_file)
-        if os_list[0] == "Gentoo" and os_list[1] == "Base":
-            return os_list[4]
-        else:
-            return False
+        if self.is_os():
+            os_list = read_issue(self._release_file)
+            if os_list[0] == "Gentoo" and os_list[1] == "Base":
+                return os_list[4]
+        return False
 
 class FreeBSD(OsDetector):
     """
@@ -263,18 +265,14 @@ class FreeBSD(OsDetector):
 
     def is_os(self):
         if os.path.exists(self._uname_file):
-            std_out = _read_stdout([filename])
+            std_out = _read_stdout([self._uname_file])
             return std_out.strip() == "FreeBSD"
         else:
             return False
 
     def get_version(self):
-        try:
-            if os.path.exists(self._uname_file):
-               return _read_stdout([self._uname_file, "-r"])
-            else:
-               return False
-        except: pass
+        if self.is_os() and os.path.exists(self._uname_file):
+            return _read_stdout([self._uname_file, "-r"])
         return False
 
 class OsDetect:
@@ -291,6 +289,7 @@ class OsDetect:
         self._os_list = os_list
         self._os_name = None
         self._os_version = None
+        self._os_detector = None
         self._override = False
 
     @staticmethod
@@ -310,29 +309,30 @@ class OsDetect:
                 if os_detector.is_os():
                     self._os_name = os_name
                     self._os_version = os_detector.get_version()
+                    self._os_detector = os_detector
 
         if self._os_name:
-            return (self._os_name, self._os_version)            
-        else:
-            # No solution found
-            attempted_oss = [o.get_name() for o in self._os_list]
-            raise OsNotDetected("Could not detect OS, tried %s"%attempted_oss)
+            return self._os_name, self._os_version
+        else: # No solution found
+            attempted = [x[0] for x in self._os_list]
+            raise OsNotDetected("Could not detect OS, tried %s"%attempted)
 
-    def get_detector(self, name):
+    def get_detector(self, name=None):
         """
-        Get detector used for specified OS name.
+        Get detector used for specified OS name, or the detector for this OS if name is None.
+        
         @raises: KeyError
         """
-        try:
-            return [d for d_name, d in self._os_list if d_name == name][0]
-        except IndexError:
-            raise KeyError(name)
+        if name is None:
+            if not self._os_detector:
+                self.detect_os()
+            return self._os_detector
+        else:
+            try:
+                return [d for d_name, d in self._os_list if d_name == name][0]
+            except IndexError:
+                raise KeyError(name)
         
-    def get_os(self):
-        if not self._os_detector:
-            self.detect_os()
-        return self._os_detector
-
     def get_name(self):
         if not self._os_name:
             self.detect_os()
@@ -340,7 +340,7 @@ class OsDetect:
 
     def get_version(self):
         if not self._os_version:
-            not self.detect_os()
+            self.detect_os()
         return self._os_version
 
 OS_ARCH='arch'

@@ -34,20 +34,25 @@ import os
 import sys
 import unittest
 
-class test_OS():
-    def check_presence(self):
+class TestOs():
+    def is_os(self):
         return True
     def get_version(self):
         return "os_version"
 
-class dummy_OS(object):
-    def check_presence(self):
+class DummyOs(object):
+    def is_os(self):
         return False
     def get_version(self):
         return "os_version2"
 
+def test__read_stdout():
+    from rospkg.os_detect import _read_stdout
+    assert 'hello' == _read_stdout(['echo', 'hello'])
+    assert None == _read_stdout(['bad-command-input-for-rospkg-os-detect'])
+
 def test_tripwire_ubuntu():
-    from rospkg import OsDetect
+    from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
     os_detect.get_detector('ubuntu')
     
@@ -60,25 +65,44 @@ def test_ubuntu():
     assert detect.is_os()
     assert detect.get_version() == 'lucid'
 
+    # test freely
+    if not detect.is_os():
+        assert detect.get_version() == False
+
 def test_tripwire_debian():
-    from rospkg import OsDetect
+    from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
     os_detect.get_detector('debian')
 
 def test_tripwire_osx():
-    from rospkg import OsDetect
+    from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
     os_detect.get_detector('osx')
     
 def test_osx():
-    from rospkg.os_detect import OSX
+    from rospkg.os_detect import OSX, _osx_codename, OsNotDetected
     test_dir = os.path.join(get_test_dir(), 'osx')
     detect = OSX(os.path.join(test_dir, "sw_vers"))
     assert detect.is_os()
     assert detect.get_version() == 'snow'
 
+    # trigger bad version number detect
+    detect = OSX(os.path.join(test_dir, "sw_vers_bad"))
+    assert detect.is_os()
+    try:
+        detect.get_version()
+        assert False, detect.get_version()
+    except OsNotDetected: pass
+
+    # regression test codename mapping
+    assert 'lion' == _osx_codename(10, 7)
+    try:
+        _osx_codename(9, 7)
+        assert False
+    except OsNotDetected: pass
+
 def test_tripwire_arch():
-    from rospkg import OsDetect
+    from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
     os_detect.get_detector('arch')
 
@@ -90,7 +114,7 @@ def test_arch():
     assert detect.get_version() == ''
 
 def test_tripwire_opensuse():
-    from rospkg import OsDetect
+    from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
     os_detect.get_detector('opensuse')
 
@@ -101,8 +125,12 @@ def test_opensuse():
     assert detect.is_os()
     assert detect.get_version() == '11.2'
 
+    detect = OpenSuse()
+    if not detect.is_os():
+        assert detect.get_version() == False
+
 def test_tripwire_gentoo():
-    from rospkg import OsDetect
+    from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
     os_detect.get_detector('gentoo')
 
@@ -113,8 +141,12 @@ def test_gentoo():
     assert detect.is_os()
     assert detect.get_version() == '2.0.1'
 
+    detect = Gentoo()
+    if not detect.is_os():
+        assert detect.get_version() == False
+
 def test_tripwire_fedora():
-    from rospkg import OsDetect
+    from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
     os_detect.get_detector('fedora')
 
@@ -129,8 +161,47 @@ def test_fedora():
     assert detect.is_os()
     assert detect.get_version() == '1'
     
+    detect = Fedora()
+    if not detect.is_os():
+        assert detect.get_version() == False
+
+def test_read_issue():
+    from rospkg.os_detect import read_issue
+    assert read_issue('/fake/file') == None
+    test_dir = os.path.join(get_test_dir(), 'rhel')
+    assert read_issue(os.path.join(test_dir, 'issue')) == ['Red', 'Hat', 'Enterprise', 'Linux', 'AS', 'release', '3', '(Taroon)']
+    
+def test_OsDetector():
+    from rospkg.os_detect import OsDetector
+    d = OsDetector()
+    try:
+        d.is_os()
+        assert False
+    except NotImplementedError: pass
+    try:
+        d.get_version()
+        assert False
+    except NotImplementedError: pass
+    
+def test_tripwire_lsb_get_version():
+    # value is platform dependent, so just make sure it doesn't throw
+    from rospkg.os_detect import lsb_get_version
+    retval = lsb_get_version()
+    assert retval == None or type(retval) == str
+    
+def test_tripwire_lsb_get_codename():
+    # value is platform dependent, so just make sure it doesn't throw
+    from rospkg.os_detect import lsb_get_codename
+    retval = lsb_get_codename()
+    assert retval == None or type(retval) == str
+
+def test_tripwire_uname_get_machine():
+    from rospkg.os_detect import uname_get_machine
+    retval = uname_get_machine()
+    assert retval in [None, 'i386', 'x86_64']
+
 def test_tripwire_rhel():
-    from rospkg import OsDetect
+    from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
     os_detect.get_detector('rhel')
 
@@ -141,46 +212,117 @@ def test_redhat():
     detect = Rhel(release_file, issue_file)
     assert detect.is_os()
     assert detect.get_version() == '3'
-    
-def xtest_OSDetect_single():
-    osa = roslib.os_detect.OSDetect([test_OS()])
-    assert "os_name" == osa.get_name()
-    assert "os_version" == osa.get_version()
 
-def xtest_OSDetect_first_of_two():
-    osa = roslib.os_detect.OSDetect([test_OS(), dummy_OS()])
+    # test freely
+    detect = Rhel()
+    if not detect.is_os():
+        assert detect.get_version() == False
+    
+def test_tripwire_freebsd():
+    from rospkg.os_detect import OsDetect
+    os_detect = OsDetect()
+    os_detect.get_detector('freebsd')
+
+def test_freebsd():
+    from rospkg.os_detect import FreeBSD
+    #TODO
+    if 0:
+        test_dir = os.path.join(get_test_dir(), 'freebsd')
+        release_file, issue_file = [os.path.join(test_dir, x) for x in ["redhat-release", "issue"]]
+        detect = FreeBSD(release_file, issue_file)
+        assert detect.is_os()
+        assert detect.get_version() == '3'
+        
+    # test freely
+    detect = FreeBSD()
+    if not detect.is_os():
+        assert False == detect.get_version()
+
+    # assure failure
+    detect = FreeBSD("/fake/uname/file")
+    assert not detect.is_os()
+    assert False == detect.get_version()
+    
+def test_cygwin():
+    from rospkg.os_detect import Cygwin
+    #TODO
+    detect = Cygwin()
+    if not detect.is_os():
+        assert False == detect.get_version()
+    
+def test_OsDetect():
+    from rospkg.os_detect import OsDetect    
+    detect = OsDetect()
+    try:
+        detect.get_detector('fake')
+        assert False, "should raise"
+    except KeyError: pass
+    
+def test_OsDetect_single():
+    from rospkg.os_detect import OsDetect    
+    detect = OsDetect([('TestOs', TestOs())])
+    assert "TestOs" == detect.get_name()
+    assert "TestOs" == detect.get_name()
+    detect = OsDetect([('TestOs', TestOs())])
+    assert "os_version" == detect.get_version()
+    assert "os_version" == detect.get_version()
+    
+    detect = OsDetect([('TestOs', TestOs())])
+    assert isinstance(detect.get_detector(), TestOs)
+    assert isinstance(detect.get_detector('TestOs'), TestOs)
+
+def test_OsDetect_nomatch():
+    from rospkg.os_detect import OsDetect, OsNotDetected
+    detect = OsDetect([('Dummy', DummyOs())])
+    assert isinstance(detect.get_detector('Dummy'), DummyOs)
+    try:
+        detect.get_name()
+        assert False
+    except OsNotDetected: pass
+    try:
+        detect.get_version()
+        assert False
+    except OsNotDetected: pass
+    try:
+        detect.get_detector()
+        assert False
+    except OsNotDetected: pass
+    
+
+def xTestOsDetect_first_of_two():
+    osa = roslib.os_detect.OSDetect([TestOs(), DummyOs()])
     assert "os_name" == osa.get_name()
     assert "os_version" == osa.get_version()
     os_class = osa.get_os()
     assert "os_name" == os_class.get_name()
     assert "os_version" == os_class.get_version()
 
-def xtest_OSDetect_second_of_two():
-    osa = roslib.os_detect.OSDetect([dummy_OS(), test_OS()])
+def xTestOsDetect_second_of_two():
+    osa = roslib.os_detect.OSDetect([DummyOs(), TestOs()])
     assert "os_name", osa.get_name()
     assert "os_version", osa.get_version()
     os_class = osa.get_os()
     assert "os_name" == os_class.get_name()
     assert "os_version" == os_class.get_version()
 
-def xtest_OSDetect_first_of_many():
-    osa = roslib.os_detect.OSDetect([test_OS(), dummy_OS(), dummy_OS(), dummy_OS(), dummy_OS()])
+def xTestOsDetect_first_of_many():
+    osa = roslib.os_detect.OSDetect([TestOs(), DummyOs(), DummyOs(), DummyOs(), DummyOs()])
     assert "os_name" == osa.get_name()
     assert "os_version" == osa.get_version()
     os_class = osa.get_os()
     assert "os_name" == os_class.get_name()
     assert "os_version" == os_class.get_version()
 
-def xtest_OSDetect_second_of_many():
-    osa = roslib.os_detect.OSDetect([dummy_OS(), test_OS(), dummy_OS(), dummy_OS(), dummy_OS()])
+def xTestOsDetect_second_of_many():
+    osa = roslib.os_detect.OSDetect([DummyOs(), TestOs(), DummyOs(), DummyOs(), DummyOs()])
     assert "os_name" == osa.get_name()
     assert "os_version" == osa.get_version()
     os_class = osa.get_os()
     assert "os_name" == os_class.get_name()
     assert "os_version" == os_class.get_version()
 
-def xtest_OSDetect_last_of_many():
-    osa = roslib.os_detect.OSDetect([dummy_OS(), dummy_OS(), dummy_OS(), dummy_OS(), test_OS(),])
+def xTestOsDetect_last_of_many():
+    osa = roslib.os_detect.OSDetect([DummyOs(), DummyOs(), DummyOs(), DummyOs(), TestOs(),])
     assert "os_name", osa.get_name()
     assert "os_version", osa.get_version()
     os_class = osa.get_os()
