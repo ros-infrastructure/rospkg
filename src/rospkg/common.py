@@ -29,9 +29,10 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#
-# Revision $Id$
-# $Author$
+
+"""
+Common definitions for rospkg modules.
+"""
 
 MANIFEST_FILE = 'manifest.xml'
 STACK_FILE = 'stack.xml'

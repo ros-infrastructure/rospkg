@@ -30,14 +30,21 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""
-Base ROS python library for manipulating ROS packages and stacks.o
-"""
-
-from .common import MANIFEST_FILE, STACK_FILE, ResourceNotFound
-from .environment import get_ros_root, get_ros_package_path, get_ros_home, \
-     get_log_dir, get_test_results_dir, on_ros_path
-from .manifest import parse_manifest_file, Manifest, InvalidManifest
-from .rospack import RosPack, RosStack, \
-     list_by_path, expand_to_packages, get_stack_version_by_dir
-
+def test_ResourceNotFound():
+    from rospkg import ResourceNotFound
+    r = ResourceNotFound('blah')
+    assert 'blah' == r.message
+    assert None == r.ros_root
+    assert None == r.ros_package_path
+    s = str(r)
+    assert not 'None' in s
+    assert 'blah' in s
+    
+    r = ResourceNotFound('blah', 'ros_root', 'ros_package_path')
+    assert 'blah' == r.message
+    assert 'ros_root' == r.ros_root
+    assert 'ros_package_path' == r.ros_package_path
+    s = str(r)
+    assert 'blah' in s
+    assert 'ros_root' in s
+    assert 'ros_package_path' in s

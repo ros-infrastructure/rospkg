@@ -29,14 +29,14 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#
-# Revision $Id$
-# $Author$
+
+"""
+Access information about ROS package system environment variables.
+"""
 
 import os
 
-################################################################################
-# Enviroment
+# Enviroment Variables
 
 # Global, usually set in setup
 ROS_ROOT         = "ROS_ROOT"
