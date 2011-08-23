@@ -118,6 +118,8 @@ def test_tripwire_osx():
     os_detect = OsDetect()
     os_detect.get_detector('osx')
     
+from mock import patch
+
 def test_osx():
     from rospkg.os_detect import OSX, _osx_codename, OsNotDetected
     test_dir = os.path.join(get_test_dir(), 'osx')
@@ -141,6 +143,22 @@ def test_osx():
         assert False
     except OsNotDetected: pass
 
+def test_osx_patched():
+    from rospkg.os_detect import OSX, OsNotDetected
+    @patch.object(OSX, 'is_os')
+    def test(mock):
+        mock.return_value = False
+        detect = OSX()
+        try:
+            detect.get_codename()
+            assert False
+        except OsNotDetected: pass
+        try:
+            detect.get_version()
+            assert False
+        except OsNotDetected: pass
+    test()
+
 def test_tripwire_arch():
     from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
@@ -159,7 +177,19 @@ def test_arch():
             detect.get_version()
             assert False
         except OsNotDetected: pass
+        try:
+            detect.get_codename()
+            assert False
+        except OsNotDetected: pass
 
+    @patch.object(Arch, 'is_os')
+    def test(mock):
+        mock.is_os.return_value = True
+        detect = Arch()
+        assert detect.get_version() == ''
+        assert detect.get_codename() == ''
+    test()
+        
 def test_tripwire_opensuse():
     from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
@@ -190,11 +220,17 @@ def test_gentoo():
     detect = Gentoo(os.path.join(test_dir, "gentoo-release"))
     assert detect.is_os()
     assert detect.get_version() == '2.0.1'
-
+    assert detect.get_codename() == ''
+    
+    # test freely
     detect = Gentoo()
     if not detect.is_os():
         try:
             detect.get_version()
+            assert False
+        except OsNotDetected: pass
+        try:
+            detect.get_codename()
             assert False
         except OsNotDetected: pass
 
@@ -292,6 +328,10 @@ def test_redhat():
             detect.get_version()
             assert False
         except OsNotDetected: pass
+        try:
+            detect.get_codename()
+            assert False
+        except OsNotDetected: pass
     
 def test_tripwire_freebsd():
     from rospkg.os_detect import OsDetect
@@ -323,6 +363,17 @@ def test_freebsd():
         detect.get_version()
         assert False
     except OsNotDetected: pass
+    try:
+        detect.get_codename()
+        assert False
+    except OsNotDetected: pass
+
+    @patch.object(FreeBSD, 'is_os')
+    def test(mock):
+        mock.is_os.return_value = True
+        detect = FreeBSD()
+        assert detect.get_codename() == ''        
+    test()
     
 def test_cygwin():
     from rospkg.os_detect import Cygwin, OsNotDetected
@@ -333,7 +384,18 @@ def test_cygwin():
             detect.get_version()
             assert False
         except OsNotDetected: pass
+        try:
+            detect.get_codename()
+            assert False
+        except OsNotDetected: pass
     
+    @patch.object(Cygwin, 'is_os')
+    def test(mock):
+        mock.is_os.return_value = True
+        detect = Cygwin()
+        assert detect.get_codename() == ''        
+    test()
+
 def test_OsDetect():
     from rospkg.os_detect import OsDetect    
     detect = OsDetect()
