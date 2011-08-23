@@ -56,6 +56,37 @@ def test_tripwire_ubuntu():
     os_detect = OsDetect()
     os_detect.get_detector('ubuntu')
     
+def test_LsbDetect():
+    import rospkg.os_detect
+    from rospkg.os_detect import LsbDetect, OsDetect, OsNotDetected, lsb_get_os
+
+    # test non-match
+    detect = LsbDetect('bad')
+    assert not detect.is_os()
+    try:
+        detect.get_version()
+        assert False
+    except OsNotDetected: pass
+    try:
+        detect.get_codename()
+        assert False
+    except OsNotDetected: pass
+
+    # test match
+    test_dir = os.path.join(get_test_dir(), 'ubuntu')
+    rospkg.os_detect._lsb_release = os.path.join(test_dir, 'lsb_release')
+
+    detect = LsbDetect('Ubuntu')
+    assert detect.is_os(), lsb_get_os()
+    assert detect.get_codename() == 'lucid'
+
+    # test freely
+    if not detect.is_os():
+        try:
+            detect.get_version()
+            assert False
+        except OsNotDetected: pass
+    
 def test_ubuntu():
     import rospkg.os_detect
     from rospkg.os_detect import LsbDetect, OsDetect, OsNotDetected
@@ -63,12 +94,17 @@ def test_ubuntu():
     rospkg.os_detect._lsb_release = os.path.join(test_dir, 'lsb_release')
     detect = OsDetect().get_detector('ubuntu')
     assert detect.is_os()
-    assert detect.get_version() == 'lucid'
+    assert detect.get_version() == '10.04'
+    assert detect.get_codename() == 'lucid'
 
     # test freely
     if not detect.is_os():
         try:
             detect.get_version()
+            assert False
+        except OsNotDetected: pass
+        try:
+            detect.get_codename()
             assert False
         except OsNotDetected: pass
 
@@ -202,6 +238,10 @@ def test_OsDetector():
         d.get_version()
         assert False
     except NotImplementedError: pass
+    try:
+        d.get_codename()
+        assert False
+    except NotImplementedError: pass
     
 def test_tripwire_lsb_get_version():
     # value is platform dependent, so just make sure it doesn't throw
@@ -234,11 +274,6 @@ def test_redhat():
     assert detect.is_os()
     assert detect.get_version() == '3'
     assert detect.get_codename() == 'taroon'
-    
-    detect = Rhel(os.path.join(test_dir, "redhat-release-pensacola"))
-    assert detect.is_os()
-    assert detect.get_version() == '2.1AS', detect.get_version()
-    assert detect.get_codename() == 'pensacola'
     
     detect = Rhel(os.path.join(test_dir, "redhat-release-tikanga"))
     assert detect.is_os()

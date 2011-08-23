@@ -126,7 +126,7 @@ class LsbDetect(OsDetector):
             return lsb_get_version()
         raise OsNotDetected('called in incorrect OS')
         
-    def get_version(self):
+    def get_codename(self):
         if self.is_os():
             return lsb_get_codename()
         raise OsNotDetected('called in incorrect OS')
@@ -181,7 +181,7 @@ class Rhel(Fedora):
 
     def is_os(self):
         os_list = read_issue(self._release_file)
-        return os_list and os_list[:2] == ['Red', 'Hat']
+        return os_list and os_list[:3] == ['Red', 'Hat', 'Enterprise']
 
     def get_version(self):
         if self.is_os():
