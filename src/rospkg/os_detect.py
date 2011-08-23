@@ -98,28 +98,38 @@ class OsDetector:
     def get_version(self):
         """
         @return: standardized version for this OS. (ala Ubuntu Hardy Heron = "8.04")
+
+        @raise OsNotDetected: if called on incorrect OS.
         """
         raise NotImplementedError("get_version unimplemented")
 
+    def get_codename(self):
+        """
+        @return: codename for this OS. (ala Ubuntu Hardy Heron = "hardy").  If codenames are not available for this OS, return empty string.
+
+        @raise OsNotDetected: if called on incorrect OS.
+        """
+        raise NotImplementedError("get_codename unimplemented")
+
 class LsbDetect(OsDetector):
     """
-    Generic detector for Debian, Ubuntu, Mint, and Mandriva
+    Generic detector for Debian, Ubuntu, and Mint
     """
-    def __init__(self, lsb_name, get_version_fn):
+    def __init__(self, lsb_name, get_version_fn=None):
         self.lsb_name = lsb_name
-        self.get_version_fn = get_version_fn
 
     def is_os(self):
         return lsb_get_os() == self.lsb_name
 
     def get_version(self):
         if self.is_os():
-            return self.get_version_fn()
-        else:
-            return False
+            return lsb_get_version()
+        raise OsNotDetected('called in incorrect OS')
         
-def mandriva_version():
-    return lsb_get_version()+uname_get_machine()
+    def get_version(self):
+        if self.is_os():
+            return lsb_get_codename()
+        raise OsNotDetected('called in incorrect OS')
 
 class OpenSuse(OsDetector):
     """
@@ -140,7 +150,7 @@ class OpenSuse(OsDetector):
                     os_list = os_list[1].split(' = ')
                     if os_list[0] == "VERSION":
                         return os_list[1]
-        return False
+        raise OsNotDetected('cannot get version on this OS')
 
 class Fedora(OsDetector):
     """
@@ -160,27 +170,38 @@ class Fedora(OsDetector):
             idx = os_list.index('release')
             if idx > 0:
                 return os_list[idx+1]
-        return False
+        raise OsNotDetected('cannot get version on this OS')
 
 class Rhel(Fedora):
     """
     Detect Redhat OS.
     """
-    def __init__(self, release_file="/etc/redhat-release", issue_file="/etc/issue"):
+    def __init__(self, release_file="/etc/redhat-release"):
         self._release_file = release_file
-        self._issue_file = issue_file
 
     def is_os(self):
         os_list = read_issue(self._release_file)
-        return os_list and os_list[2] == "Enterprise"
+        return os_list and os_list[:2] == ['Red', 'Hat']
 
     def get_version(self):
         if self.is_os():
-            os_list = read_issue(self._issue_file)
-            if os_list[2] == "Enterprise":
-                return os_list[6]
-        return False
+            os_list = read_issue(self._release_file)
+            idx = os_list.index('release')
+            return os_list[idx+1]
+        raise OsNotDetected('called in incorrect OS')
 
+    def get_codename(self):
+        # taroon, nahant, tikanga, santiago, pensacola
+        if self.is_os():
+            os_list = read_issue(self._release_file)
+            idx = os_list.index('release')
+            matches = [x for x in os_list if x[0] == '(']
+            codename = matches[0][1:]
+            if codename[-1] == ')':
+                codename = codename[:-1]
+            return codename.lower()
+        raise OsNotDetected('called in incorrect OS')
+    
 # Source: http://en.wikipedia.org/wiki/Mac_OS_X#Versions
 _osx_codename_map = {4: 'tiger',
                      5:  'leopard',
@@ -201,17 +222,21 @@ class OSX(OsDetector):
     def is_os(self):
         return os.path.exists(self._sw_vers_file)
     
+    def get_codename(self):
+        if self.is_os():
+            version = self.get_version()
+            import distutils.version # To parse version numbers
+            try:
+                ver = distutils.version.StrictVersion(version).version
+            except ValueError:
+                raise OsNotDetected("invalid version string: %s"%(version))
+            return _osx_codename(*ver[0:2])
+        raise OsNotDetected('called in incorrect OS')
+        
     def get_version(self):
         if self.is_os():
-            import distutils.version # To parse version numbers
-            # REP 111 this should be the code name (e.g., lion, snow, tiger) #3570
-            std_out = _read_stdout([self._sw_vers_file,'-productVersion'])
-            try:
-                ver = distutils.version.StrictVersion(std_out).version
-            except ValueError:
-                raise OsNotDetected("invalid version string: %s"%(std_out))
-            major, minor = ver[0:2]
-            return _osx_codename(major, minor)
+            return _read_stdout([self._sw_vers_file,'-productVersion']).strip()
+        raise OsNotDetected('called in incorrect OS')
 
 class Arch(OsDetector):
     """
@@ -224,7 +249,14 @@ class Arch(OsDetector):
         return os.path.exists(self._release_file)
 
     def get_version(self):
-        return ""
+        if self.is_os():
+            return ""
+        raise OsNotDetected('called in incorrect OS')        
+
+    def get_codename(self):
+        if self.is_os():
+            return ""
+        raise OsNotDetected('called in incorrect OS')        
 
 class Cygwin(OsDetector):
     """
@@ -236,7 +268,12 @@ class Cygwin(OsDetector):
     def get_version(self):
         if self.is_os():
             return _read_stdout(['uname','-r'])
-        return False
+        raise OsNotDetected('called in incorrect OS')        
+
+    def get_codename(self):
+        if self.is_os():
+            return ''
+        raise OsNotDetected('called in incorrect OS')        
 
 class Gentoo(OsDetector):
     """
@@ -254,7 +291,12 @@ class Gentoo(OsDetector):
             os_list = read_issue(self._release_file)
             if os_list[0] == "Gentoo" and os_list[1] == "Base":
                 return os_list[4]
-        return False
+        raise OsNotDetected('called in incorrect OS')        
+
+    def get_codename(self):
+        if self.is_os():
+            return ''
+        raise OsNotDetected('called in incorrect OS')        
 
 class FreeBSD(OsDetector):
     """
@@ -273,7 +315,12 @@ class FreeBSD(OsDetector):
     def get_version(self):
         if self.is_os() and os.path.exists(self._uname_file):
             return _read_stdout([self._uname_file, "-r"])
-        return False
+        raise OsNotDetected('called in incorrect OS')        
+
+    def get_codename(self):
+        if self.is_os():
+            return ''
+        raise OsNotDetected('called in incorrect OS')        
 
 class OsDetect:
     """
@@ -349,7 +396,6 @@ OS_DEBIAN='debian'
 OS_FEDORA='fedora'
 OS_FREEBSD='freebsd'
 OS_GENTOO='gentoo'
-OS_MANDRIVA='mandriva'
 OS_MINT='mint'
 OS_OPENSUSE='opensuse'
 OS_OSX='osx'
@@ -358,14 +404,13 @@ OS_UBUNTU='ubuntu'
 
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
-OsDetect.register_default(OS_DEBIAN, LsbDetect("Debian", lsb_get_codename))
+OsDetect.register_default(OS_DEBIAN, LsbDetect("Debian"))
 OsDetect.register_default(OS_FEDORA, Fedora())
 OsDetect.register_default(OS_FREEBSD, FreeBSD())
 OsDetect.register_default(OS_GENTOO, Gentoo())
-OsDetect.register_default(OS_MANDRIVA, LsbDetect("MandrivaLinux", mandriva_version))
-OsDetect.register_default(OS_MINT, LsbDetect("Mint", lsb_get_version))
+OsDetect.register_default(OS_MINT, LsbDetect("Mint"))
 OsDetect.register_default(OS_OPENSUSE, OpenSuse())
 OsDetect.register_default(OS_OSX, OSX())
 OsDetect.register_default(OS_RHEL, Rhel())
-OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu", lsb_get_codename))
+OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
     
