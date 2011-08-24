@@ -17,7 +17,6 @@ Currently supported OSes:
 - Fedora
 - FreeBSD
 - Gentoo
-- Mandriva Linux
 - Mint
 - OS X
 - Red Hat Linux
@@ -41,7 +40,6 @@ Currently supported OSes:
 
         List currently registered detectors.  Must not be modified directly.
     
-
     .. staticmethod:: register_default(os_name, os_detector)
 
         Add :class:`OsDetector` to the default list of detectors.    
@@ -51,13 +49,13 @@ Currently supported OSes:
         :returns: (os_name, os_version)
         :raises: :exc:`OsNotDetected` if OS could not be detected
 
-    .. method:: get_detector(name) -> :class:`OsDetector`
+    .. method:: get_detector(name) -> OsDetector
 
         Get detector used for specified OS name.
 
         :raises: :exc:`KeyError`
         
-    .. method:: get_os() -> :class:`OsDetector`
+    .. method:: get_os() -> OsDetector
 
         Get :class:`OsDetector` for this operating system.
         
@@ -65,13 +63,19 @@ Currently supported OSes:
 
     .. method:: get_name() -> str
 
-        :returns: Name of current operating system.  See ``OS_``
+        :returns: Name of current operating system.  See ``OS_*``
           definitions in this module for possible values.
         :raises: :exc:`OsNotDetected` if OS could not be detected
 
     .. method:: get_version() -> str
 
         :returns: Version of current operating system
+        :raises: :exc:`OsNotDetected` if OS could not be detected
+
+    .. method:: get_codename() -> str
+
+        :returns: Codename of current operating system if available,
+          or empty string if OS does not provide codename.
         :raises: :exc:`OsNotDetected` if OS could not be detected
 
 
@@ -87,7 +91,14 @@ Currently supported OSes:
 
     .. method:: get_version() -> str
 
-        :returns: standardized version for this OS. (ala Ubuntu Hardy Heron = "8.04")
+        :returns: standardized version for this OS. (e.g. Ubuntu Hardy Heron = "8.04")
+
+    .. method:: get_codename() -> str
+
+        :returns: codename for this OS. (e.g. Ubuntu Hardy Heron =
+          "hardy").  Empty string if OS does not have an associated
+          codename.
+        
 
 
 OS name definitions

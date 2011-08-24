@@ -50,7 +50,7 @@ caching and other optimizations for repeated querying.
 
       Get the :envvar:`ROS_PACKAGE_PATH` configuration of this instance. Read-only.
 
-   .. method:: get_manifest(name) -> :class:`Manifest`
+   .. method:: get_manifest(name) -> Manifest
 
       Get the :class:`Manifest` of the specified package.
 

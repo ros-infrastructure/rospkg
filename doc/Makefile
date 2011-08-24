@@ -128,3 +128,7 @@ doctest:
 	$(SPHINXBUILD) -b doctest $(ALLSPHINXOPTS) $(BUILDDIR)/doctest
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
+
+upload:
+	scp -r _build/html/ wgs32.willowgarage.com:/var/www/www.ros.org/html/doc/api/rospkg/html/sphinx/
+
