@@ -42,7 +42,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'rospkg'
-copyright = u'2011, Ken Conley, Tully Foote'
+copyright = u'2011, Willow Garage'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

@@ -42,3 +42,9 @@ binary_deb: dsc
 
 upload: source_deb
 	cd deb_dist && dput ppa:tully.foote/tully-test-ppa ../${NAME}_${VERSION}-1_source.changes 
+
+testsetup:
+	echo "running rospkg tests"
+
+test: testsetup
+	nosetests --with-coverage --cover-package=rospkg
