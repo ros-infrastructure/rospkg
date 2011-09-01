@@ -205,8 +205,6 @@ class Platform(object):
             raise ValueError("bad 'os' attribute")
         if not version:
             raise ValueError("bad 'version' attribute")
-        if notes:
-            raise ValueError("bad 'notes' attribute")            
         self.os = os_
         self.version = version
         self.notes = notes
@@ -234,11 +232,17 @@ class Depend(object):
     def __init__(self, name, type_):
         """
         Create new depend instance.
-        @param package: package name. must be non-empty
-        @type  package: str
+        @param name: dependency name (e.g. package/stack). Must be non-empty
+        @type  name: str
+        @param type_: dependency type, e.g. 'package', 'stack'.  Must be non-empty.
+        @type  type_: str
+        
+        @raise ValueError: if parameters are invalid
         """
         if not name:
             raise ValueError("bad '%s' attribute"%(type_))
+        if not type_:
+            raise ValueError("type_ must be specified")
         self.name = name
         self.type = type_
         
@@ -278,8 +282,8 @@ class Manifest(object):
                  'depends', 'rosdeps','platforms',\
                  'exports', 'version',\
                  'status', 'notes',\
-                 'unknown_tags', '_type']
-    def __init__(self, _type='package'):
+                 'unknown_tags', 'type']
+    def __init__(self, type_='package'):
         self.description = self.brief = self.author = \
                            self.license = self.license_url = \
                            self.url = self.status = \
@@ -288,7 +292,7 @@ class Manifest(object):
         self.rosdeps = []
         self.exports = []
         self.platforms = []
-        self._type = _type
+        self.type = type_
         
         # store unrecognized tags during parsing
         self.unknown_tags = []
