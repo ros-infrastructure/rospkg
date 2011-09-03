@@ -128,10 +128,6 @@ OS name definitions
 
    Name used for Mint OS.
 
-.. data:: OS_MANDRIVA
-
-   Name used for Mandriva Linux.
-
 .. data:: OS_OPENSUSE
 
    Name used for OpenSUSE OS.
