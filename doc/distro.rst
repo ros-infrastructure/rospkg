@@ -12,7 +12,7 @@ files.
 
 
 Data model
-==========
+----------
 
 The top level representation is a :class:`Distro` instance, which contains :class:`Variant` and :class:`DistroStack` instances.  :class:`DistroStack` instances have a :class:`VcsConfig` (:class:`SvnConfig`, :class:`GitConfig`, :class:`BzrConfig`, :class:`HgConfig`), which represents the source control information for the stack.::
 
@@ -23,7 +23,7 @@ The top level representation is a :class:`Distro` instance, which contains :clas
     
 
 Exceptions
-==========
+----------
 
 .. class:: InvalidDistro
 
@@ -31,7 +31,7 @@ Exceptions
 
 
 Utility functions
-=================
+-----------------
 
 .. method:: distro_uri(distro_name)
 
@@ -74,7 +74,7 @@ Utility functions
 
 
 Model
-======
+-----
 
 .. class:: DistroStack(stack_name, stack_version, release_name, rules)
 
@@ -125,7 +125,7 @@ Model
           this distro.
 
 Source control information
-===========================
+--------------------------
 
 .. class:: VcsConfig(type_)
 
