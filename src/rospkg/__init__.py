@@ -31,7 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 """
-Base ROS python library for manipulating ROS packages and stacks.o
+Base ROS python library for manipulating ROS packages and stacks.
 """
 
 from .common import MANIFEST_FILE, STACK_FILE, ResourceNotFound
