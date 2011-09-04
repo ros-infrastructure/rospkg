@@ -22,6 +22,7 @@ package/stack's manifest information.
    stacks
    environment
    os_detect
+   distro
 
 Example::
 

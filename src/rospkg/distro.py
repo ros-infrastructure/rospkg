@@ -55,8 +55,8 @@ def distro_uri(distro_name):
     """
     Get distro URI of main ROS distribution files.
     
-    @param distro_name: name of distro, e.g. 'diamondback'
-    @return: the SVN/HTTP URL of the specified distro.  This function should only be used
+    :param distro_name: name of distro, e.g. 'diamondback'
+    :returns: the SVN/HTTP URL of the specified distro.  This function should only be used
     with the main distros.
     """
     return "https://code.ros.org/svn/release/trunk/distros/%s.rosdistro"%(distro_name)
@@ -73,10 +73,10 @@ class DistroStack(object):
 
     def __init__(self, stack_name, stack_version, release_name, rules):
         """
-        @param stack_name: Name of stack
-        @param stack_version: Version number of stack.
-        @param release_name: name of distribution release.  Necessary for rule expansion.
-        @param rules: raw '_rules' data.  Will be converted into appropriate vcs config instance.
+        :param stack_name: Name of stack
+        :param stack_version: Version number of stack.
+        :param release_name: name of distribution release.  Necessary for rule expansion.
+        :param rules: raw '_rules' data.  Will be converted into appropriate vcs config instance.
         """
         self.name = stack_name
         self.version = stack_version
@@ -105,13 +105,9 @@ class Variant(object):
 
     def __init__(self, variant_name, extends, stack_names, stack_names_implicit):
         """
-        @param variant_name: name of variant to load from distro file
-        @type  variant_name: str
-        @param stack_names_implicit: full list of stacks implicitly included in this variant
-        @type  stack_names_implicit: [str]
-        @param raw_data: raw rosdistro data for this variant
-
-        @raise InvalidDistro
+        :param variant_name: name of variant to load from distro file, ``str``
+        :param stack_names_implicit: full list of stacks implicitly included in this variant, ``[str]``
+        :param raw_data: raw rosdistro data for this variant
         """
         self.name = variant_name
         self.extends = extends
@@ -135,11 +131,11 @@ class Distro(object):
     
     def __init__(self, stacks, variants, release_name, version, raw_data):
         """
-        @param stacks: dictionary mapping stack names to L{DistroStack} instances
-        @param variants: dictionary mapping variant names to L{Variant} instances
-        @param release_name: name of release, e.g. 'diamondback'
-        @param version: version number of release
-        @param raw_data: raw dictionary representation of a distro
+        :param stacks: dictionary mapping stack names to L{DistroStack} instances
+        :param variants: dictionary mapping variant names to L{Variant} instances
+        :param release_name: name of release, e.g. 'diamondback'
+        :param version: version number of release
+        :param raw_data: raw dictionary representation of a distro
         """
         self._stacks = stacks
         self.variants = variants
@@ -149,9 +145,9 @@ class Distro(object):
 
     def get_stacks(self, released=False):
         """
-        @param released: only included released stacks
-        @return: dictionary of stack names to DistroStack instances in
-        this distro.
+        :param released: only included released stacks
+        :returns: dictionary of stack names to :class:`DistroStack` instances in
+          this distro.
         """
         if released:
             return self._get_released_stacks()
@@ -172,11 +168,11 @@ class Distro(object):
 
 def load_distro(source_uri):
     """
-    @param source_uri: source URI of distro file, or path to distro
-    file.  Filename has precedence in resolution.
+    :param source_uri: source URI of distro file, or path to distro
+      file.  Filename has precedence in resolution.
 
-    @raise InvalidDistro
-    @raise ResourceNotFound
+    :raises :exc:`InvalidDistro`: if distro file is invalid
+    :raises :exc:`ResourceNotFound`: if file at *source_uri* is not found
     """
     try:
         # parse rosdistro yaml
@@ -232,11 +228,9 @@ def _load_variant(variant_name, all_variants_raw_data):
     
 def _load_distro_stacks(distro_doc, release_name):
     """
-    @param distro_doc: dictionary form of rosdistro file
-    @type distro_doc: dict
-    @return: dictionary of stack names to DistroStack instances
-    @rtype: {str : DistroStack}
-    @raise InvalidDistro: if distro_doc format is invalid
+    :param distro_doc: dictionary form of rosdistro file, `dict`
+    :returns: dictionary of stack names to :class:`DistroStack` instances, `{str : DistroStack}`
+    :raises :exc:`InvalidDistro`: if distro_doc format is invalid
     """
 
     # load stacks and expand out uri rules
@@ -271,13 +265,13 @@ def _distro_version(version_val):
 
 def distro_to_rosinstall(distro, branch, variant_name=None, implicit=True, released_only=True, anonymous=True):
     """
-    @param branch: branch to convert for
-    @param variant_name: if not None, only include stacks in the specified variant.
-    @param implicit: if variant_name is provided, include full (recursive) dependencies of variant, default True
-    @param released_only: only included released stacks, default True.
-    @param anonymous: create for anonymous access rules
+    :param branch: branch to convert for
+    :param variant_name: if not None, only include stacks in the specified variant.
+    :param implicit: if variant_name is provided, include full (recursive) dependencies of variant, default True
+    :param released_only: only included released stacks, default True.
+    :param anonymous: create for anonymous access rules
 
-    @raise KeyError: if branch is invalid or if distro is mis-configured
+    :raises :exc:`KeyError`: if branch is invalid or if distro is mis-configured
     """
     variant = distro.variants.get(variant_name, None)
     if variant_name:
@@ -301,10 +295,8 @@ def _get_rules(distro_doc, stack_name):
     Retrieve rules from distro_doc for specified stack.  This operates on
     the raw distro dictionary document.
 
-    @param distro_doc: rosdistro document
-    @type  distro_doc: dict
-    @param stack_name: name of stack to get rules for
-    @type  stack_name: str
+    :param distro_doc: rosdistro document, ``dict``
+    :param stack_name: name of stack to get rules for, ``str``
     """
     # top-level named section
     named_rules_d = distro_doc.get('_rules', {})
@@ -330,7 +322,10 @@ def _get_rules(distro_doc, stack_name):
     return update_r
         
 ################################################################################
-class _VcsConfig(object):
+class VcsConfig(object):
+    """
+    Base representation of a rosdistro VCS rules configuration.
+    """
 
     def __init__(self, type_):
         self.type = type_
@@ -348,11 +343,19 @@ class _VcsConfig(object):
             return [({type_: {"uri": uri, 'local-name': local_name} } )]
         
     def load(self, rules, rule_eval):
+        """
+        Initialize fields of this class based on the raw rosdistro
+        *rules* data after applying *rule_eval* function (e.g. to
+        replace variables in rules).
+
+        :param rules: raw rosdistro rules entry, ``dict``
+        :param rule_eval: function to evaluate rule values, ``fn(str) -> str``
+        """
         self.tarball_url = rule_eval(TARBALL_URI_EVAL)
         
     def get_branch(self, branch, anonymous):
         """
-        @raise ValueError: if branch is invalid
+        :raises :exc:`ValueError`: if branch is invalid
         """
         if branch == 'release-tar':
             return self.tarball_url, None
@@ -363,23 +366,25 @@ class _VcsConfig(object):
         return self.type == other.type and \
                self.tarball_url == other.tarball_url
 
-class _DvcsConfig(_VcsConfig):
+class DvcsConfig(VcsConfig):
     """
     Configuration information for a distributed VCS-style repository.
 
-     * repo_uri: base URI of repo
-     * dev_branch: git branch the code is developed
-     * distro_tag: a tag of the latest released code for a specific ROS distribution
-     * release_tag: a tag of the code for a specific release
+    Configuration fields:
+    
+     * ``repo_uri``: base URI of repo
+     * ``dev_branch``: git branch the code is developed
+     * ``distro_tag``: a tag of the latest released code for a specific ROS distribution
+     * ``release_tag``: a tag of the code for a specific release
     """
 
     def __init__(self, type_):
-        super(_DvcsConfig, self).__init__(type_)
+        super(DvcsConfig, self).__init__(type_)
         self.repo_uri = self.anon_repo_uri = None
         self.dev_branch = self.distro_tag = self.release_tag   = None
 
     def load(self, rules, rule_eval):
-        super(_DvcsConfig, self).load(rules, rule_eval)
+        super(DvcsConfig, self).load(rules, rule_eval)
 
         self.repo_uri = rule_eval(rules['uri'])
         if 'anon-uri' in rules:
@@ -392,10 +397,10 @@ class _DvcsConfig(_VcsConfig):
         
     def get_branch(self, branch, anonymous):
         """
-        @raise KeyError: invalid branch parameter 
+        :raises :exc:`KeyError`: invalid branch parameter 
         """
         if branch == 'release-tar':
-            return super(_DvcsConfig, self).get_branch(branch, anonymous)            
+            return super(DvcsConfig, self).get_branch(branch, anonymous)            
         elif branch == 'devel':
             version_tag = self.dev_branch
         elif branch == 'distro':
@@ -413,49 +418,46 @@ class _DvcsConfig(_VcsConfig):
             return self.repo_uri, version_tag            
         
     def __eq__(self, other):
-        return super(_DvcsConfig, self).__eq__(other) and \
+        return super(DvcsConfig, self).__eq__(other) and \
                self.repo_uri == other.repo_uri and \
                self.anon_repo_uri == other.anon_repo_uri and \
                self.dev_branch == other.dev_branch and \
                self.release_tag == other.release_tag and \
                self.distro_tag == other.distro_tag
     
-class GitConfig(_DvcsConfig):
+class GitConfig(DvcsConfig):
     """
-    Configuration information about an GIT repository
+    Configuration information about an GIT repository. See :class:`DvcsConfig`.
     """
 
     def __init__(self):
         super(GitConfig, self).__init__('git')
 
-class HgConfig(_DvcsConfig):
+class HgConfig(DvcsConfig):
     """
-    Configuration information about a Mercurial repository.
+    Configuration information about a Mercurial repository. See :class:`DvcsConfig`.
     """
 
     def __init__(self):
         super(HgConfig, self).__init__('hg')
 
-class BzrConfig(_DvcsConfig):
+class BzrConfig(DvcsConfig):
     """
-    Configuration information about an BZR repository.
-    
-     * repo_uri: base URI of repo
-     * dev_branch: hg branch the code is developed
-     * distro_tag: a tag of the latest released code for a specific ROS distribution
-     * release_tag: a tag of the code for a specific release
-     """
+    Configuration information about an BZR repository.  See :class:`DvcsConfig`.
+    """
 
     def __init__(self):
         super(BzrConfig, self).__init__('bzr')
 
-class SvnConfig(_VcsConfig):
+class SvnConfig(VcsConfig):
     """
     Configuration information about an SVN repository.
 
-     * dev: where the code is developed
-     * distro_tag: a tag of the code for a specific ROS distribution
-     * release_tag: a tag of the code for a specific release
+    Configuration fields:
+    
+     * ``dev``: where the code is developed
+     * ``distro_tag``: a tag of the code for a specific ROS distribution
+     * ``release_tag``: a tag of the code for a specific release
     """
     
     def __init__(self):
@@ -496,7 +498,7 @@ class SvnConfig(_VcsConfig):
         
     def get_branch(self, branch, anonymous):        
         """
-        @raise ValueError: if branch is invalid
+        :raises :exc:`ValueError`: if branch is invalid
         """
         if branch == 'release-tar':
             return super(SvnConfig, self).get_branch(branch, anonymous)
@@ -530,9 +532,22 @@ _vcs_configs = {
     }
 
 def get_vcs_configs():
+    """
+    :returns: Dictionary of supported :class:`VcsConfig` instances.
+      Key is the VCS type name, e.g. 'svn'. ``{str: VcsConfig}``
+    """
     return _vcs_configs.copy()
 
 def load_vcs_config(rules, rule_eval):
+    """
+    Factory for creating :class:`VcsConfig` subclass based on
+    rosdistro _rules data.
+
+    :param rules: rosdistro rules data
+    :param rules_eval: Function to apply to rule values, e.g. to
+      convert variables.  ``fn(str)->str``
+    :returns: :class:`VcsConfig` subclass instance with interpreted rules data.
+    """
     vcs_config = None
     for k, clazz in _vcs_configs.items():
         if k in rules:
