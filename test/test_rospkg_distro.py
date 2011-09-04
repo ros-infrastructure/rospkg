@@ -215,11 +215,12 @@ dback_versions = {
   }
 
 def test_load_distro_bad_data():
-    from rospkg.distro import load_distro, DistroNotFound, InvalidDistro
+    from rospkg import ResourceNotFound
+    from rospkg.distro import load_distro, InvalidDistro
     try:
         load_distro('bad')
         assert False
-    except DistroNotFound: pass
+    except ResourceNotFound: pass
     for i in range(1, 10):
         filename = 'bad%s.rosdistro'%(i)
         try:

@@ -49,7 +49,7 @@ class ResourceNotFound(Exception):
         self.ros_package_path = ros_package_path
 
     def __str__(self):
-        s = self.message
+        s = self.args[0] #python 2.6
         if self.ros_root:
             s = s + '\nROS_ROOT=%s'%(self.ros_root)
         if self.ros_package_path:

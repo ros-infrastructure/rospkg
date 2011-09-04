@@ -33,7 +33,7 @@
 def test_ResourceNotFound():
     from rospkg import ResourceNotFound
     r = ResourceNotFound('blah')
-    assert 'blah' == r.message
+    assert 'blah' == str(r)
     assert None == r.ros_root
     assert None == r.ros_package_path
     s = str(r)
@@ -41,7 +41,7 @@ def test_ResourceNotFound():
     assert 'blah' in s
     
     r = ResourceNotFound('blah', 'ros_root', 'ros_package_path')
-    assert 'blah' == r.message
+    assert 'blah' == str(r.args[0])
     assert 'ros_root' == r.ros_root
     assert 'ros_package_path' == r.ros_package_path
     s = str(r)

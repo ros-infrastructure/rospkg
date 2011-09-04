@@ -41,11 +41,15 @@ import sys
 import urllib2
 import yaml
 
+from .common import ResourceNotFound
+
 TARBALL_URI_EVAL ='https://code.ros.org/svn/release/download/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION/$STACK_NAME-$STACK_VERSION.tar.bz2'
 
-class DistroException(Exception): pass
-class DistroNotFound(DistroException): pass
-class InvalidDistro(DistroException): pass
+class InvalidDistro(Exception):
+    """
+    Distro file data does not match specification.
+    """
+    pass
 
 def distro_uri(distro_name):
     """
@@ -172,7 +176,7 @@ def load_distro(source_uri):
     file.  Filename has precedence in resolution.
 
     @raise InvalidDistro
-    @raise DistroNotFound
+    @raise ResourceNotFound
     """
     try:
         # parse rosdistro yaml
@@ -184,7 +188,7 @@ def load_distro(source_uri):
             try:
                 raw_data = yaml.load(urllib2.urlopen(source_uri))
             except ValueError:
-                raise DistroNotFound(source_uri)
+                raise ResourceNotFound(source_uri)
         if not type(raw_data) == dict:
             raise InvalidDistro("Distro must be a dictionary: %s"%(source_uri))
     except yaml.YAMLError as e:
