@@ -46,7 +46,7 @@ Currently supported OSes:
         
     .. method:: detect_os() -> tuple
 
-        :returns: (os_name, os_version), ``(str, str)``
+        :returns: (os_name, os_version, os_codename), ``(str, str, str)``
         :raises: :exc:`OsNotDetected` if OS could not be detected
 
     .. method:: get_detector([name]) -> OsDetector
