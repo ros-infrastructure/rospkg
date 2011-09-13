@@ -338,6 +338,7 @@ class OsDetect:
         self._os_list = os_list
         self._os_name = None
         self._os_version = None
+        self._os_codename = None
         self._os_detector = None
         self._override = False
 
@@ -355,7 +356,10 @@ class OsDetect:
         
     def detect_os(self):
         """
-        :returns: ``(os_name, os_version)``
+        Detect operating system.  Return value can be overridden by
+        the :env:`ROS_OS_OVERRIDE` environment variable.
+        
+        :returns: (os_name, os_version, os_codename), ``(str, str, str)``
         :raises: :exc:`OsNotDetected` if OS could not be detected
         """
         if 'ROS_OS_OVERRIDE' in os.environ:
@@ -366,10 +370,11 @@ class OsDetect:
                 if os_detector.is_os():
                     self._os_name = os_name
                     self._os_version = os_detector.get_version()
+                    self._os_codename = os_detector.get_codename()
                     self._os_detector = os_detector
 
         if self._os_name:
-            return self._os_name, self._os_version
+            return self._os_name, self._os_version, self._os_codename
         else: # No solution found
             attempted = [x[0] for x in self._os_list]
             raise OsNotDetected("Could not detect OS, tried %s"%attempted)
@@ -409,6 +414,11 @@ class OsDetect:
         if not self._os_version:
             self.detect_os()
         return self._os_version
+
+    def get_codename(self):
+        if not self._os_codename:
+            self.detect_os()
+        return self._os_codename
 
 OS_ARCH='arch'
 OS_CYGWIN='cygwin'

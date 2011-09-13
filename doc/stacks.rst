@@ -101,6 +101,8 @@ caching and other optimizations for repeated querying.
     Expand names into a list of packages. Names can either be of packages or stacks.
 
     :param names: list of names of stacks or packages, ``[str]``
+    :param rospack: :class:`RosPack` instance
+    :param rosstack: :class:`RosStack` instance
     :returns: ([packages], [not_found]). ``expand_packages()`` returns
       two lists. The first is of packages names. The second is a list
       of names for which no matching stack or package was found. Lists
