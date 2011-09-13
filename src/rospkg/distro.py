@@ -57,7 +57,7 @@ def distro_uri(distro_name):
     
     :param distro_name: name of distro, e.g. 'diamondback'
     :returns: the SVN/HTTP URL of the specified distro.  This function should only be used
-    with the main distros.
+      with the main distros.
     """
     return "https://code.ros.org/svn/release/trunk/distros/%s.rosdistro"%(distro_name)
 
@@ -131,8 +131,8 @@ class Distro(object):
     
     def __init__(self, stacks, variants, release_name, version, raw_data):
         """
-        :param stacks: dictionary mapping stack names to L{DistroStack} instances
-        :param variants: dictionary mapping variant names to L{Variant} instances
+        :param stacks: dictionary mapping stack names to :class:`DistroStack` instances
+        :param variants: dictionary mapping variant names to :class:`Variant` instances
         :param release_name: name of release, e.g. 'diamondback'
         :param version: version number of release
         :param raw_data: raw dictionary representation of a distro
@@ -171,8 +171,8 @@ def load_distro(source_uri):
     :param source_uri: source URI of distro file, or path to distro
       file.  Filename has precedence in resolution.
 
-    :raises :exc:`InvalidDistro`: if distro file is invalid
-    :raises :exc:`ResourceNotFound`: if file at *source_uri* is not found
+    :raises: :exc:`InvalidDistro` If distro file is invalid
+    :raises: :exc:`ResourceNotFound` If file at *source_uri* is not found
     """
     try:
         # parse rosdistro yaml
@@ -230,7 +230,7 @@ def _load_distro_stacks(distro_doc, release_name):
     """
     :param distro_doc: dictionary form of rosdistro file, `dict`
     :returns: dictionary of stack names to :class:`DistroStack` instances, `{str : DistroStack}`
-    :raises :exc:`InvalidDistro`: if distro_doc format is invalid
+    :raises: :exc:`InvalidDistro` if distro_doc format is invalid
     """
 
     # load stacks and expand out uri rules
@@ -271,7 +271,7 @@ def distro_to_rosinstall(distro, branch, variant_name=None, implicit=True, relea
     :param released_only: only included released stacks, default True.
     :param anonymous: create for anonymous access rules
 
-    :raises :exc:`KeyError`: if branch is invalid or if distro is mis-configured
+    :raises: :exc:`KeyError` If branch is invalid or if distro is mis-configured
     """
     variant = distro.variants.get(variant_name, None)
     if variant_name:
@@ -355,7 +355,7 @@ class VcsConfig(object):
         
     def get_branch(self, branch, anonymous):
         """
-        :raises :exc:`ValueError`: if branch is invalid
+        :raises: :exc:`ValueError` If branch is invalid
         """
         if branch == 'release-tar':
             return self.tarball_url, None
@@ -397,7 +397,7 @@ class DvcsConfig(VcsConfig):
         
     def get_branch(self, branch, anonymous):
         """
-        :raises :exc:`KeyError`: invalid branch parameter 
+        :raises: :exc:`KeyError` Invalid branch parameter 
         """
         if branch == 'release-tar':
             return super(DvcsConfig, self).get_branch(branch, anonymous)            
@@ -427,7 +427,7 @@ class DvcsConfig(VcsConfig):
     
 class GitConfig(DvcsConfig):
     """
-    Configuration information about an GIT repository. See :class:`DvcsConfig`.
+    Configuration information about an GIT repository. See parent class :class:`DvcsConfig` for more API information.
     """
 
     def __init__(self):
@@ -435,7 +435,7 @@ class GitConfig(DvcsConfig):
 
 class HgConfig(DvcsConfig):
     """
-    Configuration information about a Mercurial repository. See :class:`DvcsConfig`.
+    Configuration information about a Mercurial repository. See parent class :class:`DvcsConfig` for more API information.
     """
 
     def __init__(self):
@@ -443,7 +443,7 @@ class HgConfig(DvcsConfig):
 
 class BzrConfig(DvcsConfig):
     """
-    Configuration information about an BZR repository.  See :class:`DvcsConfig`.
+    Configuration information about an BZR repository.  See parent class :class:`DvcsConfig` for more API information.
     """
 
     def __init__(self):
@@ -498,7 +498,7 @@ class SvnConfig(VcsConfig):
         
     def get_branch(self, branch, anonymous):        
         """
-        :raises :exc:`ValueError`: if branch is invalid
+        :raises: :exc:`ValueError` If branch is invalid
         """
         if branch == 'release-tar':
             return super(SvnConfig, self).get_branch(branch, anonymous)

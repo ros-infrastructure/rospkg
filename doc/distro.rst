@@ -1,7 +1,7 @@
 rosdistro file library
 ======================
 
-.. module: rospkg.distro
+.. currentmodule:: rospkg.distro
 
 This submodule provides the :class:`Distro` class, which provides an
 API for processing `rosdistro <http://www.ros.org/wiki/rosdistro>`_
@@ -25,9 +25,7 @@ The top level representation is a :class:`Distro` instance, which contains :clas
 Exceptions
 ----------
 
-.. class:: InvalidDistro
-
-    Distro file data does not match specification.
+.. autoclass:: InvalidDistro
 
 
 Utility functions
@@ -76,7 +74,7 @@ Utility functions
 Model
 -----
 
-.. class:: DistroStack(stack_name, stack_version, release_name, rules)
+.. class:: DistroStack
 
     Stores information about a stack release
 
@@ -112,8 +110,8 @@ Model
 
     Store information in a rosdistro file.
 
-    :param stacks: dictionary mapping stack names to L{DistroStack} instances
-    :param variants: dictionary mapping variant names to L{Variant} instances
+    :param stacks: dictionary mapping stack names to :class:`DistroStack` instances
+    :param variants: dictionary mapping variant names to :class:`Variant` instances
     :param release_name: name of release, e.g. 'diamondback'
     :param version: version number of release
     :param raw_data: raw dictionary representation of a distro
@@ -127,73 +125,21 @@ Model
 Source control information
 --------------------------
 
-.. class:: VcsConfig(type_)
+.. autoclass:: VcsConfig
+   :members:
 
-    Base representation of a rosdistro VCS rules configuration.
 
-    .. method:: to_rosinstall(local_name, branch, anonymous)
+.. autoclass:: DvcsConfig
+   :members:
     
-        Convert to rosinstall entry.
-        
-    .. method:: load(rules, rule_eval)
+.. autoclass:: GitConfig
 
-        Initialize fields of this class based on the raw rosdistro
-        *rules* data after applying *rule_eval* function (e.g. to
-        replace variables in rules).
+.. autoclass:: HgConfig
 
-        :param rules: raw rosdistro rules entry, ``dict``
-        :param rule_eval: function to evaluate rule values, ``fn(str) -> str``
-        
-    .. method:: get_branch(branch, anonymous)
+.. autoclass:: BzrConfig
 
-        :raises: :exc:`ValueError` if branch is invalid
+.. autoclass:: SvnConfig()
 
-
-.. class:: DvcsConfig(type_)
-
-    Configuration information for a distributed VCS-style repository.
-    See parent class :class:`VcsConfig` for more API informatin.
-
-    Configuration fields:
-    
-     * ``repo_uri``: base URI of repo
-     * ``dev_branch``: git branch the code is developed
-     * ``distro_tag``: a tag of the latest released code for a specific ROS distribution
-     * ``release_tag``: a tag of the code for a specific release
-
-    .. method:: load(rules, rule_eval)
-        
-    .. method:: get_branch(branch, anonymous)
-
-        :raises :exc:`KeyError`: invalid branch parameter 
-    
-.. class:: GitConfig()
-
-    Configuration information about an GIT repository. See parent class :class:`DvcsConfig` for more API information.
-
-.. class:: HgConfig()
-
-    Configuration information about a Mercurial repository. See parent class :class:`DvcsConfig` for more API information.
-
-.. class:: BzrConfig()
-
-    Configuration information about an BZR repository.  See parent class :class:`DvcsConfig` for more API information.
-
-.. class:: SvnConfig()
-
-    Configuration information about an SVN repository.
-
-    Configuration fields:
-    
-     * ``dev``: where the code is developed
-     * ``distro_tag``: a tag of the code for a specific ROS distribution
-     * ``release_tag``: a tag of the code for a specific release
-        
-    .. method:: load(rules, rule_eval)
-        
-    .. method:: get_branch(branch, anonymous)
-
-        :raises: :exc:`ValueError` if branch is invalid
         
 
 .. method:: get_vcs_configs() -> {str: VcsConfig}

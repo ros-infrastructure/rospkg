@@ -81,7 +81,11 @@ def read_issue(filename="/etc/issue"):
             return f.read().split()
     return None
 
-class OsNotDetected(Exception): pass
+class OsNotDetected(Exception):
+    """
+    Exception to indicate failure to detect operating system.
+    """
+    pass
 
 class OsDetector:
     """
@@ -105,7 +109,7 @@ class OsDetector:
     def get_codename(self):
         """
         :returns: codename for this OS. (ala Ubuntu Hardy Heron = "hardy").  If codenames are not available for this OS, return empty string.
-        :raises: `OsNotDetected` if called on incorrect OS.
+        :raises: :exc:`OsNotDetected` if called on incorrect OS.
         """
         raise NotImplementedError("get_codename unimplemented")
 

@@ -23,9 +23,7 @@ Currently supported OSes:
 - Ubuntu
 
 
-.. class:: OsNotDetected
-
-   Exception to indicate failure to detect operating system.
+.. autoclass:: OsNotDetected
 
 .. class:: OsDetect(os_list)
 
@@ -38,7 +36,7 @@ Currently supported OSes:
 
     .. attribute:: default_os_list
 
-        List currently registered detectors.  Must not be modified directly.
+        List of currently registered detectors.  Must not be modified directly.
     
     .. staticmethod:: register_default(os_name, os_detector)
 
@@ -79,26 +77,9 @@ Currently supported OSes:
         :raises: :exc:`OsNotDetected` if OS could not be detected
 
 
-.. class:: OsDetector
+.. autoclass:: OsDetector
+   :members:
 
-   Generic API for detecting a specific OS.  
-
-    .. method:: is_os() -> bool
-
-        :returns: if the specific OS which this class is designed to
-          detect is present.  Only one version of this class should
-          return for any version.
-
-    .. method:: get_version() -> str
-
-        :returns: standardized version for this OS. (e.g. Ubuntu Hardy Heron = "8.04")
-
-    .. method:: get_codename() -> str
-
-        :returns: codename for this OS. (e.g. Ubuntu Hardy Heron =
-          "hardy").  Empty string if OS does not have an associated
-          codename.
-        
 
 
 OS name definitions
