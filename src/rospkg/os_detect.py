@@ -74,7 +74,7 @@ def uname_get_machine():
 
 def read_issue(filename="/etc/issue"):
     """
-    @return: list of strings in issue file, or None if issue file cannot be read/split
+    :returns: list of strings in issue file, or None if issue file cannot be read/split
     """
     if os.path.exists(filename):
         with open(filename, 'r') as f:
@@ -89,25 +89,23 @@ class OsDetector:
     """
     def is_os(self):
         """
-        @return: if the specific OS which this class is designed to
-        detect is present.  Only one version of this class should
-        return for any version.
+        :returns: if the specific OS which this class is designed to
+          detect is present.  Only one version of this class should
+          return for any version.
         """
         raise NotImplementedError("is_os unimplemented")
 
     def get_version(self):
         """
-        @return: standardized version for this OS. (ala Ubuntu Hardy Heron = "8.04")
-
-        @raise OsNotDetected: if called on incorrect OS.
+        :returns: standardized version for this OS. (ala Ubuntu Hardy Heron = "8.04")
+        :raises: :exc:`OsNotDetected` if called on incorrect OS.
         """
         raise NotImplementedError("get_version unimplemented")
 
     def get_codename(self):
         """
-        @return: codename for this OS. (ala Ubuntu Hardy Heron = "hardy").  If codenames are not available for this OS, return empty string.
-
-        @raise OsNotDetected: if called on incorrect OS.
+        :returns: codename for this OS. (ala Ubuntu Hardy Heron = "hardy").  If codenames are not available for this OS, return empty string.
+        :raises: `OsNotDetected` if called on incorrect OS.
         """
         raise NotImplementedError("get_codename unimplemented")
 
@@ -341,12 +339,20 @@ class OsDetect:
 
     @staticmethod
     def register_default(os_name, os_detector):
-        OsDetect.default_os_list.append((os_name, os_detector))
+        """
+        Register detector to be used with all future instances of
+        :class:`OsDetect`.  The new detector will have precedence over
+        any previously registered detectors associated with *os_name*.
+
+        :param os_name: OS key associated with OS detector
+        :param os_detector: :class:`OsDetector` instance
+        """
+        OsDetect.default_os_list.insert(0, (os_name, os_detector))
         
     def detect_os(self):
         """
-        @return: (os_name, os_version)
-        @raise OsNotDetected: is OS could not be detected
+        :returns: ``(os_name, os_version)``
+        :raises: :exc:`OsNotDetected` if OS could not be detected
         """
         if 'ROS_OS_OVERRIDE' in os.environ:
             self._os_name, self._os_version = os.environ["ROS_OS_OVERRIDE"].split(':')
@@ -366,9 +372,9 @@ class OsDetect:
 
     def get_detector(self, name=None):
         """
-        Get detector used for specified OS name, or the detector for this OS if name is None.
+        Get detector used for specified OS name, or the detector for this OS if name is ``None``.
         
-        @raises: KeyError
+        :raises: :exc:`KeyError`
         """
         if name is None:
             if not self._os_detector:
@@ -380,6 +386,13 @@ class OsDetect:
             except IndexError:
                 raise KeyError(name)
         
+    def add_detector(self, name, detector):
+        """
+        Add detector to list of detectors used by this instance.  *detector* will override any previous
+        detectors associated with *name*.
+        """
+        self._os_list.insert(0, (name, detector))
+
     def get_name(self):
         if not self._os_name:
             self.detect_os()

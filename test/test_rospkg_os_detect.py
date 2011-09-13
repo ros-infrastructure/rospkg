@@ -34,13 +34,19 @@ import os
 import sys
 import unittest
 
-class TestOs():
+class TrueOs():
     def is_os(self):
         return True
     def get_version(self):
         return "os_version"
 
-class DummyOs(object):
+class TrueOs2():
+    def is_os(self):
+        return True
+    def get_version(self):
+        return "os_version"
+
+class FalseOs(object):
     def is_os(self):
         return False
     def get_version(self):
@@ -406,21 +412,46 @@ def test_OsDetect():
     
 def test_OsDetect_single():
     from rospkg.os_detect import OsDetect    
-    detect = OsDetect([('TestOs', TestOs())])
-    assert "TestOs" == detect.get_name()
-    assert "TestOs" == detect.get_name()
-    detect = OsDetect([('TestOs', TestOs())])
+    detect = OsDetect([('TrueOs', TrueOs())])
+    assert "TrueOs" == detect.get_name()
+    assert "TrueOs" == detect.get_name()
+    detect = OsDetect([('TrueOs', TrueOs())])
     assert "os_version" == detect.get_version()
     assert "os_version" == detect.get_version()
     
-    detect = OsDetect([('TestOs', TestOs())])
-    assert isinstance(detect.get_detector(), TestOs)
-    assert isinstance(detect.get_detector('TestOs'), TestOs)
+    detect = OsDetect([('TrueOs', TrueOs())])
+    assert isinstance(detect.get_detector(), TrueOs)
+    assert isinstance(detect.get_detector('TrueOs'), TrueOs)
 
+def test_OsDetect_register_default_add_detector():
+    # test behavior of register_default and add_detector.  Both take
+    # precedence over previous detectors, but at different scopes.
+    from rospkg.os_detect import OsDetect
+    o1 = TrueOs()
+    o2 = TrueOs2()
+    key = 'TrueOs'
+    detect = OsDetect([(key, o1)])
+
+    assert detect.get_detector(key) == o1
+    detect.register_default(key, o2)
+    assert detect.get_detector(key) == o1
+    detect.add_detector(key, o2)
+    assert detect.get_detector(key) == o2    
+
+    detect = OsDetect()
+    assert detect.get_detector(key) == o2
+    detect.add_detector(key, o1)
+    assert detect.get_detector(key) == o1
+    
+    # restore precendence of o1 in default list
+    detect.register_default(key, o1)
+    detect = OsDetect()
+    assert detect.get_detector(key) == o1
+    
 def test_OsDetect_nomatch():
     from rospkg.os_detect import OsDetect, OsNotDetected
-    detect = OsDetect([('Dummy', DummyOs())])
-    assert isinstance(detect.get_detector('Dummy'), DummyOs)
+    detect = OsDetect([('Dummy', FalseOs())])
+    assert isinstance(detect.get_detector('Dummy'), FalseOs)
     try:
         detect.get_name()
         assert False
@@ -435,40 +466,40 @@ def test_OsDetect_nomatch():
     except OsNotDetected: pass
     
 
-def xTestOsDetect_first_of_two():
-    osa = roslib.os_detect.OSDetect([TestOs(), DummyOs()])
+def xTrueOsDetect_first_of_two():
+    osa = roslib.os_detect.OSDetect([TrueOs(), FalseOs()])
     assert "os_name" == osa.get_name()
     assert "os_version" == osa.get_version()
     os_class = osa.get_os()
     assert "os_name" == os_class.get_name()
     assert "os_version" == os_class.get_version()
 
-def xTestOsDetect_second_of_two():
-    osa = roslib.os_detect.OSDetect([DummyOs(), TestOs()])
+def xTrueOsDetect_second_of_two():
+    osa = roslib.os_detect.OSDetect([FalseOs(), TrueOs()])
     assert "os_name", osa.get_name()
     assert "os_version", osa.get_version()
     os_class = osa.get_os()
     assert "os_name" == os_class.get_name()
     assert "os_version" == os_class.get_version()
 
-def xTestOsDetect_first_of_many():
-    osa = roslib.os_detect.OSDetect([TestOs(), DummyOs(), DummyOs(), DummyOs(), DummyOs()])
+def xTrueOsDetect_first_of_many():
+    osa = roslib.os_detect.OSDetect([TrueOs(), FalseOs(), FalseOs(), FalseOs(), FalseOs()])
     assert "os_name" == osa.get_name()
     assert "os_version" == osa.get_version()
     os_class = osa.get_os()
     assert "os_name" == os_class.get_name()
     assert "os_version" == os_class.get_version()
 
-def xTestOsDetect_second_of_many():
-    osa = roslib.os_detect.OSDetect([DummyOs(), TestOs(), DummyOs(), DummyOs(), DummyOs()])
+def xTrueOsDetect_second_of_many():
+    osa = roslib.os_detect.OSDetect([FalseOs(), TrueOs(), FalseOs(), FalseOs(), FalseOs()])
     assert "os_name" == osa.get_name()
     assert "os_version" == osa.get_version()
     os_class = osa.get_os()
     assert "os_name" == os_class.get_name()
     assert "os_version" == os_class.get_version()
 
-def xTestOsDetect_last_of_many():
-    osa = roslib.os_detect.OSDetect([DummyOs(), DummyOs(), DummyOs(), DummyOs(), TestOs(),])
+def xTrueOsDetect_last_of_many():
+    osa = roslib.os_detect.OSDetect([FalseOs(), FalseOs(), FalseOs(), FalseOs(), TrueOs(),])
     assert "os_name", osa.get_name()
     assert "os_version", osa.get_version()
     os_class = osa.get_os()
