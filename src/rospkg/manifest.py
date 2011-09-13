@@ -68,7 +68,7 @@ def _check_optional(name, allowXHTML=False):
     def check(n, filename):
         n = _get_nodes_by_name(n, name)
         if len(n) > 1:
-            raise InvalidManifest("Invalid manifest file: must have a single '%s' element"%name)
+            raise InvalidManifest("Invalid manifest file [%s]: must have a single '%s' element"%(filename, name))
         if n:
             if allowXHTML:
                 return ''.join([x.toxml() for x in n[0].childNodes])

@@ -193,11 +193,11 @@ def test_parse_bad_file():
         with open(p, 'r') as f:
             contents = f.read()
         try:
-            parse_manifest(MANIFEST_FILE, contents, p)
+            parse_manifest(MANIFEST_FILE, contents, filename=p)
             assert False, "parse should have failed on bad manifest"
         except InvalidManifest as e:
             print(str(e))
-            assert b in str(e), "file name should be in error message [%s]"%(str(e))
+            assert p in str(e), "file name [%s] should be in error message [%s]"%(p, str(e))
     
 EXAMPLE1 = """<package>
   <description brief="a brief description">Line 1

@@ -87,9 +87,9 @@ def test_to_rosinstall():
             retval = vcs_config.to_rosinstall('local_name', branch, anonymous)
             assert retval == rosinstalls[vcs][branch], "%s %s:\n%s\nvs.\n%s"%(vcs, branch, retval, rosinstalls[vcs][branch])
     
-def test__VcsConfig():
-    from rospkg.distro import _VcsConfig
-    vcs_config = _VcsConfig('fake')
+def test_VcsConfig():
+    from rospkg.distro import VcsConfig
+    vcs_config = VcsConfig('fake')
     vcs_config.tarball_url = 'http://foo'
     assert 'fake' == vcs_config.type
     for b in ['devel', 'release', 'distro']:
