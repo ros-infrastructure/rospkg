@@ -40,19 +40,30 @@ Currently supported OSes:
     
     .. staticmethod:: register_default(os_name, os_detector)
 
-        Add :class:`OsDetector` to the default list of detectors.    
+        Register detector to be used with all future instances of
+        :class:`OsDetect`.  The new detector will have precedence over
+        any previously registered detectors associated with *os_name*.
         
-    .. method:: detect_os() -> (str, str)
+    .. method:: detect_os() -> tuple
 
-        :returns: (os_name, os_version)
+        :returns: (os_name, os_version), ``(str, str)``
         :raises: :exc:`OsNotDetected` if OS could not be detected
 
-    .. method:: get_detector(name) -> OsDetector
+    .. method:: get_detector([name]) -> OsDetector
 
-        Get detector used for specified OS name.
+        Get detector used for specified OS name, or the detector for this OS if name is ``None``.
 
         :raises: :exc:`KeyError`
         
+    .. method:: add_detector(name, detector)
+
+        Add detector to list of detectors used by this instance.
+        *detector* will override any previous detectors associated
+        with *name*.
+
+        :param name: OS name that detector matches
+        :param detector: :class:`OsDetector` instance
+
     .. method:: get_os() -> OsDetector
 
         Get :class:`OsDetector` for this operating system.
@@ -75,6 +86,7 @@ Currently supported OSes:
         :returns: Codename of current operating system if available,
           or empty string if OS does not provide codename.
         :raises: :exc:`OsNotDetected` if OS could not be detected
+
 
 
 .. autoclass:: OsDetector

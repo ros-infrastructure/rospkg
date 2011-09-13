@@ -394,6 +394,9 @@ class OsDetect:
         """
         Add detector to list of detectors used by this instance.  *detector* will override any previous
         detectors associated with *name*.
+
+        :param name: OS name that detector matches
+        :param detector: :class:`OsDetector` instance
         """
         self._os_list.insert(0, (name, detector))
 
