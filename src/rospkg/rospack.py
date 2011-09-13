@@ -46,16 +46,12 @@ def _read_rospack_cache(cache_name, cache, ros_root, ros_package_path):
     specifies a ROS_ROOT and ROS_PACKAGE_PATH, which must match the
     requested environment.
     
-    @param cache_name: name of cache file, e.g. rospack_cache
-    @param cache: empty dictionary to store package list in. 
-        The format of the cache is {package_name: file_path}.
-    @type  cache: {str: str, str, str}
-    @param ros_package_path: ROS_ROOT value to validate cache.
-    @type  ros_root: str
-    @param ros_package_path: ROS_PACKAGE_PATH value or '' if not specified
-    @type  ros_package_path: str
-    @return: True if on-disk cache matches and was loaded, false otherwise
-    @rtype: bool
+    :param cache_name: name of cache file, e.g. rospack_cache
+    :param cache: empty dictionary to store package list in. 
+        The format of the cache is {package_name: file_path}. ``{str: str}``
+    :param ros_package_path: :env:`ROS_ROOT` value to validate cache, ``str``
+    :param ros_package_path: :env:`ROS_PACKAGE_PATH` value or '' if not specified, ``str``
+    :returns: ``True`` if on-disk cache matches and was loaded, ``False`` otherwise, ``bool``
     """
     cache_path = os.path.join(get_ros_home(), cache_name)
     if not os.path.exists(cache_path):
@@ -92,14 +88,10 @@ def list_by_path(manifest_name, path, cache):
     mappings. list_by_path() does NOT returned cached results
     -- it only updates the cache.
     
-    @param manifest_name: MANIFEST_FILE or STACK_FILE
-    @type  manifest_name: str
-    @param path: path to list resources in
-    @type  path: str
-    @param cache: path cache to update. Maps resource name to directory path.
-    @type  cache: {str: str}
-    @return: complete list of resources in ROS environment.
-    @rtype: [str]
+    :param manifest_name: MANIFEST_FILE or STACK_FILE, ``str``
+    :param path: path to list resources in, ``str``
+    :param cache: path cache to update. Maps resource name to directory path, ``{str: str}``
+    :returns: complete list of resources in ROS environment, ``[str]``
     """
     resources = []
     path = os.path.abspath(path)
@@ -139,10 +131,10 @@ class ManifestManager(object):
         cache_name, and list_by_path_fn to customize behavior of
         ManifestManager.
         
-        @param manifest_name: MANIFEST_FILE or STACK_FILE
-        @param cache_name: rospack_cache or rosstack_cache
-        @param ros_root: (optional) override ROS_ROOT.
-        @param ros_package_path: (optional) override ROS_PACKAGE_PATH.
+        :param manifest_name: MANIFEST_FILE or STACK_FILE
+        :param cache_name: rospack_cache or rosstack_cache
+        :param ros_root: (optional) override ROS_ROOT.
+        :param ros_package_path: (optional) override ROS_PACKAGE_PATH.
         To specify no ROS_PACKAGE_PATH, use the empty string.  An
         assignment of None will use the default path.
         """
@@ -171,7 +163,7 @@ class ManifestManager(object):
 
     def get_manifest(self, name):
         """
-        @raise InvalidManifest
+        :raises: :exc:`InvalidManifest`
         """
         if name in self._manifests:
             return self._manifests[name]
@@ -194,7 +186,7 @@ class ManifestManager(object):
         """
         List resources.
 
-        @return: complete list of package names in ROS environment
+        :returns: complete list of package names in ROS environment
         @rtype: [str]
         """
         self._update_location_cache()
@@ -202,10 +194,9 @@ class ManifestManager(object):
 
     def get_path(self, name):
         """
-        @param name: package name
-        @type  name: str
-        @return: filesystem path of package
-        @raise ResourceNotFound
+        :param name: package name, ``str``
+        :returns: filesystem path of package
+        :raises: :exc:`ResourceNotFound`
         """
         self._update_location_cache()
         if not name in self._location_cache:
@@ -215,7 +206,7 @@ class ManifestManager(object):
         
     def _load_manifest(self, name):
         """
-        @raise ResourceNotFound
+        :raises: :exc:`ResourceNotFound`
         """
         retval = self._manifests[name] = parse_manifest_file(self.get_path(name), self._manifest_name)
         return retval
@@ -228,15 +219,11 @@ class ManifestManager(object):
         Get dependencies of a resource.  If implicit is True, this
         includes implicit (recursive) dependencies.
 
-        @param name: resource name
-        @type  name: str
-        @param implicit: include implicit (recursive) dependencies
-        @type  implicit: bool
+        :param name: resource name, ``str``
+        :param implicit: include implicit (recursive) dependencies, ``bool``
 
-        @return: list of names of dependencies.
-        @rtype: [str]
-
-        @raise InvalidManifest        
+        :returns: list of names of dependencies, ``[str]``
+        :raises: :exc:`InvalidManifest`
         """
         if not implicit:
             m = self.get_manifest(name)
@@ -278,8 +265,8 @@ class RosPack(ManifestManager):
     
     def __init__(self, ros_root=None, ros_package_path=None):
         """
-        @param ros_root: (optional) override ROS_ROOT.
-        @param ros_package_path: (optional) override ROS_PACKAGE_PATH.
+        :param ros_root: (optional) override ROS_ROOT.
+        :param ros_package_path: (optional) override ROS_PACKAGE_PATH.
         To specify no ROS_PACKAGE_PATH, use the empty string.  An
         assignment of None will use the default path.
         """
@@ -292,13 +279,10 @@ class RosPack(ManifestManager):
         """
         Collect rosdeps of specified package into a dictionary.
         
-        @param package: package name
-        @type  package: str
-        @param implicit: include implicit (recursive) rosdeps
-        @type  implicit: bool
+        :param package: package name, ``str``
+        :param implicit: include implicit (recursive) rosdeps, ``bool``
         
-        @return: list of rosdep names.
-        @rtype: [str]
+        :returns: list of rosdep names, ``[str]``
         """
         m = self.get_manifest(package)
         if implicit:
@@ -311,10 +295,8 @@ class RosPack(ManifestManager):
         Compute recursive rosdeps of a single package and cache the
         result in self._rosdeps_cache.
 
-        @param package: package name
-        @type  package: str
-        @return: list of rosdeps
-        @rtype: [str]
+        :param package: package name, ``str``
+        :returns: list of rosdeps, ``[str]``
         """
         if package in self._rosdeps_cache:
             return self._rosdeps_cache[package]
@@ -336,11 +318,9 @@ class RosPack(ManifestManager):
         
     def stack_of(self, package):
         """
-        @param package: package name
-        @type  package: str
-        @return: name of stack that package is in, or None if package is not part of a stack
-        @rtype: str
-        @raise ResourceNotFound: if package cannot be located
+        :param package: package name, ``str``
+        :returns: name of stack that package is in, or None if package is not part of a stack, ``str``
+        :raises: :exc:`ResourceNotFound` If package cannot be located
         """
         d = self.get_path(package)
         while d and os.path.dirname(d) != d:
@@ -354,29 +334,25 @@ class RosStack(ManifestManager):
     
     def __init__(self, ros_root=None, ros_package_path=None):
         """
-        @param ros_root: (optional) override ROS_ROOT.
-        @param ros_package_path: (optional) override ROS_PACKAGE_PATH.
-        To specify no ROS_PACKAGE_PATH, use the empty string.  An
-        assignment of None will use the default path.
+        :param ros_root: (optional) override ROS_ROOT.
+        :param ros_package_path: (optional) override ROS_PACKAGE_PATH.
+          To specify no ROS_PACKAGE_PATH, use the empty string.  An
+          assignment of None will use the default path.
         """
         super(RosStack, self).__init__(STACK_FILE, 'rosstack_cache',
                                        ros_root, ros_package_path)
             
     def packages_of(self, stack):
         """
-        @return: name of packages that are part of stack
-        @rtype: [str]
-        @raise ResourceNotFound: if stack cannot be located
+        :returns: name of packages that are part of stack, ``[str]``
+        :raises: :exc:`ResourceNotFound` If stack cannot be located
         """
         return list_by_path(MANIFEST_FILE, self.get_path(stack), {})
 
     def get_stack_version(self, stack):
         """
-        @param env: override environment variables
-        @type  env: {str: str}
-
-        @return: version number of stack, or None if stack is unversioned.
-        @rtype: str
+        :param env: override environment variables, ``{str: str}``
+        :returns: version number of stack, or None if stack is unversioned, ``str``
         """
         return get_stack_version_by_dir(self.get_path(stack))
 
@@ -385,12 +361,10 @@ def expand_to_packages(names, rospack, rosstack):
     """
     Expand names into a list of packages. Names can either be of packages or stacks.
 
-    @param names: names of stacks or packages
-    @type  names: [str]
-    @return: ([packages], [not_found]). expand_packages() returns two
-    lists. The first is of packages names. The second is a list of
-    names for which no matching stack or package was found. Lists may have duplicates.
-    @rtype: ([str], [str])
+    :param names: names of stacks or packages, ``[str]``
+    :returns: ([packages], [not_found]). expand_packages() returns two
+      lists. The first is of packages names. The second is a list of
+      names for which no matching stack or package was found. Lists may have duplicates. ``([str], [str])``
     """
     if type(names) not in (tuple, list):
         raise ValueError("names must be a list of strings")
@@ -415,11 +389,9 @@ def get_stack_version_by_dir(stack_dir):
     """
     Get stack version where stack_dir points to root directory of stack.
     
-    @param env: override environment variables
-    @type  env: {str: str}
+    :param env: override environment variables, ``{str: str}``
 
-    @return: version number of stack, or None if stack is unversioned.
-    @rtype: str
+    :returns: version number of stack, or None if stack is unversioned, ``str``
     """
     # REP 109: check for <version> tag first, then CMakeLists.txt
     manifest_filename = os.path.join(stack_dir, STACK_FILE)
@@ -440,7 +412,7 @@ def get_stack_version_by_dir(stack_dir):
 
 def _get_cmake_version(text):
     """
-    @raise ValueError: if version number in CMakeLists.txt cannot be parsed correctly
+    :raises :exc:`ValueError` If version number in CMakeLists.txt cannot be parsed correctly
     """
     import re
     for l in text.split('\n'):

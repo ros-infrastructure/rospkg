@@ -140,8 +140,6 @@ Source control information
 
 .. autoclass:: SvnConfig()
 
-        
-
 .. method:: get_vcs_configs() -> {str: VcsConfig}
 
     :returns: Dictionary of supported :class:`VcsConfig` instances.
