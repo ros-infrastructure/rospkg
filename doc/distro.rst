@@ -138,6 +138,18 @@ Model
         :returns: dictionary of stack names to :class:`DistroStack` instances in
           this distro.
 
+
+    .. attribute:: stacks
+
+        Dictionary of stack names mapped to :class:`DistroStack` instances in
+          this distro.
+
+    .. attribute:: released_stacks
+
+        Dictionary of released stack names mapped to :class:`DistroStack` instances in
+          this distro.
+
+
 Source control information
 --------------------------
 
