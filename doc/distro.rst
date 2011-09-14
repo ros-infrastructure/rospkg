@@ -74,7 +74,7 @@ Utility functions
 Model
 -----
 
-.. class:: DistroStack
+.. class:: DistroStack()
 
     Stores information about a stack release
 
@@ -83,21 +83,21 @@ Model
     :param release_name: name of distribution release.  Necessary for rule expansion.
     :param rules: raw ``_rules`` data.  Will be converted into appropriate vcs config instance.
 
-   .. attribute:: stack_name
+    .. attribute:: stack_name
 
-     Name of stack.
+      Name of stack.
 
-   .. attribute:: stack_version
+    .. attribute:: stack_version
 
-     Version number of stack.
+      Version number of stack.
 
-   .. attribute:: release_name
+    .. attribute:: release_name
 
-     Name of distribution release.  Necessary for rule expansion.
+      Name of distribution release.  Necessary for rule expansion.
 
-   .. attribute:: vcs_config
+    .. attribute:: vcs_config
 
-    :class:`VcsConfig` instance representing the ``_rules`` for this stack.
+      :class:`VcsConfig` instance representing the ``_rules`` for this stack.
 
 .. class:: Variant(variant_name, extends, stack_names, stack_names_implicit)
 
