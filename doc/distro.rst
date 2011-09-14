@@ -81,7 +81,23 @@ Model
     :param stack_name: Name of stack
     :param stack_version: Version number of stack.
     :param release_name: name of distribution release.  Necessary for rule expansion.
-    :param rules: raw '_rules' data.  Will be converted into appropriate vcs config instance.
+    :param rules: raw ``_rules`` data.  Will be converted into appropriate vcs config instance.
+
+   .. attribute:: stack_name
+
+     Name of stack.
+
+   .. attribute:: stack_version
+
+     Version number of stack.
+
+   .. attribute:: release_name
+
+     Name of distribution release.  Necessary for rule expansion.
+
+   .. attribute:: vcs_config
+
+    :class:`VcsConfig` instance representing the ``_rules`` for this stack.
 
 .. class:: Variant(variant_name, extends, stack_names, stack_names_implicit)
 
