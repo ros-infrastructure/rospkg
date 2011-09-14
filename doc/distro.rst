@@ -74,7 +74,7 @@ Utility functions
 Model
 -----
 
-.. class:: DistroStack()
+.. class:: DistroStack(stack_name, stack_version, release_name, rules)
 
     Stores information about a stack release
 
