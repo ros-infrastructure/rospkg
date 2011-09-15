@@ -23,7 +23,8 @@ package/stack's manifest information.
    environment
    os_detect
    distro
-
+   distro_format
+   
 Example::
 
     import rospkg
