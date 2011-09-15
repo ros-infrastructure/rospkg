@@ -149,6 +149,11 @@ Model
         Dictionary of released stack names mapped to :class:`DistroStack` instances in
           this distro.
 
+    .. attribute:: variants
+
+        Dictionary of variant names mapped to :class:`Variant`
+          instances in this distro.
+
 
 Source control information
 --------------------------
