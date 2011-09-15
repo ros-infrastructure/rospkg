@@ -1,5 +1,5 @@
-rosdistro Python library
-========================
+rospkg.distro Python library
+============================
 
 .. currentmodule:: rospkg.distro
 
