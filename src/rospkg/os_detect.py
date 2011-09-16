@@ -356,16 +356,28 @@ class OsDetect:
         """
         OsDetect.default_os_list.insert(0, (os_name, os_detector))
         
-    def detect_os(self):
+    def detect_os(self, env=None):
         """
         Detect operating system.  Return value can be overridden by
         the :env:`ROS_OS_OVERRIDE` environment variable.
         
+        :param env: override ``os.environ``
         :returns: (os_name, os_version, os_codename), ``(str, str, str)``
         :raises: :exc:`OsNotDetected` if OS could not be detected
         """
-        if 'ROS_OS_OVERRIDE' in os.environ:
-            self._os_name, self._os_version = os.environ["ROS_OS_OVERRIDE"].split(':')
+        if env is None:
+            env = os.environ
+        if 'ROS_OS_OVERRIDE' in env:
+            splits = env["ROS_OS_OVERRIDE"].split(':')
+            self._os_name = splits[0]
+            if len(splits) > 1:
+                self._os_version = splits[1]
+                if len(splits) > 2:
+                    self._os_codename = splits[2]
+                else:
+                    self._os_codename = ''
+            else:
+                self._os_version = self._os_codename = ''  
             self._override = True
         else:
             for os_name, os_detector in self._os_list:

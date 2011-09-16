@@ -39,18 +39,24 @@ class TrueOs():
         return True
     def get_version(self):
         return "os_version"
+    def get_codename(self):
+        return "os_codename"
 
 class TrueOs2():
     def is_os(self):
         return True
     def get_version(self):
         return "os_version"
+    def get_codename(self):
+        return "os_codename"
 
 class FalseOs(object):
     def is_os(self):
         return False
     def get_version(self):
         return "os_version2"
+    def get_codename(self):
+        return "os_codename"
 
 def test__read_stdout():
     from rospkg.os_detect import _read_stdout
@@ -410,7 +416,19 @@ def test_OsDetect():
         assert False, "should raise"
     except KeyError: pass
     
+def test_OsDetect_ROS_OVERRIDE():
+    from rospkg.os_detect import OsDetect
+    detect = OsDetect([('TrueOs', TrueOs())])
+    env = {'ROS_OS_OVERRIDE': 'arch'}
+    assert detect.detect_os(env=env) == ('arch', '', ''), detect.detect_os(env=env)
+    env = {'ROS_OS_OVERRIDE': 'fubuntu:04.10'}
+    assert detect.detect_os(env=env) == ('fubuntu', '04.10', '')
+    env = {'ROS_OS_OVERRIDE': 'fubuntu:04.10:opaque'}
+    assert detect.detect_os(env=env) == ('fubuntu', '04.10', 'opaque')
+
+    
 def test_OsDetect_single():
+    # test each method twice with new instance b/c of caching
     from rospkg.os_detect import OsDetect    
     detect = OsDetect([('TrueOs', TrueOs())])
     assert "TrueOs" == detect.get_name()
@@ -418,6 +436,9 @@ def test_OsDetect_single():
     detect = OsDetect([('TrueOs', TrueOs())])
     assert "os_version" == detect.get_version()
     assert "os_version" == detect.get_version()
+    detect = OsDetect([('TrueOs', TrueOs())])
+    assert "os_codename" == detect.get_codename()
+    assert "os_codename" == detect.get_codename()
     
     detect = OsDetect([('TrueOs', TrueOs())])
     assert isinstance(detect.get_detector(), TrueOs)
