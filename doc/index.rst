@@ -49,13 +49,13 @@ Installation
 rospkg is available on pypi and can be installed via ``pip``
 ::
 
-    pip install rospkg
+    pip install -U rospkg
 
 or ``easy_install``:
 
 ::
 
-    easy_install rospkg
+    easy_install -U rospkg
 
 Using rospkg
 ============
