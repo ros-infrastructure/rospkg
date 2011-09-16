@@ -96,7 +96,6 @@ def test_RosStack_get_path():
     print("ROS_PACKAGE_PATH: ")
     r = RosStack(ros_root=path, ros_package_path='')
     assert bar_path == r.get_path('bar'), "%s vs. %s"%(bar_path, r.get_path('bar'))
-    assert baz_path == r.get_path('baz'), "%s vs. %s"%(baz_path, r.get_path('baz'))
     try:
         r.get_path('fake')
         assert False

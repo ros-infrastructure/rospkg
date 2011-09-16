@@ -90,16 +90,6 @@ def test_Depend():
     for v in [Depend('roslib', 'stack'), Depend('roslib2', 'package'), 1]:
         assert d != v
     
-def test_ROSDep():
-    from roslib.manifestlib import ROSDep, ManifestException
-    for bad in [None, '']:
-      try:
-        rd = ROSDep(bad)
-        assert False, "should have failed on [%s]"%bad
-      except ValueError: pass
-    
-    rd = ROSDep('python')
-    
 def _subtest_parse_example1(m):
     from rospkg.manifest import Manifest
     assert isinstance(m, Manifest)
