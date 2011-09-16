@@ -47,4 +47,4 @@ testsetup:
 	echo "running rospkg tests"
 
 test: testsetup
-	nosetests --with-coverage --cover-package=rospkg
+	nosetests --with-coverage --cover-package=rospkg --with-xunit
