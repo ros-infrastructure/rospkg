@@ -62,28 +62,30 @@ def delete_cache():
         os.remove(p)
     
 def test_RosStack_list():
-    from rospkg import RosStack
-    r = RosStack()
+    from rospkg import RosStack, get_ros_root
 
-    l = rosstack_list()
-    retval = r.list()
-    assert set(l) == set(retval), "%s vs %s"%(l, retval)
-    
-    # test twice for caching
-    retval = r.list()
-    assert set(l) == set(retval), "%s vs %s"%(l, retval)
+    if get_ros_root() is not None:
+        r = RosStack()
 
-    # make sure stress test works with rospack_cache invalidated
-    delete_cache()
-    r = RosStack()
-    retval = r.list()
-    assert set(l) == set(retval), "%s vs %s"%(l, retval)
+        l = rosstack_list()
+        retval = r.list()
+        assert set(l) == set(retval), "%s vs %s"%(l, retval)
+
+        # test twice for caching
+        retval = r.list()
+        assert set(l) == set(retval), "%s vs %s"%(l, retval)
+
+        # make sure stress test works with rospack_cache invalidated
+        delete_cache()
+        r = RosStack()
+        retval = r.list()
+        assert set(l) == set(retval), "%s vs %s"%(l, retval)
 
 def get_stack_test_path():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), 'stack_tests'))
 
 def test_RosStack_get_path():
-    from rospkg import RosStack, ResourceNotFound
+    from rospkg import RosStack, ResourceNotFound, get_ros_root
 
     path = get_stack_test_path()
     bar_path = os.path.join(path, 's1', 'bar')
@@ -117,24 +119,25 @@ def test_RosStack_get_path():
     r = RosStack(ros_root=os.path.join(path, 'notapath'), ros_package_path="%s%s%s"%(os.path.join(path, 's2'), os.pathsep, os.path.join(path, 's1')))
     assert foo_path == r.get_path('foo'), "%s vs. %s"%(foo_path, r.get_path('foo'))
 
-    # stresstest against rospack
-    r = RosStack()
-    listval = rosstack_list()
-    for p in listval:
-        retval = r.get_path(p)
-        rospackval = rosstack_find(p)
-        assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+    if get_ros_root() is not None:
+        # stresstest against rospack
+        r = RosStack()
+        listval = rosstack_list()
+        for p in listval:
+            retval = r.get_path(p)
+            rospackval = rosstack_find(p)
+            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
 
-    # stresstest with cache invalidated
-    delete_cache()
-    r = RosStack() 
-    for p in listval:
-        retval = r.get_path(p)
-        rospackval = rosstack_find(p)
-        assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+        # stresstest with cache invalidated
+        delete_cache()
+        r = RosStack() 
+        for p in listval:
+            retval = r.get_path(p)
+            rospackval = rosstack_find(p)
+            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
 
 def test_RosStack_get_depends():
-    from rospkg import RosStack, ResourceNotFound
+    from rospkg import RosStack, ResourceNotFound, get_ros_root
     path = get_stack_test_path()
     s1 = os.path.join(path, 's1')
     s3 = os.path.join(path, 's3')
@@ -145,16 +148,16 @@ def test_RosStack_get_depends():
     assert r.get_depends('bar') == ['foo']
     assert r.get_depends('foo') == []
 
-    # stress test: test default environment against rosstack
-    r = RosStack()
-    
-    for p in rosstack_list():
-        retval = set(r.get_depends(p))
-        rospackval = set(rosstack_depends(p))
-        assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+    if get_ros_root() is not None:
+        # stress test: test default environment against rosstack
+        r = RosStack()
+        for p in rosstack_list():
+            retval = set(r.get_depends(p))
+            rospackval = set(rosstack_depends(p))
+            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
     
 def test_RosStack_get_depends_explicit():
-    from rospkg import RosStack, ResourceNotFound
+    from rospkg import RosStack, ResourceNotFound, get_ros_root
     path = get_stack_test_path()
     s1 = os.path.join(path, 's1')
     s3 = os.path.join(path, 's3')
@@ -166,11 +169,12 @@ def test_RosStack_get_depends_explicit():
     assert r.get_depends('foo', implicit) == []
 
     # stress test: test default environment against rospack
-    r = RosStack()
-    for p in rosstack_list():
-        retval = set(r.get_depends(p, implicit))
-        rospackval = set(rosstack_depends1(p))
-        assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+    if get_ros_root() is not None:
+        r = RosStack()
+        for p in rosstack_list():
+            retval = set(r.get_depends(p, implicit))
+            rospackval = set(rosstack_depends1(p))
+            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
 
 def test_expand_to_packages():
     from rospkg import expand_to_packages, RosPack, RosStack

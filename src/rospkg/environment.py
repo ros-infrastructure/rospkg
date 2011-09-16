@@ -185,7 +185,8 @@ def on_ros_path(p, env=None):
         env = os.environ
         
     package = os.path.realpath(_resolve_path(p))
-    paths = [p for p in compute_package_paths(get_ros_root(env), get_ros_package_path(env))]
+    # filter out non-paths (e.g. if no ROS environment is configured)
+    paths = [p for p in compute_package_paths(get_ros_root(env), get_ros_package_path(env)) if p is not None]
     paths = [os.path.realpath(_resolve_path(x)) for x in paths]
     return bool([x for x in paths if package == x or package.startswith(x + os.sep)])
 

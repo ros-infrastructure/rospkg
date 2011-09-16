@@ -86,28 +86,29 @@ def delete_cache():
         os.remove(p)
     
 def test_RosPack_list():
-    from rospkg import RosPack
-    r = RosPack()
+    from rospkg import RosPack, get_ros_root
+    if get_ros_root() is not None:
+        r = RosPack()
 
-    pkgs = rospack_list()
-    retval = r.list()
-    assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
-    
-    # test twice for caching
-    retval = r.list()
-    assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
+        pkgs = rospack_list()
+        retval = r.list()
+        assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
 
-    # make sure stress test works with rospack_cache invalidated
-    delete_cache()
-    r = RosPack()
-    retval = r.list()
-    assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
+        # test twice for caching
+        retval = r.list()
+        assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
+
+        # make sure stress test works with rospack_cache invalidated
+        delete_cache()
+        r = RosPack()
+        retval = r.list()
+        assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
 
 def get_package_test_path():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), 'package_tests'))
 
 def test_RosPack_get_path():
-    from rospkg import RosPack, ResourceNotFound
+    from rospkg import RosPack, ResourceNotFound, get_ros_root
 
     path = get_package_test_path()
     foo_path = os.path.join(path, 'p1', 'foo')
@@ -135,15 +136,16 @@ def test_RosPack_get_path():
     assert bar_path == r.get_path('bar')
     assert baz_path == r.get_path('baz')
 
-    # stresstest against rospack
-    r = RosPack()
-    for p in rospack_list():
-        retval = r.get_path(p)
-        rospackval = rospack_find(p)
-        assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+    if get_ros_root() is not None:
+        # stresstest against rospack
+        r = RosPack()
+        for p in rospack_list():
+            retval = r.get_path(p)
+            rospackval = rospack_find(p)
+            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
 
 def test_RosPackage_get_depends():
-    from rospkg import RosPack, ResourceNotFound
+    from rospkg import RosPack, ResourceNotFound, get_ros_root
     path = get_package_test_path()
     r = RosPack(ros_root=path, ros_package_path='')
 
@@ -152,12 +154,13 @@ def test_RosPackage_get_depends():
     assert r.get_depends('bar') == ['foo']
     assert r.get_depends('foo') == []
 
-    # stress test: test default environment against rospack
-    r = RosPack()
-    for p in rospack_list():
-        retval = set(r.get_depends(p))
-        rospackval = set(rospack_depends(p))
-        assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+    if get_ros_root() is not None:
+        # stress test: test default environment against rospack
+        r = RosPack()
+        for p in rospack_list():
+            retval = set(r.get_depends(p))
+            rospackval = set(rospack_depends(p))
+            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
     
 def get_stack_test_path():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), 'stack_tests'))
@@ -185,7 +188,7 @@ def test_stack_of():
     assert r.stack_of('foo') == None
 
 def test_RosPackage_get_depends_explicit():
-    from rospkg import RosPack, ResourceNotFound
+    from rospkg import RosPack, ResourceNotFound, get_ros_root
     path = get_package_test_path()
     r = RosPack(ros_root=path, ros_package_path='')
 
@@ -194,10 +197,11 @@ def test_RosPackage_get_depends_explicit():
     assert r.get_depends('bar', implicit) == ['foo']
     assert r.get_depends('foo', implicit) == []
 
-    # stress test: test default environment against rospack
-    r = RosPack()
-    for p in rospack_list():
-        retval = set(r.get_depends(p, implicit))
-        rospackval = set(rospack_depends1(p))
-        assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+    if get_ros_root() is not None:
+        # stress test: test default environment against rospack
+        r = RosPack()
+        for p in rospack_list():
+            retval = set(r.get_depends(p, implicit))
+            rospackval = set(rospack_depends1(p))
+            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
 

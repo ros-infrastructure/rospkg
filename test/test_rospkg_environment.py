@@ -45,11 +45,12 @@ def test_get_ros_root():
     assert '/fake/path' == get_ros_root(env=env)
 
     real_ros_root = get_ros_root()
-    
-    # make sure that ros root is a directory
-    p = os.path.join(real_ros_root, 'Makefile')
-    env = {'ROS_ROOT': p}
-    assert p == get_ros_root(env=env)
+
+    if real_ros_root is not None:
+        # make sure that ros root is a directory
+        p = os.path.join(real_ros_root, 'Makefile')
+        env = {'ROS_ROOT': p}
+        assert p == get_ros_root(env=env)
     
 def test_get_ros_package_path():
     from rospkg import get_ros_package_path
@@ -120,14 +121,15 @@ def test_get_ros_home():
 def test_on_ros_path():
     from rospkg import on_ros_path, get_ros_root, get_ros_package_path
     from rospkg.environment import _resolve_paths
-    
-    assert on_ros_path(get_ros_root())
-
-    paths = _resolve_paths(get_ros_package_path()).split(os.pathsep)
-    for p in paths:
-        assert on_ros_path(p), "failed: %s, [%s]"%(p, paths)
 
     assert not on_ros_path(tempfile.gettempdir())
+
+    if get_ros_root() is not None:
+        assert on_ros_path(get_ros_root())
+
+        paths = _resolve_paths(get_ros_package_path()).split(os.pathsep)
+        for p in paths:
+            assert on_ros_path(p), "failed: %s, [%s]"%(p, paths)
 
 def test_compute_package_paths():
     from rospkg.environment import compute_package_paths
