@@ -449,6 +449,6 @@ OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
 
 if __name__ == '__main__':
     detect = OsDetect()
-    print("OS Name: \t%s"%detect.get_name())
-    print("OS Version: \t%s"%detect.get_version())    
-    print("OS Codename: \t%s"%detect.get_codename())    
+    print("OS Name:     %s"%detect.get_name())
+    print("OS Version:  %s"%detect.get_version())    
+    print("OS Codename: %s"%detect.get_codename())    

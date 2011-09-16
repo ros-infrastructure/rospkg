@@ -9,6 +9,13 @@ build toolchain.  The :mod:`rospkg.os_detect` module provides and
 extendable library for detecting various operating systems.  It is
 focused on detecting operating systems used with ROS.
 
+You can test this library on your platform from the command line::
+
+    $ python -m rospkg.os_detect
+    OS Name:     ubuntu
+    OS Version:	 10.04
+    OS Codename: lucid
+
 Currently supported OSes:
 
 - Arch Linux
