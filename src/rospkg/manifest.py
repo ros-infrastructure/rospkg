@@ -119,7 +119,7 @@ def _check_depends(type_, n, filename):
     try:
         depend_names = [d[type_].value for d in depends]
     except KeyError:
-        raise InvalidManifest("Invalid manifest file: depends is missing '%s' attribute"%(type_))
+        raise InvalidManifest("Invalid manifest file [%s]: depends is missing '%s' attribute"%(filename, type_))
 
     return [Depend(name, type_) for name in depend_names]
 
