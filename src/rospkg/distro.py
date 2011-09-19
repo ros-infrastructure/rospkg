@@ -253,6 +253,9 @@ def _distro_version(version_val):
     Parse distro version value, converting SVN revision to version value if necessary
     """
     version_val = str(version_val)
+    # check for no keyword sub
+    if version_val == '$Revision$':
+        return 0
     m = re.search('\$Revision:\s*([0-9]*)\s*\$', version_val)
     if m is not None:
         version_val = 'r'+m.group(1)
