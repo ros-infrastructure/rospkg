@@ -69,20 +69,12 @@ caching and other optimizations for repeated querying.
       :returns: filesystem path of stack
       :raises: :exc:`ResourceNotFound`
         
-   .. method:: get_direct_depends(name) -> [str]
-
-      Get the explicit dependencies of a stack.
-        
-      :param name: stack name, ``str``
-      :returns: list of names of direct dependencies
-      :raises: :exc:`ResourceNotFound`
-      :raises: :exc:`InvalidManifest`
-
-   .. method::  get_depends(name) -> [str]
+   .. method::  get_depends(name, [implicit=True]) -> [str]
 
       Get explicit and implicit dependencies of a stack.
 
       :param name: stack name, ``str``
+      :param implicit: include implicit (recursive) dependencies, ``bool``
       :returns: list of names of dependencies.
       :raises: :exc:`InvalidManifest`        
 
