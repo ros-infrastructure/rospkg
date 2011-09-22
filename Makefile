@@ -1,7 +1,7 @@
 .PHONY: all setup clean_dist distro clean install dsc source_deb upload
 
 NAME='rospkg'
-VERSION='0.2.1'
+VERSION='0.2.2'
 
 all:
 	echo "noop for debbuild"
