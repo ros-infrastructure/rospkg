@@ -112,6 +112,7 @@ def test_RosPack_get_path():
 
     path = get_package_test_path()
     foo_path = os.path.join(path, 'p1', 'foo')
+    foo_path_alt = os.path.join(path, 'p2', 'foo')
     bar_path = os.path.join(path, 'p1', 'bar')
     baz_path = os.path.join(path, 'p2', 'baz')
     
@@ -119,7 +120,8 @@ def test_RosPack_get_path():
     print("ROS_ROOT: %s"%(path))
     print("ROS_PACKAGE_PATH: ")
     r = RosPack(ros_root=path, ros_package_path='')
-    assert foo_path == r.get_path('foo')
+    # precedence in this case is undefined as there are two 'foo's in the same path
+    assert r.get_path('foo') in [foo_path, foo_path_alt]
     assert bar_path == r.get_path('bar')
     assert baz_path == r.get_path('baz')
     try:
