@@ -65,7 +65,7 @@ Example
 Types of Dependencies
 ---------------------
 
-The most common type of dependency that is expressed by a manifest is a dependency on another [[Packages|package]], which is expressed by the :ref:`\<depend\> <depend_tag>` tag. As explained earlier, the exact meaning of this dependency depends on the code involved and may either mean a compile-time dependency or runtime dependency.
+The most common type of dependency that is expressed by a manifest is a dependency on another ROS package, which is expressed by the :ref:`\<depend\> <depend_tag>` tag. As explained earlier, the exact meaning of this dependency depends on the code involved and may either mean a compile-time dependency or runtime dependency.
 
 A manifest can also declare dependencies on thirdparty software provided by the operating system, which is expressed by the :ref:`\<rosdep\> <rosdep_tag>`. For example, your package may need boost::
 
