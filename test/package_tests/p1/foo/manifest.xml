@@ -9,6 +9,9 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/foo</url>
 
+  <rosdep name="foo_rosdep1"/>
+  <rosdep name="foo_rosdep2"/>
+  <rosdep name="foo_rosdep3"/>
 </package>
 
 

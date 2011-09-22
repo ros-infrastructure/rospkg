@@ -205,3 +205,27 @@ def test_RosPackage_get_depends_explicit():
             rospackval = set(rospack_depends1(p))
             assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
 
+def test_RosPack_get_rosdeps():
+    from rospkg import RosPack, ResourceNotFound, get_ros_root    
+
+    path = get_package_test_path()    
+    r = RosPack(ros_root=os.path.join(path, 'p1'), ros_package_path=os.path.join(path, 'p2'))
+
+    # repeat tests due to caching
+    assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3']) == set(r.get_rosdeps('foo', implicit=True)), r.get_rosdeps('foo', implicit=True)
+    assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3']) == set(r.get_rosdeps('foo', implicit=True))
+    assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3']) == set(r.get_rosdeps('foo', implicit=False))
+    
+    assert set(['bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('bar', implicit=False))
+    assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('bar', implicit=True))
+    assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('bar', implicit=True))
+    assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('bar'))
+
+    assert ['baz_rosdep1'] == r.get_rosdeps('baz', implicit=False)
+    assert set(['baz_rosdep_1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))    
+    assert set(['baz_rosdep_1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))
+
+    # create a brand new instance to test with brand new cache
+    r = RosPack(ros_root=os.path.join(path, 'p1'), ros_package_path=os.path.join(path, 'p2'))
+    assert set(['baz_rosdep_1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))
+    assert set(['baz_rosdep_1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))    

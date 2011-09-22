@@ -211,9 +211,6 @@ class ManifestManager(object):
         retval = self._manifests[name] = parse_manifest_file(self.get_path(name), self._manifest_name)
         return retval
         
-    def _invalidate_cache(self):
-        self._rospack_cache.clear()
-
     def get_depends(self, name, implicit=True):
         """
         Get dependencies of a resource.  If implicit is True, this
@@ -284,10 +281,10 @@ class RosPack(ManifestManager):
         
         :returns: list of rosdep names, ``[str]``
         """
-        m = self.get_manifest(package)
         if implicit:
             return self._implicit_rosdeps(package)
         else:
+            m = self.get_manifest(package)
             return [d.name for d in m.rosdeps]
         
     def _implicit_rosdeps(self, package):
@@ -306,8 +303,8 @@ class RosPack(ManifestManager):
 
         # take the union of all dependencies
         packages = self.get_depends(package, implicit=True)
-        for p in pkgs:
-            s.update(self._rosdeps(p))
+        for p in packages:
+            s.update(self.get_rosdeps(p, implicit=False))
         # add in our own deps
         m = self.get_manifest(package)
         s.update([d.name for d in m.rosdeps])

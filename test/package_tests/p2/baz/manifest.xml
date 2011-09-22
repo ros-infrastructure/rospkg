@@ -11,6 +11,8 @@
   <depend package="foo" />
   <depend package="bar" />
 
+  <rosdep name="baz_rosdep1" />
+
 </package>
 
 

@@ -9,6 +9,8 @@
   <review status="unreviewed" notes=""/>
   <url>http://ros.org/wiki/bar</url>
   <depend package="foo" />
+  <rosdep name="bar_rosdep1" />
+  <rosdep name="bar_rosdep2" />
 
 </package>
 
