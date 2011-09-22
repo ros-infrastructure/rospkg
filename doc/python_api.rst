@@ -37,14 +37,14 @@ Example::
     
 
 Common API
-==========
+----------
 
 .. exception:: ResourceNotFound
 
    Requested resource (e.g. package/stack) could not be found.
 
 Installation
-============
+------------
 
 rospkg is available on pypi and can be installed via ``pip``
 ::
@@ -58,7 +58,7 @@ or ``easy_install``:
     easy_install -U rospkg
 
 Using rospkg
-============
+------------
 
 The :mod:`rospkg` module is meant to be used as a normal Python
 module.  After it has been installed, you can ``import`` it normally
@@ -66,7 +66,7 @@ and do not need to declare as a ROS package dependency.
 
 
 Advanced: rospkg developers/contributors
-========================================
+----------------------------------------
 
 .. toctree::
    :maxdepth: 2
@@ -75,7 +75,7 @@ Advanced: rospkg developers/contributors
 
 
 Indices and tables
-==================
+------------------
 
 * :ref:`genindex`
 * :ref:`modindex`

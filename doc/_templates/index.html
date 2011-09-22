@@ -1,0 +1,31 @@
+{% extends "layout.html" %}
+{% set title = 'ROS package system' %}
+{% block body %}
+  <h1>Welcome</h1>
+
+  <p>
+    The ROS packaging system simplifies development and distribution of
+    code libraries.  It enable you to easily specify dependencies between
+    code libraries, easily interact with those libraries from the command-line,
+    and release your code for others to use.
+  </p>
+  <h2>Documentation</h2>
+
+  <table class="contentstable" align="center" style="margin-left: 30px"><tr>
+    <td width="50%">
+      <p class="biglink"><a class="biglink" href="{{ pathto("overview") }}">Package system overview</a><br/>
+         <span class="linkdescr">Overview of the ROS concepts like packages, stacks, and manifests.</span></p>
+      <p class="biglink"><a class="biglink" href="{{ pathto("command_line") }}">Command-line tools</a><br/>
+         <span class="linkdescr">rospack, rosstack, rosdep, and more</span></p>
+      <p class="biglink"><a class="biglink" href="{{ pathto("python_api") }}">Python API (rospkg)</a><br/>
+         <span class="linkdescr">Code API documenation for using the rospkg Python library</span></p>
+    </td><td width="50%">
+      <p class="biglink"><a class="biglink" href="{{ pathto("tutorials") }}">Tutorials</a><br/>
+         <span class="linkdescr">TODO</span></p>
+      <p class="biglink"><a class="biglink" href="{{ pathto("file_formats") }}">File formats</a><br/>
+         <span class="linkdescr">Documentation for manifest and other file formats</span></p>
+    </td></tr>
+  </table>
+
+{% endblock %}
+
