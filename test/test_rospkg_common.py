@@ -48,3 +48,4 @@ def test_ResourceNotFound():
     assert 'blah' in s
     assert 'ros_root' in s
     assert 'ros_package_path' in s
+

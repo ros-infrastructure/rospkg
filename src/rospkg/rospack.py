@@ -29,9 +29,6 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#
-# Revision $Id$
-# $Author$
 
 import os
 import sys
@@ -119,33 +116,36 @@ def list_by_path(manifest_name, path, cache):
 
 class ManifestManager(object):
     """
-    Base class implementation for L{RosPack} and L{RosStack}.
-    NOTE: for performance reasons, _RosPack caches information about
-    packages.
+    Base class implementation for :class:`RosPack` and
+    :class:`RosStack`.  This class indexes resources on paths with
+    where manifests denote the precense of the resource.  NOTE: for
+    performance reasons, instances cache information and will not
+    reflect changes made on disk or to environment configuration.
     """
     
     def __init__(self, manifest_name, cache_name,
                  ros_root=None, ros_package_path=None):
         """
-        ctor. subclasses are expected to use manifest_name,
-        cache_name, and list_by_path_fn to customize behavior of
-        ManifestManager.
+        ctor. subclasses are expected to use *manifest_name* and
+        *cache_name* to customize behavior of ManifestManager.
         
         :param manifest_name: MANIFEST_FILE or STACK_FILE
         :param cache_name: rospack_cache or rosstack_cache
-        :param ros_root: (optional) override ROS_ROOT.
-        :param ros_package_path: (optional) override ROS_PACKAGE_PATH.
-        To specify no ROS_PACKAGE_PATH, use the empty string.  An
-        assignment of None will use the default path.
+        :param ros_root: (optional) override :envvar:`ROS_ROOT`.
+        :param ros_package_path: (optional) override
+          :envvar:`ROS_PACKAGE_PATH`.  To specify no
+          :envvar:`ROS_PACKAGE_PATH`, use the empty string.  An
+          assignment of ``None`` will use the default path.
         """
         self._manifest_name = manifest_name
         self._cache_name = cache_name
         
-        self._ros_root = ros_root or get_ros_root()
+        self._ros_root = ros_root
+        if self._ros_root is None:
+            self._ros_root = get_ros_root()
         self._ros_package_path = ros_package_path
         if self._ros_package_path is None:
             self._ros_package_path = get_ros_package_path()
-            
         self._package_paths = compute_package_paths(ros_root, ros_package_path)
         
         self._manifests = {}
@@ -175,6 +175,9 @@ class ManifestManager(object):
             return
         # initialize cache
         cache = self._location_cache = {}
+        # nothing to search, #3680
+        if not self._package_paths:
+            return
         # - first attempt to read .rospack_cache
         if _read_rospack_cache(self._cache_name, cache, self._ros_root, self._ros_package_path):
             return list(cache.keys()) #py3k
@@ -186,8 +189,7 @@ class ManifestManager(object):
         """
         List resources.
 
-        :returns: complete list of package names in ROS environment
-        @rtype: [str]
+        :returns: complete list of package names in ROS environment, ``[str]``
         """
         self._update_location_cache()
         return self._location_cache.keys()
@@ -262,10 +264,11 @@ class RosPack(ManifestManager):
     
     def __init__(self, ros_root=None, ros_package_path=None):
         """
-        :param ros_root: (optional) override ROS_ROOT.
-        :param ros_package_path: (optional) override ROS_PACKAGE_PATH.
-        To specify no ROS_PACKAGE_PATH, use the empty string.  An
-        assignment of None will use the default path.
+        :param ros_root: (optional) override :envvar:`ROS_ROOT`.
+        :param ros_package_path: (optional) override
+          :envvar:`ROS_PACKAGE_PATH`.  To specify no
+          :envvar:`ROS_PACKAGE_PATH`, use the empty string.  An
+          assignment of ``None`` will use the default path.
         """
         super(RosPack, self).__init__(MANIFEST_FILE,
                                       'rospack_cache',
@@ -331,9 +334,10 @@ class RosStack(ManifestManager):
     
     def __init__(self, ros_root=None, ros_package_path=None):
         """
-        :param ros_root: (optional) override ROS_ROOT.
-        :param ros_package_path: (optional) override ROS_PACKAGE_PATH.
-          To specify no ROS_PACKAGE_PATH, use the empty string.  An
+        :param ros_root: (optional) override :envvar:`ROS_ROOT`.
+        :param ros_package_path: (optional) override
+          :envvar:`ROS_PACKAGE_PATH`.  To specify no
+          :envvar:`ROS_PACKAGE_PATH`, use the empty string.  An
           assignment of None will use the default path.
         """
         super(RosStack, self).__init__(STACK_FILE, 'rosstack_cache',
@@ -359,9 +363,10 @@ def expand_to_packages(names, rospack, rosstack):
     Expand names into a list of packages. Names can either be of packages or stacks.
 
     :param names: names of stacks or packages, ``[str]``
-    :returns: ([packages], [not_found]). expand_packages() returns two
-      lists. The first is of packages names. The second is a list of
-      names for which no matching stack or package was found. Lists may have duplicates. ``([str], [str])``
+    :returns: ([packages], [not_found]). Returns two lists. The first
+      is of packages names. The second is a list of names for which no
+      matching stack or package was found. Lists may have
+      duplicates. ``([str], [str])``
     """
     if type(names) not in (tuple, list):
         raise ValueError("names must be a list of strings")

@@ -107,6 +107,25 @@ def test_RosPack_list():
 def get_package_test_path():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), 'package_tests'))
 
+def test_RosPack_no_env():
+    # regression test for #3680
+    from rospkg import RosPack, ResourceNotFound
+    try:
+        environ_copy = os.environ.copy()
+        if 'ROS_ROOT' in os.environ:
+            del os.environ['ROS_ROOT']
+        if 'ROS_PACKAGE_PATH' in os.environ:
+            del os.environ['ROS_PACKAGE_PATH']
+        r = RosPack()
+        try:
+            r.get_depends('roscpp')
+            assert False, "should have raised"
+        except ResourceNotFound:
+            pass
+    finally:
+        os.environ = environ_copy
+    
+    
 def test_RosPack_get_path():
     from rospkg import RosPack, ResourceNotFound, get_ros_root
 

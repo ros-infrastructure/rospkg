@@ -64,12 +64,12 @@ def _resolve_path(p):
     
 def _resolve_paths(paths):
     """
-    @param paths: path string with OS-defined separator (i.e. ':' for Linux)
-    @type  paths: str
-    Catch-all utility routine for fixing ROS environment variables that
-    are paths (e.g. ROS_PACKAGE_PATH).  Currently this just expands
-    tildes to home directories, but in the future it may encode other
-    behaviors.
+    Catch-all utility routine for fixing ROS environment variables
+    that are paths (e.g. ROS_PACKAGE_PATH).  Currently this just
+    expands tildes to home directories, but in the future it may
+    encode other behaviors.
+
+    :param paths: path string with OS-defined separator (i.e. ':' for Linux), ``str``
     """
     splits = [p for p in paths.split(os.pathsep) if p]
     return os.pathsep.join([_resolve_path(p) for p in splits])
@@ -78,9 +78,9 @@ def _resolve_paths(paths):
 
 def get_ros_root(env=None):
     """
-    Get the current ROS_ROOT.
-    @param env: override environment dictionary
-    @type  env: dict
+    Get the current :envvar:`ROS_ROOT`.
+
+    :param env: override environment dictionary, ``dict``
     """
     if env is None:
         env = os.environ
@@ -89,8 +89,7 @@ def get_ros_root(env=None):
 def get_ros_package_path(env=None):
     """
     Get the current ROS_PACKAGE_PATH.
-    @param env: (optional) environment override.
-    @type  env: dict
+    :param env: (optional) environment override, ``dict``
     """
     if env is None:
         env = os.environ
@@ -99,14 +98,12 @@ def get_ros_package_path(env=None):
 def get_ros_home(env=None):
     """
     Get directory location of '.ros' directory (aka ROS home).
-    possible locations for this. The ROS_LOG_DIR environment variable
-    has priority. If that is not set, then ROS_HOME/log is used. If
-    ROS_HOME is not set, $HOME/.ros/log is used.
+    possible locations for this. The :envvar:`ROS_HOME` environment
+    variable has priority. If :envvar:`ROS_HOME` is not set,
+    ``$HOME/.ros/log`` is used.
 
-    @param env: override os.environ dictionary
-    @type  env: dict
-    @return: path to use use for log file directory
-    @rtype: str
+    :param env: override ``os.environ`` dictionary, ``dict``
+    :returns: path to use use for log file directory, ``str``
     """
     if env is None:
         env = os.environ
@@ -123,10 +120,8 @@ def get_log_dir(env=None):
     has priority. If that is not set, then ROS_HOME/log is used. If
     ROS_HOME is not set, $HOME/.ros/log is used.
 
-    @param env: override os.environ dictionary
-    @type  env: dict
-    @return: path to use use for log file directory
-    @rtype: str
+    :param env: override os.environ dictionary, ``dict``
+    :returns: path to use use for log file directory, ``str``
     """
     if env is None:
         env = os.environ
@@ -137,16 +132,16 @@ def get_log_dir(env=None):
 
 def get_test_results_dir(env=None):
     """
-    Get directory to use for writing test result files. There are multiple
-    possible locations for this. The ROS_TEST_RESULTS_DIR environment variable
-    has priority. If that is set, ROS_TEST_RESULTS_DIR is returned.
-    If ROS_TEST_RESULTS_DIR is not set, then ROS_HOME/test_results is used. If
-    ROS_HOME is not set, $HOME/.ros/test_results is used.
+    Get directory to use for writing test result files. There are
+    multiple possible locations for this. The
+    :envvar:`ROS_TEST_RESULTS_DIR` environment variable has
+    priority. If that is set, :envvar:`ROS_TEST_RESULTS_DIR` is
+    returned.  If :envvar:`ROS_TEST_RESULTS_DIR` is not set, then
+    :envvar:`ROS_HOME`/test_results is used. If :envvar:`ROS_HOME` is
+    not set, ``$HOME/.ros/test_results`` is used.
 
-    @param env: environment dictionary (defaults to os.environ)
-    @type  env: dict
-    @return: path to use use for log file directory
-    @rtype: str
+    :param env: environment dictionary (defaults to ``os.environ``), ``dict``
+    :returns: path to use use for log file directory, ``str``
     """
     if env is None:
         env = os.environ
@@ -160,26 +155,24 @@ def compute_package_paths(ros_root, ros_package_path):
     """
     Get the paths to search for packages in reverse precedence order (i.e. last path wins).
 
-    @param ros_root: value of ROS_ROOT parameter
-    @type  ros_root: str
-    @param ros_package_path: value of ROS_PACKAGE_PATH parameter
-    @type  ros_package_path: str
-    @return: paths to search in reverse order of precedence
-    @rtype: [str]
+    :param ros_root: value of ROS_ROOT parameter, ``str``
+    :param ros_package_path: value of ROS_PACKAGE_PATH parameter, ``str``
+    :returns: paths to search in reverse order of precedence, ``[str]``
     """
     if ros_package_path:
         return list(reversed([x for x in ros_package_path.split(os.pathsep) if x])) + [ros_root]
-    else:
+    elif ros_root:
         return [ros_root]
+    else:
+        return []
 
 def on_ros_path(p, env=None):
     """
     Check to see if filesystem path is on paths specified in ROS
-    environment (ROS_ROOT, ROS_PACKAGE_PATH).
+    environment (:envvar:`ROS_ROOT`, :envvar:`ROS_PACKAGE_PATH`).
 
-    @param p: path
-    @type  p: str
-    @return: True if p is on the ROS path (ROS_ROOT, ROS_PACKAGE_PATH)
+    :param p: path, ``str``
+    :return: ``True`` if p is on the ROS path, ``bool``
     """
     if env is None:
         env = os.environ

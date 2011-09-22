@@ -40,9 +40,8 @@ default values when environment variable overrides are not active.
 .. method:: get_ros_home([env=None]) -> str
 
    Get directory location of ``.ros`` directory (aka ``ROS_HOME``).
-   possible locations for this. The :envvar:`ROS_LOG_DIR` environment
-   variable has priority. If that is not set, then
-   :envvar:`ROS_HOME`/log is used. If :envvar:`ROS_HOME` is not set,
+   possible locations for this. The :envvar:`ROS_HOME` environment
+   variable has priority. If :envvar:`ROS_HOME` is not set,
    ``$HOME/.ros/log`` is used.
 
    :param env: override environment dictionary

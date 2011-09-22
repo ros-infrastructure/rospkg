@@ -133,6 +133,7 @@ def test_on_ros_path():
 
 def test_compute_package_paths():
     from rospkg.environment import compute_package_paths
+    assert compute_package_paths(None, None) == []
     assert compute_package_paths('foo', None) == ['foo']
     assert compute_package_paths('foo', '') == ['foo']    
     assert compute_package_paths('foo', 'bar') == ['bar', 'foo']
