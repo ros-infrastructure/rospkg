@@ -1,13 +1,37 @@
-Manifest files
-==============
+.. _manifest_file:
 
-A ROS *manifest* (``manifest.xml``) is a minimal specification about a ROS package and supports a wide variety of tools, from compilation to documentation to distribution. In addition to providing a minimal specification of metadata about your package, an important role of manifests is to declare dependencies in a language-neutral and operating-system-neutral manner. The presence of a ``manifest.xml`` file in a directory is significant: any directory within your ROS package path that contains a ``manifest.xml`` file is considered to be a package (NOTE: packages cannot contain packages). 
+Package manifest files
+======================
 
-The bare minimum manifest file is much like a README file, stating who wrote your package and what license it is under. The license is important as packages are means by which ROS code is distributed. The most common manifest files also include :ref:`\<depend\> <depend_tag>` and :ref:`\<export\> <export_tag>` tags, which help manage the installation and use of a package. 
+A ROS *manifest* (``manifest.xml``) is a minimal specification about a
+ROS package and supports a wide variety of tools, from compilation to
+documentation to distribution. In addition to providing a minimal
+specification of metadata about your package, an important role of
+manifests is to declare dependencies in a language-neutral and
+operating-system-neutral manner. The presence of a ``manifest.xml``
+file in a directory is significant: any directory within your ROS
+package path that contains a ``manifest.xml`` file is considered to be
+a package (NOTE: packages cannot contain packages).
 
-The :ref:`\<depend\> <depend_tag>` tag points to another ROS package that must be installed. It can have a variety of meanings depending on the contents of the package is it pointing to. For example, for rospy code, a depend declares that the other package should be added to the :envvar:`PYTHONPATH`. For roslaunch files, a depend may indicate that this package includes roslaunch files from the other package.
+The bare minimum manifest file is much like a README file, stating who
+wrote your package and what license it is under. The license is
+important as packages are means by which ROS code is distributed. The
+most common manifest files also include :ref:`\<depend\> <depend_tag>`
+and :ref:`\<export\> <export_tag>` tags, which help manage the
+installation and use of a package.
 
-The :ref:`\<export\> <export_tag>` tag describes language-specific build and runtime flags that should be used by any package that depends on your package. For a package containing roscpp code, an export tag may declare header files and libraries that should be picked by any package that depends on it.
+The :ref:`\<depend\> <depend_tag>` tag points to another ROS package
+that must be installed. It can have a variety of meanings depending on
+the contents of the package is it pointing to. For example, for rospy
+code, a depend declares that the other package should be added to the
+:envvar:`PYTHONPATH`. For roslaunch files, a depend may indicate that
+this package includes roslaunch files from the other package.
+
+The :ref:`\<export\> <export_tag>` tag describes language-specific
+build and runtime flags that should be used by any package that
+depends on your package. For a package containing roscpp code, an
+export tag may declare header files and libraries that should be
+picked by any package that depends on it.
 
 
 Uses

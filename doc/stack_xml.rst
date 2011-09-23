@@ -1,3 +1,5 @@
+.. _stack_xml:
+
 Stack manifest XML tags reference
 =================================
 

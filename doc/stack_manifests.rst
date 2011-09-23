@@ -1,11 +1,25 @@
-Stack manifest
-==============
+.. _stack_manifest_file:
 
-A ROS *stack manifest* (``stack.xml``) is a minimal specification for ROS stacks.  Whereas a :ref:`package manifest.xml <manifests>` provides information for building software, a stack manifest mainly deals with distributing and installing software. 
+Stack manifest files
+====================
 
-In addition to providing a metadata about a stack, an important role of a ``stack.xml`` is to declare dependencies on other stacks. The presence of a `stack.xml` file in a directory is significant: a directory that contains a `stack.xml` file is considered to be a stack, and any packages within it are considered to be part of that stack (NOTE: stacks cannot contain stacks). 
+A ROS *stack manifest* (``stack.xml``) is a minimal specification for
+ROS stacks.  Whereas a :ref:`package manifest.xml <manifests>`
+provides information for building software, a stack manifest mainly
+deals with distributing and installing software.
 
-A bare minimum ``stack.xml`` file is much like a readme file, stating who is responsible for the stack and what license it is under. The license is important as it indicates who can use your code. `stack.xml` files usually include `<depend>` tags, which declare stacks that must be installed as pre-requisites.
+In addition to providing a metadata about a stack, an important role
+of a ``stack.xml`` is to declare dependencies on other stacks. The
+presence of a `stack.xml` file in a directory is significant: a
+directory that contains a `stack.xml` file is considered to be a
+stack, and any packages within it are considered to be part of that
+stack (NOTE: stacks cannot contain stacks).
+
+A bare minimum ``stack.xml`` file is much like a readme file, stating
+who is responsible for the stack and what license it is under. The
+license is important as it indicates who can use your
+code. `stack.xml` files usually include `<depend>` tags, which declare
+stacks that must be installed as pre-requisites.
 
 
 Uses
@@ -33,6 +47,7 @@ Example
 -------
 
 ::
+
     <stack>
       <description brief="common code for personal robots">
         A set of code and messages that are widely useful to all robots. Things
