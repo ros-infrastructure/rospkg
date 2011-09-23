@@ -1,7 +1,7 @@
 .. _manifest_xml:
 
-Manifest Tags Reference
-=======================
+Package manifest XML tags reference
+===================================
 
 Manifests always have the filename ``manifest.xml``.
 
