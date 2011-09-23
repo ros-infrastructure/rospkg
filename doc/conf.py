@@ -180,7 +180,7 @@ htmlhelp_basename = 'rospkgdoc'
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'rospkg.tex', u'ROS Package Documentation',
-   u'Ken Conley, Tully Foote', 'manual'),
+   u'Eric Berger, Ken Conley, Josh Faust, Tully Foote, Brian Gerkey, Jeremy Leibs, Morgan Quigley, Rob Wheeler', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
@@ -213,5 +213,5 @@ latex_documents = [
 # (source start file, name, description, authors, manual section).
 man_pages = [
     ('index', 'rospkg', u'ROS Packages Documentation',
-     [u'Ken Conley, Tully Foote'], 1)
+     [u'Eric Berger, Ken Conley, Josh Faust, Tully Foote, Brian Gerkey, Jeremy Leibs, Morgan Quigley, Rob Wheeler'], 1)
 ]
