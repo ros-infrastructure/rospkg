@@ -57,7 +57,7 @@ Example
       <author>Maintained by Tully Foote</author>
       <license>BSD</license>
       <review status="unreviewed" notes=""/>
-      <url>http://pr.willowgarage.com/wiki/common</url>
+      <url>http://ros.org/wiki/common</url>
       <depend stack="ros"/>
     </stack>
 

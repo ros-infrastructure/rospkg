@@ -65,26 +65,41 @@ Example
 ::
 
     <package>
-      <description brief="one line of text">
-        long description goes here, 
-        <em>XHTML is allowed</em>
+      <description brief="ROS Python client library">
+    
+        <p>
+        rospy is a pure Python client library for ROS. The rospy client
+        API enables Python programmers to quickly interface with
+        ROS <a href="http://ros.org/wiki/Topics">Topics</a>, <a href="http://ros.org/wiki/Services">Services</a>,
+        and <a href="http://ros.org/wiki/Parameter Server">Parameters</a>. The
+        design of rospy favors implementation speed (i.e. developer time)
+        over runtime performance so that algorithms can be quickly
+        prototyped and tested within ROS. It is also ideal for
+        non-critical-path code, such as configuration and initialization
+        code. Many of the ROS tools are written in rospy to take advantage
+        of the type introspection capabilities.
+        </p>
+        <p>
+        Many of the ROS tools, such
+        as <a href="http://ros.org/wiki/rostopic">rostopic</a>
+        and <a href="http://ros.org/wiki/rosservice">rosservice</a>, are
+        built on top of rospy.
+        </p>
+    
       </description>
-      <author>Alice/alice@somewhere.bar, Bob/bob@nowhere.foo</author>
+      <author>Ken Conley/kwc@willowgarage.com</author>
       <license>BSD</license>
-      <url>http://pr.willowgarage.com/</url>
-      <logo>http://pr.willowgarage.com/blog/photos/sensor_head1_500.jpg</logo>
-    
-      <depend package="pkgname"/>
-      <depend package="common"/>
-      <rosdep name="python" />
-      <versioncontrol type="svn" url="https://playerstage.svn.sourceforge.net/svnroot/playerstage/code/player/trunk"/>
+      <review status="Doc reviewed" notes="2010/01/18"/>
+      <url>http://ros.org/wiki/rospy</url>
+      <depend package="roslib"/>
+      <depend package="rosgraph_msgs"/>
+      <depend package="std_msgs"/>
+      <depend package="roslang"/>
       <export>
-        <cpp cflags="-I${prefix}/include" lflags="-L${prefix}/lib -lros"/>
-        <cpp os="osx" cflags="-I${prefix}/include" lflags="-L${prefix}/lib -Wl,-rpath,-L${prefix}lib -lrosthread -framework CoreServices"/>
+        <rosdoc config="rosdoc.yaml"/>
       </export>
-    
     </package>
-
+    
 
 Types of Dependencies
 ---------------------

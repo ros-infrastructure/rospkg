@@ -32,6 +32,28 @@ update information about your stack.
  * :ref:`\<review\> <review_tag>`
  * :ref:`\<version\> <version_tag>` 
 
+Example
+-------
+
+::
+
+    <stack>
+      <description brief="Common code for working with images">
+        Common code for working with images in ROS.
+      </description>
+      <author>Maintained by Patrick Mihelich</author>
+      <license>BSD</license>
+      <review status="Doc reviewed" notes="2009/6/10"/>
+      <url>http://ros.org/wiki/image_common</url>
+      <depend stack="common_msgs" />
+      <depend stack="common_rosdeps" />
+      <depend stack="pluginlib" /> 
+      <depend stack="ros" /> 
+      <depend stack="ros_comm" /> 
+    
+    </stack>
+    
+
 .. _stack_tag:
 
 <stack>

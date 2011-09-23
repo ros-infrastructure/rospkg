@@ -1,3 +1,5 @@
+.. _manifest_xml:
+
 Manifest Tags Reference
 =======================
 
