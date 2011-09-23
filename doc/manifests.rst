@@ -34,6 +34,12 @@ export tag may declare header files and libraries that should be
 picked by any package that depends on it.
 
 
+.. seealso::
+
+   :ref:`rospack <rospack>`
+
+      ``rospack`` is the main command-line tool for retrieving information about manifests.
+
 Uses
 ----
 
@@ -117,7 +123,7 @@ By declaring this, users can now use the `rosdep <http://ros.org/wiki/rosdep>`_ 
 Tools
 -----
 
-`rospack <http://ros.org/wiki/rospack>`_ parses and retrieves information from ``manifest.xml`` files. For example, ``rospack depends package-name`` will tell you all of the dependencies of ``package-name`` (use ``depends1`` to retrieve the direct dependencies).
+:ref:`rospack <rospack>` parses and retrieves information from ``manifest.xml`` files. For example, ``rospack depends package-name`` will tell you all of the dependencies of ``package-name`` (use ``depends1`` to retrieve the direct dependencies).
 
 Library Support
 ---------------

@@ -1,4 +1,12 @@
 Command-line Tools
 ==================
 
-TODO
+.. toctree::
+   :maxdepth: 2
+
+   rospack
+
+
+.. seealso::
+
+   :ref:`rosdep2 <rosdep2>`
