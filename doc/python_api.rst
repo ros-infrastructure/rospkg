@@ -4,10 +4,11 @@ rospkg documentation
 .. module:: rospkg
 .. moduleauthor:: Ken Conley <kwc@willowgarage.com>
 
-The :mod:`rospkg` module provides basic utilities for querying
+The :mod:`rospkg` Python module provides basic utilities for querying
 information about ROS packages and stacks.  There are several basic
-APIs: :doc:`ROS environment <environment>`, :class:`RosPack`/:class:`RosStack`, and
-:doc:`OS detection <os_detect>`.  The environment APIs enable access to environment
+APIs: :doc:`ROS environment <environment>`,
+:class:`RosPack`/:class:`RosStack`, and :doc:`OS detection
+<os_detect>`.  The environment APIs enable access to environment
 settings that defines the ROS package/stack filesystem configuration.
 The :class:`RosPack` and :class:`RosStack` APIs are similar to the
 ``rospack`` and ``rosstack`` command-line tools and provide
@@ -18,12 +19,11 @@ package/stack's manifest information.
 .. toctree::
    :maxdepth: 2
 
-   packages
-   stacks
-   environment
+   rospkg_packages
+   rospkg_stacks
+   rospkg_environment
    os_detect
-   distro
-   distro_format
+   rospkg_distro
    
 Example::
 

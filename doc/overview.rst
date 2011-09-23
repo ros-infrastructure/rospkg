@@ -5,3 +5,4 @@ Overview
    :maxdepth: 2
 
    manifests
+   stack_manifests

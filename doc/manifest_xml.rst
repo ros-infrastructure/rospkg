@@ -38,8 +38,8 @@ wiki page on ros.org.
 
 .. _package_tag:
 
-<package> tag
--------------
+<package>
+---------
 
 This is the top-level tag in a manifest.
 
@@ -58,8 +58,8 @@ Elements
 
 .. _description_tag:
 
-<description> tag
------------------
+<description>
+-------------
 
 Text
 ''''
@@ -84,15 +84,29 @@ Example
 
 .. _license_tag:
 
-<license> tag
--------------
+<license>
+---------
 
 Text
 ''''
 
 Name of license for this package, e.g. BSD, GPL, LGPL. In order to assist machine readability, only include the license name in this tag. For any explanatory text about licensing caveats, please use the ``<description>`` tag. 
 
-TODO: LIST OF LICENSE NAMES
+Most common open-source licenses are described on the `OSI website <http://www.opensource.org/licenses/alphabetical>`_.
+
+Commonly used license strings:
+
+ - Apache 2.0
+ - BSD
+ - Boost Software License
+ - GPLv2
+ - GPLv3
+ - LGPLv2.1
+ - LGPLv3
+ - MIT 
+ - Mozilla Public License Version 1.1
+ - ZLib
+ - wxWindows
 
 
 Attributes
@@ -111,8 +125,8 @@ Example
   
 .. _author_tag:
 
-<author> tag
-------------
+<author>
+--------
 
 Text
 ''''
@@ -129,8 +143,8 @@ Example
 
 .. _depend_tag:
 
-<depend> tag
-------------
+<depend>
+--------
 
 Declare a ROS package that this package depends on.
 
@@ -149,8 +163,8 @@ Example
 
 .. _rosdep_tag:
 
-<rosdep> tag
-------------
+<rosdep>
+--------
 
 Declare an external dependency that this package requires and can be installed via `rosdep <http://ros.org/wiki/rosdep>`_. These external dependencies are generally libraries that can be installed by OS package managers, like ``apt``.
 
@@ -189,8 +203,8 @@ Example
 
 .. _export_tag:
 
-<export> tag
-------------
+<export>
+--------
 
 The ``<export> ... </export>`` portion of the manifest declares
 various flags and settings that a package wishes to export to support
@@ -214,8 +228,8 @@ such as plugins. Tags currently used include:
 
 .. _cpp_tag:
 
-export: <cpp> tag
------------------
+export: <cpp>
+-------------
 
 Export flags to the make compiler. These flags are made available to
 *users* of this package, not the package itself.  This is not the
@@ -246,8 +260,8 @@ Note the use of ``-Wl,-rpath,${prefix}/lib``.  This tells the linker to look in 
 
 .. _python_tag:
 
-export: <python> tag
---------------------
+export: <python>
+----------------
 
 Export a path other than the default ``${prefix}/src`` to the :envvar:`PYTHONPATH`.
 
@@ -267,8 +281,8 @@ Example
 
 .. _rosdoc_tag:
 
-export: <rosdoc> tag
----------------------
+export: <rosdoc>
+----------------
 
 Override settings in the `rosdoc <http://ros.org/wiki/rosdoc>`_ documentation generator. Currently this is used to disable auto-generated code documentation on the package. This is common for thirdparty packages, which have their own documentation. This tag enables packages to link to this external documentation.
 
@@ -303,8 +317,8 @@ Attributes
 
 .. _roslang_tag:
 
-export: <roslang> tag
----------------------
+export: <roslang>
+-----------------
 
 This tag should only be used by ROS client libraries, such as `roscpp <http://ros.org/wiki/roscpp>`_ and `rospy <http://ros.org/wiki/rospy>`_.
 
@@ -328,8 +342,8 @@ Example
 
 .. _roswtf_tag:
 
-export: <roswtf> tag
---------------------
+export: <roswtf>
+----------------
 
 Declare a `roswtf <http://ros.org/wiki/roswtf>`_ plugin.
 
@@ -349,8 +363,8 @@ Example
 
 .. _review_tag:
 
-<review> tag
-------------
+<review>
+--------
 
 Status of the package in the review process (Design, API, and Code review). See `QAProcess <http://ros.org/wiki/QAProcess>`_.  Packages that have not yet been reviewed should be marked as "experimental".
 

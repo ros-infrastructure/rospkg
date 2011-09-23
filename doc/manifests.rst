@@ -1,7 +1,7 @@
 Manifest files
 ==============
 
-A ROS *manifest* (``manifest.xml``) is a minimal specification about your ROS package and supports a wide variety of tools, from compilation to documentation to distribution. In addition to providing a minimal specification of metadata about your package, an important role of manifests is to declare dependencies in a language-neutral and operating-system-neutral manner. The presence of a ``manifest.xml`` file in a directory is significant: any directory within your ROS package path that contains a ``manifest.xml`` file is considered to be a package (NOTE: packages cannot contain packages). 
+A ROS *manifest* (``manifest.xml``) is a minimal specification about a ROS package and supports a wide variety of tools, from compilation to documentation to distribution. In addition to providing a minimal specification of metadata about your package, an important role of manifests is to declare dependencies in a language-neutral and operating-system-neutral manner. The presence of a ``manifest.xml`` file in a directory is significant: any directory within your ROS package path that contains a ``manifest.xml`` file is considered to be a package (NOTE: packages cannot contain packages). 
 
 The bare minimum manifest file is much like a README file, stating who wrote your package and what license it is under. The license is important as packages are means by which ROS code is distributed. The most common manifest files also include :ref:`\<depend\> <depend_tag>` and :ref:`\<export\> <export_tag>` tags, which help manage the installation and use of a package. 
 
@@ -25,7 +25,7 @@ Uses
 
     The ``<depend>`` tags of manifests are used to order ROS packages for compilation.  Also, the ``<export>`` section of manifests is frequently used by libraries like roscpp and rosjava to export properties to their respective build systems, as well as by rospy to configure :envvar:`PYTHONPATH`.  
 
-*Deployment and Release*
+*System dependency specification*
 
     In addition to declaring dependencies between ROS packages, manifests can declare system dependencies (e.g. on the Boost library).  This information is used to release and deploy code to other machines.
 

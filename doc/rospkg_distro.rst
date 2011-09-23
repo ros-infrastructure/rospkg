@@ -4,8 +4,7 @@ rospkg.distro Python library
 .. currentmodule:: rospkg.distro
 
 This submodule provides the :class:`Distro` class, which provides an
-API for processing `rosdistro <http://www.ros.org/wiki/rosdistro>`_
-files.
+API for processing :ref:`rosdistro files <distro_format>`.
 
 .. contents:: Table of Contents
    :depth: 2

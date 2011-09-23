@@ -5,6 +5,5 @@ File formats
    :maxdepth: 2
 
    manifest_xml
-
-
-TODO: rosdistro file format
+   stack_xml
+   distro_format

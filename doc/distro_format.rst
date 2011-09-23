@@ -1,3 +1,5 @@
+.. _distro_format:
+
 rosdistro file format
 =====================
 
