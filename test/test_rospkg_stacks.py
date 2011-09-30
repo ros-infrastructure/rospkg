@@ -38,6 +38,12 @@ import time
   
 import subprocess
 
+def get_stack_test_path():
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), 'stack_tests'))
+
+def get_unary_test_path():
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), 'unary_tests'))
+
 def rosstackexec(args):
     rosstack_bin = os.path.join(os.environ['ROS_ROOT'], 'bin', 'rosstack')
     val = (subprocess.Popen([rosstack_bin] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0] or '').strip()
@@ -47,7 +53,18 @@ def rosstackexec(args):
 
 # for comparing against 'ground truth'
 def rosstack_list():
-    return [s.split()[0] for s in rosstackexec(['list']).split('\n')]
+    rosstack_bin = os.path.join(os.environ['ROS_ROOT'], 'bin', 'rosstack')
+    val = subprocess.Popen([rosstack_bin] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
+    print("VAL1", val)
+    
+
+    val = rosstackexec(['list-names'])
+    print("VAL", val)
+    val = rosstackexec(['list'])
+    print("VAL", val)
+    print("ENV", os.environ['ROS_ROOT'])
+    print("ENV", os.environ['ROS_PACKAGE_PATH'])
+    return [s.strip() for s in val.split('\n') if s.strip()]
 def rosstack_find(package):
     return rosstackexec(['find', package]).strip()
 def rosstack_depends(package):
@@ -62,12 +79,15 @@ def delete_cache():
         os.remove(p)
     
 def test_RosStack_list():
-    from rospkg import RosStack, get_ros_root
+    from rospkg import RosStack, get_ros_root, get_ros_package_path
 
+    print("ROS_ROOT", get_ros_root())
+    print("ROS_PACKAGE_PATH", get_ros_package_path())
     if get_ros_root() is not None:
         r = RosStack()
 
         l = rosstack_list()
+        print("ROSSTACK LIST", l)
         retval = r.list()
         assert set(l) == set(retval), "%s vs %s"%(l, retval)
 
@@ -80,9 +100,6 @@ def test_RosStack_list():
         r = RosStack()
         retval = r.list()
         assert set(l) == set(retval), "%s vs %s"%(l, retval)
-
-def get_stack_test_path():
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), 'stack_tests'))
 
 def test_RosStack_get_path():
     from rospkg import RosStack, ResourceNotFound, get_ros_root
@@ -246,3 +263,13 @@ def test_get_cmake_version():
         assert False, "should have raised ValueError"
     except ValueError:
         pass
+
+def test_unary():
+    from rospkg import RosStack, RosPack
+    path = get_unary_test_path()
+    rospack = RosPack(ros_root=path, ros_package_path='')
+    rosstack = RosStack(ros_root=path, ros_package_path='')
+    assert rospack.get_path('unary') == rosstack.get_path('unary')
+
+    assert rosstack.packages_of('unary') == ['unary']
+    assert rospack.stack_of('unary') == 'unary'

@@ -71,7 +71,7 @@ def rospackexec(args):
 
 # for comparing against 'ground truth'
 def rospack_list():
-    return [s.split()[0] for s in rospackexec(['list']).split('\n')]
+    return [s.strip() for s in rospackexec(['list-names']).split('\n') if s.strip()]
 def rospack_find(package):
     return rospackexec(['find', package]).strip()
 def rospack_depends(package):

@@ -146,7 +146,7 @@ class ManifestManager(object):
         self._ros_package_path = ros_package_path
         if self._ros_package_path is None:
             self._ros_package_path = get_ros_package_path()
-        self._package_paths = compute_package_paths(ros_root, ros_package_path)
+        self._package_paths = compute_package_paths(self.ros_root, self.ros_package_path)
         
         self._manifests = {}
         self._depends_cache = {}
