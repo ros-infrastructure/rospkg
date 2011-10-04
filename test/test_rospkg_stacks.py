@@ -46,25 +46,16 @@ def get_unary_test_path():
 
 def rosstackexec(args):
     rosstack_bin = os.path.join(os.environ['ROS_ROOT'], 'bin', 'rosstack')
-    val = (subprocess.Popen([rosstack_bin] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0] or '').strip()
+    val = subprocess.Popen([rosstack_bin] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ).communicate()
+    val = val[0].strip()
     if val.startswith('rosstack:'): #rosstack error message
         raise Exception(val)
     return val
 
 # for comparing against 'ground truth'
 def rosstack_list():
-    rosstack_bin = os.path.join(os.environ['ROS_ROOT'], 'bin', 'rosstack')
-    val = subprocess.Popen([rosstack_bin] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()
-    print("VAL1", val)
-    
+    return [s.strip() for s in rosstackexec(['list-names']).split('\n') if s.strip()]
 
-    val = rosstackexec(['list-names'])
-    print("VAL", val)
-    val = rosstackexec(['list'])
-    print("VAL", val)
-    print("ENV", os.environ['ROS_ROOT'])
-    print("ENV", os.environ['ROS_PACKAGE_PATH'])
-    return [s.strip() for s in val.split('\n') if s.strip()]
 def rosstack_find(package):
     return rosstackexec(['find', package]).strip()
 def rosstack_depends(package):
@@ -87,7 +78,6 @@ def test_RosStack_list():
         r = RosStack()
 
         l = rosstack_list()
-        print("ROSSTACK LIST", l)
         retval = r.list()
         assert set(l) == set(retval), "%s vs %s"%(l, retval)
 

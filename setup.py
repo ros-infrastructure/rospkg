@@ -1,7 +1,7 @@
 from distutils.core import setup
 
 setup(name='rospkg',
-      version= '0.2.2',
+      version= '0.2.3',
       packages=['rospkg'],
       package_dir = {'':'src'},
       scripts = [],
