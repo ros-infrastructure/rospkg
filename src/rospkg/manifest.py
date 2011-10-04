@@ -277,8 +277,14 @@ class Manifest(object):
                  'depends', 'rosdeps','platforms',\
                  'exports', 'version',\
                  'status', 'notes',\
-                 'unknown_tags', 'type']
-    def __init__(self, type_='package'):
+                 'unknown_tags', 'type', 'filename']
+
+    def __init__(self, type_='package', filename=None):
+        """
+        :param type: `'package'` or `'stack'`
+        :param filename: location of manifest file.  Necessary if
+          converting ``${prefix}`` in ``<export>`` values, ``str``.
+        """
         self.description = self.brief = self.author = \
                            self.license = self.license_url = \
                            self.url = self.status = \
@@ -287,16 +293,27 @@ class Manifest(object):
         self.rosdeps = []
         self.exports = []
         self.platforms = []
+
         self.type = type_
+        self.filename = filename
         
         # store unrecognized tags during parsing
         self.unknown_tags = []
         
-    def get_export(self, tag, attr):
+    def get_export(self, tag, attr, convert=True):
         """
+        :param tag: Name of XML tag to retrieve, ``str``
+        :param attr: Name of XML attribute to retrieve from tag, ``str``
+        :param convert: If ``True``, interpret variables (e.g. ``${prefix}``) export values.
         :returns: exports that match the specified tag and attribute, e.g. 'python', 'path'. ``[str]``
         """
-        return [e.get(attr) for e in self.exports if e.tag == tag if e.get(attr) is not None]
+        vals = [e.get(attr) for e in self.exports if e.tag == tag if e.get(attr) is not None]
+        if convert:
+            if not self.filename:
+                raise ValueError("cannot convert export values when filename for Manifest is not set")
+            prefix = os.path.dirname(self.filename)
+            vals = [v.replace('${prefix}', prefix) for v in vals]
+        return vals
 
 def _get_text(nodes):
     """
@@ -341,7 +358,7 @@ def parse_manifest(manifest_name, string, filename='string'):
     except Exception as e:
         raise InvalidManifest("[%s] invalid XML: %s"%(filename, e))
     
-    m = Manifest(type_)
+    m = Manifest(type_, filename)
     p = _get_nodes_by_name(d, type_)
     if len(p) != 1:
         raise InvalidManifest("manifest [%s] must have a single '%s' element"%(filename, type_))
