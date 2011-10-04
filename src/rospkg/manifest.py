@@ -1,4 +1,3 @@
-#! /usr/bin/env python
 # Software License Agreement (BSD License)
 #
 # Copyright (c) 2008, Willow Garage, Inc.
@@ -30,9 +29,6 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-#
-# Revision $Id$
-# $Author$
 
 """
 Library for processing 'manifest' files, i.e. manifest.xml and
@@ -63,7 +59,8 @@ def _get_nodes_by_name(n, name):
 def _check_optional(name, allowXHTML=False):
     """
     Validator for optional elements.
-    @raise InvalidManifest: if validation fails
+
+    :raise: :exc:`InvalidManifest` If validation fails
     """
     def check(n, filename):
         n = _get_nodes_by_name(n, name)
@@ -78,7 +75,8 @@ def _check_optional(name, allowXHTML=False):
 def _check_required(name, allowXHTML=False):
     """
     Validator for required elements.
-    @raise InvalidManifest: if validation fails
+
+    :raise: :exc:`InvalidManifest` If validation fails
     """
     def check(n, filename):
         n = _get_nodes_by_name(n, name)
@@ -95,7 +93,7 @@ def _check_required(name, allowXHTML=False):
 def _check_platform(n, filename):
     """
     Validator for manifest platform.
-    @raise InvalidManifest: if validation fails
+    :raise: :exc:`InvalidManifest` If validation fails
     """
     platforms = _get_nodes_by_name(n, 'platform')
     try:
@@ -107,7 +105,7 @@ def _check_platform(n, filename):
 def _check_depends(type_, n, filename):
     """
     Validator for manifest depends.
-    @raise InvalidManifest: if validation fails
+    :raise: :exc:`InvalidManifest` If validation fails
     """
     nodes = _get_nodes_by_name(n, 'depend')
     # TDS 20110419:  this is a hack.
@@ -126,7 +124,8 @@ def _check_depends(type_, n, filename):
 def _check_rosdeps(n, filename):
     """
     Validator for stack rosdeps.    
-    @raise InvalidManifest: if validation fails
+
+    :raises: :exc:`InvalidManifest` If validation fails
     """
     nodes = _get_nodes_by_name(n, 'rosdep')
     rosdeps = [e.attributes for e in nodes]
@@ -167,11 +166,11 @@ class Export(object):
     def __init__(self, tag, attrs, str):
         """
         Create new export instance.
-        @param tag: name of the XML tag
+        :param tag: name of the XML tag
         @type  tag: str
-        @param attrs: dictionary of XML attributes for this export tag
+        :param attrs: dictionary of XML attributes for this export tag
         @type  attrs: dict
-        @param str: string value contained by tag, if any
+        :param str: string value contained by tag, if any
         @type  str: str
         """
         self.tag = tag
@@ -180,8 +179,7 @@ class Export(object):
 
     def get(self, attr):
         """
-        @return: value of attribute or None if attribute not set
-        @rtype:  str
+        :returns: value of attribute or ``None`` if attribute not set, ``str``
         """
         return self.attrs.get(attr, None)
 
@@ -194,12 +192,9 @@ class Platform(object):
     def __init__(self, os_, version, notes=None):
         """
         Create new depend instance.
-        @param os_: OS name. must be non-empty
-        @type  os_: str
-        @param version: OS version. must be non-empty
-        @type  version: str
-        @param notes: (optional) notes about platform support
-        @type  notes: str
+        :param os_: OS name. must be non-empty, ``str``
+        :param version: OS version. must be non-empty, ``str``
+        :param notes: (optional) notes about platform support, ``str``
         """
         if not os_:
             raise ValueError("bad 'os' attribute")
@@ -232,9 +227,9 @@ class Depend(object):
     def __init__(self, name, type_):
         """
         Create new depend instance.
-        @param name: dependency name (e.g. package/stack). Must be non-empty
+        :param name: dependency name (e.g. package/stack). Must be non-empty
         @type  name: str
-        @param type_: dependency type, e.g. 'package', 'stack'.  Must be non-empty.
+        :param type_: dependency type, e.g. 'package', 'stack'.  Must be non-empty.
         @type  type_: str
         
         @raise ValueError: if parameters are invalid
@@ -266,8 +261,8 @@ class RosDep(object):
     def __init__(self, name):
         """
         Create new rosdep instance.
-        @param name: dependency name. Must be non-empty.
-        @type  name: str
+
+        :param name: dependency name. Must be non-empty. ``str``
         """
         if not name:
             raise ValueError("bad 'name' attribute")
@@ -275,7 +270,7 @@ class RosDep(object):
 
 class Manifest(object):
     """
-    Object representation of a ROS manifest file (manifest.xml and stack.xml)
+    Object representation of a ROS manifest file (``manifest.xml`` and ``stack.xml``)
     """
     __slots__ = ['description', 'brief', \
                  'author', 'license', 'license_url', 'url', \
@@ -299,8 +294,7 @@ class Manifest(object):
         
     def get_export(self, tag, attr):
         """
-        @return: exports that match the specified tag and attribute, e.g. 'python', 'path'
-        @rtype: [L{Export}]
+        :returns: exports that match the specified tag and attribute, e.g. 'python', 'path'. ``[str]``
         """
         return [e.get(attr) for e in self.exports if e.tag == tag if e.get(attr) is not None]
 
@@ -314,16 +308,12 @@ def parse_manifest_file(dirpath, manifest_name):
     """
     Parse manifest file (package, stack).  Type will be inferred from manifest_name.
     
-    @param dirpath: directory of manifest file
-    @type  dirpath: str
-    @param manifest_name: MANIFEST_FILE or STACK_FILE
-    @type  manifest_name: str
-    
-    @return: return m, populated with parsed fields
-    @rtype: L{Manifest}
+    :param dirpath: directory of manifest file, ``str``
+    :param manifest_name: ``MANIFEST_FILE`` or ``STACK_FILE``, ``str``
 
-    @raise InvalidManifest
-    @raise IOError
+    :returns: return :class:`Manifest` instance, populated with parsed fields
+    :raises: :exc:`InvalidManifest`
+    :raises: :exc:`IOError`
     """
     filename = os.path.join(dirpath, manifest_name)
     if not os.path.isfile(filename):
@@ -336,14 +326,10 @@ def parse_manifest(manifest_name, string, filename='string'):
     """
     Parse manifest string contents.
 
-    @param manifest_name: MANIFEST_FILE or STACK_FILE
-    @type  manifest_name: str
-    @param string: manifest.xml contents
-    @type  string: str
-    @param filename: full file path for debugging
-    @type  filename: str
-    @return: return parsed Manifest
-    @rtype: L{Manifest}
+    :param manifest_name: ``MANIFEST_FILE`` or ``STACK_FILE``, ``str``
+    :param string: manifest.xml contents, ``str``
+    :param filename: full file path for debugging, ``str``
+    :returns: return parsed :class:`Manifest`
     """
     if manifest_name == MANIFEST_FILE:
         type_ = 'package'
