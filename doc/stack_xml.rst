@@ -13,9 +13,9 @@ only provides the most basic metadata about your stack, including what
 it is, who wrote it, and who can use it.
 
  * :ref:`\<stack\> <stack_tag>`
- * :ref:`\<description\> <description_tag>`
- * :ref:`\<license\> <license_tag>`
- * :ref:`\<author\> <author_tag>`
+ * :ref:`\<description\> <stack_description_tag>`
+ * :ref:`\<license\> <stack_license_tag>`
+ * :ref:`\<author\> <stack_author_tag>`
 
 Optional Tags
 -------------
@@ -27,10 +27,10 @@ most commonly a wiki page on ROS.org so that users can easily edit and
 update information about your stack.
 
 
- * :ref:`\<depend\> <depend_tag>`
- * :ref:`\<url\> <url_tag>`
- * :ref:`\<review\> <review_tag>`
- * :ref:`\<version\> <version_tag>` 
+ * :ref:`\<depend\> <stack_depend_tag>`
+ * :ref:`\<url\> <stack_url_tag>`
+ * :ref:`\<review\> <stack_review_tag>`
+ * :ref:`\<version\> <stack_version_tag>` 
 
 Example
 -------
@@ -64,13 +64,15 @@ The ``<stack>`` tag is the top-level tag in a stack manifest.
 Elements
 ''''''''
 
- * :ref:`\<description\> <description_tag>`
- * :ref:`\<license\> <license_tag>`
- * :ref:`\<author\> <author_tag>`
- * :ref:`\<url\> <url_tag>`
- * :ref:`\<depend\> <depend_tag>`
- * :ref:`\<review\> <review_tag>`
+ * :ref:`\<description\> <stack_description_tag>`
+ * :ref:`\<license\> <stack_license_tag>`
+ * :ref:`\<author\> <stack_author_tag>`
+ * :ref:`\<url\> <stack_url_tag>`
+ * :ref:`\<depend\> <stack_depend_tag>`
+ * :ref:`\<review\> <stack_review_tag>`
 
+
+.. _stack_description_tag:
 
 <description>
 -------------
@@ -97,7 +99,7 @@ Attributes
  ``brief="brief text"`` *(optional)*
   One-line summary of your stack. Useful for UI displays where the stack name isn't sufficiently descriptive.
 
-.. _license_tag:
+.. _stack_license_tag:
 
 <license>
 ---------
@@ -142,7 +144,7 @@ Example
     <license>BSD</license>
 
 
-.. _author_tag:
+.. _stack_author_tag:
 
 <author>
 --------
@@ -161,7 +163,7 @@ Example
     <author>Alyssa P. Hacker/aphacker@willowgarage.com</author>
 
 
-.. _depend_tag:
+.. _stack_depend_tag:
 
 <depend>
 --------
@@ -182,7 +184,7 @@ Attributes
  ``stack="stack_name"``
    Name of ROS stack dependency.
 
-.. _url_tag:
+.. _stack_url_tag:
 
 <url>
 -----
@@ -200,7 +202,7 @@ Example
     <url>http://ros.org/wiki/navigation</url>
 
 
-.. _review_tag:
+.. _stack_review_tag:
 
 <review>
 --------
@@ -227,7 +229,8 @@ Example
     <review status="experimental" notes="reviewed on 3/14/09" />
 
 
-.. _version_tag:
+.. _stack_version_tag:
+
 <version>
 ---------
 

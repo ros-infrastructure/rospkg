@@ -43,6 +43,10 @@ Common API
 
    Requested resource (e.g. package/stack) could not be found.
 
+.. attribute:: __version__
+
+   Version of this module.
+
 Installation
 ------------
 

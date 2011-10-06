@@ -13,6 +13,7 @@
 
 import sys, os
 sys.path.insert(0, os.path.abspath('../src'))
+import rospkg
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -55,7 +56,7 @@ intersphinx_mapping = {
 # built documents.
 #
 # The short X.Y version.
-version = '0.2'
+version = rospkg.__version__
 # The full version, including alpha/beta/rc tags.
 release = 'Fuerte'
 

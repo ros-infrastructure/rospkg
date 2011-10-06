@@ -16,26 +16,26 @@ Required Tags
 The required set of tags in a ``manifest.xml`` file is very minimal and only provides the most basic metadata about your package, including what it is, who wrote it, and who can use it. 
 
  * :ref:`\<package\> <package_tag>`
- * :ref:`\<description\> <description_tag>`
- * :ref:`\<description|<description_tag>`
- * :ref:`\<license|<license_tag>`
- * :ref:`\<author\> <author_tag>`
+ * :ref:`\<description\> <manifest_description_tag>`
+ * :ref:`\<description|<manifest_description_tag>`
+ * :ref:`\<license|<manifest_license_tag>`
+ * :ref:`\<author\> <manifest_author_tag>`
 
 Optional Tags
 -------------
 
-The most common optional tags are :ref:`\<depend\> <depend_tag>` and
-:ref:`\<url\> <url_tag>`. We strongly recommend the use of the
+The most common optional tags are :ref:`\<depend\> <manifest_depend_tag>` and
+:ref:`\<url\> <manifest_url_tag>`. We strongly recommend the use of the
 ``<url>`` tag to point users to a website where they can find out
 more information about your stack. This website is most commonly a
 wiki page on ros.org.
 
 
- * :ref:`\<depend\> <depend_tag>`
- * :ref:`\<rosdep\> <rosdep_tag>`
- * :ref:`\<url\> <url_tag>`
- * :ref:`\<review\> <review_tag>`
- * :ref:`\<export\> <export_tag>`
+ * :ref:`\<depend\> <manifest_depend_tag>`
+ * :ref:`\<rosdep\> <manifest_rosdep_tag>`
+ * :ref:`\<url\> <manifest_url_tag>`
+ * :ref:`\<review\> <manifest_review_tag>`
+ * :ref:`\<export\> <manifest_export_tag>`
  * :ref:`\<versioncontrol\> <versioncontrol_tag>`
 
 .. _package_tag:
@@ -48,17 +48,17 @@ This is the top-level tag in a manifest.
 Elements
 ''''''''
 
- * :ref:`\<description\> <description_tag>`
- * :ref:`\<license\> <license_tag>`
- * :ref:`\<author\> <author_tag>`
- * :ref:`\<url\> <url_tag>`
- * :ref:`\<depend\> <depend_tag>`
- * :ref:`\<rosdep\> <rosdep_tag>`
- * :ref:`\<export\> <export_tag>`
- * :ref:`\<review\> <review_tag>`
+ * :ref:`\<description\> <manifest_description_tag>`
+ * :ref:`\<license\> <manifest_license_tag>`
+ * :ref:`\<author\> <manifest_author_tag>`
+ * :ref:`\<url\> <manifest_url_tag>`
+ * :ref:`\<depend\> <manifest_depend_tag>`
+ * :ref:`\<rosdep\> <manifest_rosdep_tag>`
+ * :ref:`\<export\> <manifest_export_tag>`
+ * :ref:`\<review\> <manifest_review_tag>`
  * :ref:`\<versioncontrol\> <versioncontrol_tag>`
 
-.. _description_tag:
+.. _manifest_description_tag:
 
 <description>
 -------------
@@ -84,7 +84,7 @@ Example
     </description>
 
 
-.. _license_tag:
+.. _manifest_license_tag:
 
 <license>
 ---------
@@ -125,7 +125,7 @@ Example
     <license>BSD</license>
 
   
-.. _author_tag:
+.. _manifest_author_tag:
 
 <author>
 --------
@@ -143,7 +143,7 @@ Example
     <author>Alyssa P. Hacker/aphacker@willowgarage.com, Norman Contributor/norcon@example.com</author>
 
 
-.. _depend_tag:
+.. _manifest_depend_tag:
 
 <depend>
 --------
@@ -163,7 +163,7 @@ Example
 
     <depend package="pkgname"/>
 
-.. _rosdep_tag:
+.. _manifest_rosdep_tag:
 
 <rosdep>
 --------
@@ -184,7 +184,7 @@ Example
     <rosdep name="boost"/>
 
 
-.. _url_tag:
+.. _manifest_url_tag:
 
 <url> tag
 ---------
@@ -203,7 +203,7 @@ Example
 
 .. _versioncontrol_tag:
 
-.. _export_tag:
+.. _manifest_export_tag:
 
 <export>
 --------
@@ -363,7 +363,7 @@ Example
     <roswtf plugin="tf.tfwtf" />
 
 
-.. _review_tag:
+.. _manifest_review_tag:
 
 <review>
 --------
