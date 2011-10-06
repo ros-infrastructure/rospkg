@@ -1,7 +1,14 @@
+#!/usr/bin/env python
+
 from distutils.core import setup
 
+import sys
+sys.path.insert(0, 'src')
+
+from rospkg import __version__
+
 setup(name='rospkg',
-      version= '0.2.3',
+      version=__version__,
       packages=['rospkg'],
       package_dir = {'':'src'},
       scripts = [],

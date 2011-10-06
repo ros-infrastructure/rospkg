@@ -1,14 +1,12 @@
 .PHONY: all setup clean_dist distro clean install dsc source_deb upload
 
 NAME='rospkg'
-VERSION='0.2.3'
+VERSION=`./setup.py --version`
 
 all:
 	echo "noop for debbuild"
 
 setup:
-	echo "confirming version numbers are all consistent"
-	grep ${VERSION} setup.py
 	echo "building version ${VERSION}"
 
 clean_dist:
