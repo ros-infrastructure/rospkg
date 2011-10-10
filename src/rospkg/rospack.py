@@ -246,14 +246,49 @@ class ManifestManager(object):
             self._depends_cache[name] = s
             return s
     
+    def get_depends_on(self, name, implicit=True):
+        """
+        Get resources that depend on a resource.  If implicit is ``True``, this
+        includes implicit (recursive) dependency relationships.
+
+        :param name: resource name, ``str``
+        :param implicit: include implicit (recursive) dependencies, ``bool``
+
+        :returns: list of names of dependencies, ``[str]``
+        :raises: :exc:`InvalidManifest`
+        """
+        if not implicit:
+            m = self.get_manifest(name)
+            return [d.name for d in m.depends]
+        else:
+            if name in self._depends_cache:
+                return self._depends_cache[name]
+
+            # take the union of all dependencies
+            names = [p.name for p in self.get_manifest(name).depends]
+
+            # assign key before recursive call to prevent infinite case
+            self._depends_cache[name] = s = set()
+
+            for p in names:
+                s.update(self.get_depends(p, implicit))
+            # add in our own deps
+            s.update(names)
+            # cache the return value as a list
+            s = list(s)
+            self._depends_cache[name] = s
+            return s
+
 class RosPack(ManifestManager):
     """
     Utility class for querying properties about ROS packages. This
     should be used when querying properties about multiple
     packages.
 
-    NOTE: for performance reasons, RosPack caches information about
+    NOTE 1: for performance reasons, RosPack caches information about
     packages.
+
+    NOTE 2: RosPack is not thread-safe. 
 
     Example::
       rp = RosPack()
@@ -332,6 +367,16 @@ class RosPack(ManifestManager):
                 d = os.path.dirname(d)
 
 class RosStack(ManifestManager):
+    """
+    Utility class for querying properties about ROS stacks. This
+    should be used when querying properties about multiple
+    stacks.
+
+    NOTE 1: for performance reasons, RosStack caches information about
+    stacks.
+
+    NOTE 2: RosStack is not thread-safe. 
+    """
     
     def __init__(self, ros_root=None, ros_package_path=None):
         """

@@ -25,8 +25,10 @@ caching and other optimizations for repeated querying.
    its environment configuration can be overridden with alternate
    :envvar:`ROS_ROOT` and :envvar:`ROS_PACKAGE_PATH` settings.
 
-   NOTE: for performance reasons, ``RosPack`` caches information about
-   packages.
+   NOTE: for performance reasons, ``RosStack`` caches information about
+   stacks.
+
+   NOTE 2: ``RosStack`` is not thread-safe.
 
    :param ros_root: (optional) override :envvar:`ROS_ROOT`.
    :param ros_package_path: (optional) override

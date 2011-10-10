@@ -25,8 +25,10 @@ other optimizations for repeated querying.
    its environment configuration can be overridden with alternate
    :envvar:`ROS_ROOT` and :envvar:`ROS_PACKAGE_PATH` settings.
 
-   NOTE: for performance reasons, ``RosPack`` caches information about
+   NOTE 1: for performance reasons, ``RosPack`` caches information about
    packages
+
+   NOTE 2: ``RosPack`` is not thread-safe.
 
    Example::
 
