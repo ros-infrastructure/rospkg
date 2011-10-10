@@ -268,7 +268,7 @@ def test_get_package_name():
 
     # test dir is a subdirectory of this package
     test_dir = get_package_test_path()
-    assert 'rospkg' == get_package_name(test_dir)
+    assert 'rospkg' == get_package_name(test_dir), get_package_name(test_dir)
 
     test_dir_foo = os.path.join(test_dir, 'p1', 'foo')
     assert 'foo' == get_package_name(test_dir_foo)
