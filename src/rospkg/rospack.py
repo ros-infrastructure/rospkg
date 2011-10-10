@@ -231,11 +231,12 @@ class ManifestManager(object):
             if name in self._depends_cache:
                 return self._depends_cache[name]
 
+            # take the union of all dependencies
+            names = [p.name for p in self.get_manifest(name).depends]
+
             # assign key before recursive call to prevent infinite case
             self._depends_cache[name] = s = set()
 
-            # take the union of all dependencies
-            names = [p.name for p in self.get_manifest(name).depends]
             for p in names:
                 s.update(self.get_depends(p, implicit))
             # add in our own deps
@@ -428,3 +429,27 @@ def _get_cmake_version(text):
                 return version
             else:
                 raise ValueError("cannot parse version number in CMakeLists.txt:\n\n%s"%l)
+
+def get_package_name(path):
+    """
+    Get the name of the ROS package that contains *path*. This is
+    determined by finding the nearest parent ``manifest.xml`` file.
+    This routine may not traverse package setups that rely on internal
+    symlinks within the package itself.
+    
+    :param path: filesystem path
+    :return: Package name or ``None`` if package cannot be found, ``str``
+    """
+    #NOTE: the realpath is going to create issues with symlinks, most
+    #likely.
+    parent = os.path.dirname(os.path.realpath(path))
+    #walk up until we hit ros root or ros/pkg
+    while not os.path.exists(os.path.join(path, MANIFEST_FILE)) and parent != path:
+        path = parent
+        parent = os.path.dirname(path)
+    # check termination condition
+    if os.path.exists(os.path.join(path, MANIFEST_FILE)):
+        return os.path.basename(os.path.abspath(path))
+    else:
+        return None
+    

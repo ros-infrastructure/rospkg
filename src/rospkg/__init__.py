@@ -41,5 +41,6 @@ from .environment import get_ros_root, get_ros_package_path, get_ros_home, \
      get_log_dir, get_test_results_dir, on_ros_path
 from .manifest import parse_manifest_file, Manifest, InvalidManifest
 from .rospack import RosPack, RosStack, \
-     list_by_path, expand_to_packages, get_stack_version_by_dir
+     list_by_path, expand_to_packages, get_stack_version_by_dir, \
+     get_package_name
 

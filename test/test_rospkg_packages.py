@@ -36,6 +36,7 @@ import os
 import sys
 import time
 import subprocess
+import tempfile
   
 def test_ManifestManager_constructor():
     from rospkg import RosPack, RosStack
@@ -170,6 +171,16 @@ def test_RosPackage_get_depends():
     path = get_package_test_path()
     r = RosPack(ros_root=path, ros_package_path='')
 
+    # test on multiple calls to bad package -- there was an ordering
+    # issue in the logic that caused get_depends() to return an empty
+    # set on the second call.
+    for i in range(1, 4):
+        try:
+            r.get_depends('bad', implicit=True)
+            assert False, "should have raised"
+        except ResourceNotFound:
+            pass
+
     # TODO: need one more step
     assert set(r.get_depends('baz')) == set(['foo', 'bar'])
     assert r.get_depends('bar') == ['foo']
@@ -250,3 +261,18 @@ def test_RosPack_get_rosdeps():
     r = RosPack(ros_root=os.path.join(path, 'p1'), ros_package_path=os.path.join(path, 'p2'))
     assert set(['baz_rosdep1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))
     assert set(['baz_rosdep1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))    
+
+
+def test_get_package_name():
+    from rospkg import get_package_name
+
+    # test dir is a subdirectory of this package
+    test_dir = get_package_test_path()
+    assert 'rospkg' == get_package_name(test_dir)
+
+    test_dir_foo = os.path.join(test_dir, 'p1', 'foo')
+    assert 'foo' == get_package_name(test_dir_foo)
+
+    # test with path outside of our hierarchy
+    assert None == get_package_name(tempfile.tempdir)
+    
