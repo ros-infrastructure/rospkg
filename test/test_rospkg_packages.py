@@ -79,6 +79,10 @@ def rospack_depends(package):
     return unicode(rospackexec(['depends', package])).split()
 def rospack_depends1(package):
     return unicode(rospackexec(['depends1', package])).split()
+def rospack_depends_on(package):
+    return unicode(rospackexec(['depends-on', package])).split()
+def rospack_depends_on1(package):
+    return unicode(rospackexec(['depends-on1', package])).split()
 
 def delete_cache():
     from rospkg import get_ros_home
@@ -276,3 +280,35 @@ def test_get_package_name():
     # test with path outside of our hierarchy
     assert None == get_package_name(tempfile.tempdir)
     
+
+def test_get_depends_on():
+    from rospkg import RosPack, get_ros_root
+    test_dir = get_package_test_path()
+    rp = RosPack(ros_root=test_dir, ros_package_path='')
+    # test direct depends
+    val = rp.get_depends_on('foo', implicit=False)
+    assert set(['bar', 'baz']) == set(val), val
+    val = rp.get_depends_on('bar', implicit=False)
+    assert ['baz'] == val, val
+    val = rp.get_depends_on('baz', implicit=False)
+    assert [] == val, val
+
+    # test implicit depends
+    val = rp.get_depends_on('foo', implicit=True)
+    assert set(['bar', 'baz']) == set(val), val
+    val = rp.get_depends_on('bar', implicit=True)
+    assert ['baz'] == val, val
+    val = rp.get_depends_on('baz', implicit=True) 
+    assert [] == val, val
+
+    if get_ros_root() is not None:
+        # stress test: test default environment against rospack
+        r = RosPack()
+        for p in rospack_list():
+            retval = set(r.get_depends_on(p, False))
+            rospackval = set(rospack_depends_on1(p))
+            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+        for p in rospack_list():
+            retval = set(r.get_depends_on(p, True))
+            rospackval = set(rospack_depends_on(p))
+            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)

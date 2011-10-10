@@ -80,6 +80,18 @@ caching and other optimizations for repeated querying.
       :returns: list of names of dependencies.
       :raises: :exc:`InvalidManifest`        
 
+   .. method::  get_depends_on(name, [implicit=True]) -> [str]
+
+      Get list of stacks that depend on a stack.  If implicit is
+      ``True``, this includes implicit (recursive) dependency
+      relationships.
+
+      :param name: stack name, ``str``
+      :param implicit: include implicit (recursive) dependencies, ``bool``
+
+      :returns: list of names of dependencies, ``[str]``
+      :raises: :exc:`InvalidManifest`
+
    .. method:: packages_of(stack) -> [str]
 
       :returns: name of packages that are part of stack

@@ -35,7 +35,7 @@ import sys
 
 from .common import MANIFEST_FILE, STACK_FILE, ROS_STACK, ResourceNotFound
 from .environment import get_ros_root, get_ros_package_path, get_ros_home, compute_package_paths
-from .manifest import parse_manifest_file
+from .manifest import parse_manifest_file, InvalidManifest
 
 def _read_rospack_cache(cache_name, cache, ros_root, ros_package_path):
     """
@@ -215,14 +215,15 @@ class ManifestManager(object):
         
     def get_depends(self, name, implicit=True):
         """
-        Get dependencies of a resource.  If implicit is True, this
+        Get dependencies of a resource.  If implicit is ``True``, this
         includes implicit (recursive) dependencies.
 
         :param name: resource name, ``str``
         :param implicit: include implicit (recursive) dependencies, ``bool``
 
         :returns: list of names of dependencies, ``[str]``
-        :raises: :exc:`InvalidManifest`
+        :raises: :exc:`InvalidManifest` If resource or any of its
+          dependencies have an invalid manifest.
         """
         if not implicit:
             m = self.get_manifest(name)
@@ -251,33 +252,45 @@ class ManifestManager(object):
         Get resources that depend on a resource.  If implicit is ``True``, this
         includes implicit (recursive) dependency relationships.
 
+        NOTE: this does *not* raise :exc:`rospkg.InvalidManifest` if
+        there are invalid manifests found.
+
         :param name: resource name, ``str``
         :param implicit: include implicit (recursive) dependencies, ``bool``
 
         :returns: list of names of dependencies, ``[str]``
-        :raises: :exc:`InvalidManifest`
         """
+        depends_on = []
         if not implicit:
-            m = self.get_manifest(name)
-            return [d.name for d in m.depends]
+            # have to examine all dependencies
+            for r in self.list():
+                if r == name:
+                    continue
+                try:
+                    m = self.get_manifest(r)
+                    if any(d for d in m.depends if d.name == name):
+                        depends_on.append(r)
+                except InvalidManifest:
+                    # robust to bad packages
+                    pass
         else:
-            if name in self._depends_cache:
-                return self._depends_cache[name]
-
-            # take the union of all dependencies
-            names = [p.name for p in self.get_manifest(name).depends]
-
-            # assign key before recursive call to prevent infinite case
-            self._depends_cache[name] = s = set()
-
-            for p in names:
-                s.update(self.get_depends(p, implicit))
-            # add in our own deps
-            s.update(names)
-            # cache the return value as a list
-            s = list(s)
-            self._depends_cache[name] = s
-            return s
+            # Computing implicit dependencies requires examining the
+            # dependencies of all packages.  As we already implement
+            # this logic in get_depends(), we simply reuse it here for
+            # the reverse calculation.  This enables us to use the
+            # same dependency cache that get_depends() uses.  The
+            # efficiency is roughly the same due to the caching.
+            for r in self.list():
+                if r == name:
+                    continue
+                try:
+                    depends = self.get_depends(r, implicit=True)
+                    if name in depends:
+                        depends_on.append(r)
+                except InvalidManifest:
+                    # robust to bad packages
+                    pass
+        return depends_on
 
 class RosPack(ManifestManager):
     """

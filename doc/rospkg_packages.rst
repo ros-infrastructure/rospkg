@@ -87,6 +87,18 @@ other optimizations for repeated querying.
       :returns: list of names of dependencies.
       :raises: :exc:`InvalidManifest`        
 
+   .. method::  get_depends_on(name, [implicit=True]) -> [str]
+
+      Get list of packages that depend on a package.  If implicit is
+      ``True``, this includes implicit (recursive) dependency
+      relationships.
+
+      :param name: package name, ``str``
+      :param implicit: include implicit (recursive) dependencies, ``bool``
+
+      :returns: list of names of dependencies, ``[str]``
+      :raises: :exc:`InvalidManifest`
+
    .. method:: get_rosdeps(package, [implicit=True]) -> [str]
 
       Collect rosdeps of specified package into a dictionary.
