@@ -52,8 +52,6 @@ def _read_rospack_cache(cache_path, cache, ros_paths):
       ``bool``
     """
     if not os.path.exists(cache_path):
-        #TODOXXX
-        print("cache_path DNE %s"%cache_path)
         return False
 
     cached_ros_paths = []
@@ -74,9 +72,6 @@ def _read_rospack_cache(cache_path, cache, ros_paths):
                 cache[os.path.basename(l)] = l
 
     if not ros_paths == cached_ros_paths:
-        #TODOXXX
-        print("cache_path validate failed %s vs %s"%(ros_paths, cached_ros_paths))
-
         cache.clear()
         return False
     return True
