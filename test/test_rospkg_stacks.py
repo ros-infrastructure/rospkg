@@ -45,6 +45,8 @@ def get_unary_test_path():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), 'unary_tests'))
 
 def rosstackexec(args):
+    if 'ROS_ROOT' not in os.environ:
+        return ''
     rosstack_bin = os.path.join(os.environ['ROS_ROOT'], 'bin', 'rosstack')
     val = subprocess.Popen([rosstack_bin] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ).communicate()
     val = val[0].strip()
@@ -125,7 +127,7 @@ def test_RosStack_get_path():
     r = RosStack(ros_paths=ros_paths)
     assert foo_path == r.get_path('foo'), "%s vs. %s"%(foo_path, r.get_path('foo'))
 
-    if get_ros_paths() is not None:
+    if get_ros_paths():
         # stresstest against rospack
         r = RosStack()
         listval = rosstack_list()
@@ -154,7 +156,7 @@ def test_RosStack_get_depends():
     assert r.get_depends('bar') == ['foo']
     assert r.get_depends('foo') == []
 
-    if get_ros_paths() is not None:
+    if get_ros_paths():
         # stress test: test default environment against rosstack
         r = RosStack()
         for p in rosstack_list():
@@ -175,7 +177,7 @@ def test_RosStack_get_depends_explicit():
     assert r.get_depends('foo', implicit) == []
 
     # stress test: test default environment against rospack
-    if get_ros_paths() is not None:
+    if get_ros_paths():
         r = RosStack()
         for p in rosstack_list():
             retval = set(r.get_depends(p, implicit))
