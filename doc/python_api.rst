@@ -10,14 +10,14 @@ several basic APIs: :doc:`ROS environment <environment>`,
 :class:`RosPack`/:class:`RosStack`, :doc:`OS detection
 <os_detect>`, and :doc:`distributions <rospkg_distro>`. 
 
- The environment APIs enable access to environment settings that
-defines the ROS package/stack filesystem configuration.  The
-:class:`RosPack` and :class:`RosStack` APIs are similar to the
-``rospack`` and ``rosstack`` command-line tools and provide
-information about dependency, location, and other package/stack
-metadata.  The :class:`Manifest` class provides access to a specific
-package/stack's manifest information. NOTE: the :class:`Manifest`
-class API is still volatile.  Where possible, use the relevant
+The environment APIs enable access to environment settings that define
+the ROS package/stack filesystem configuration.  The :class:`RosPack`
+and :class:`RosStack` APIs are similar to the ``rospack`` and
+``rosstack`` command-line tools and provide information about
+dependency, location, and other package/stack metadata.  The
+:class:`Manifest` class provides access to a specific package/stack's
+manifest information. NOTE: the :class:`Manifest` class API is still
+volatile.  Where possible, use the relevant
 :class:`RosPack`/:class:`RosStack` APIs to access manifest-related
 information instead (e.g. dependency relationships).
 
