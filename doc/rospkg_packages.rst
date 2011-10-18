@@ -14,7 +14,7 @@ other optimizations for repeated querying.
 
    Name of package manifest file, i.e. 'manifest.xml'.
 
-.. class:: RosPack([ros_root=None, [ros_package_path=None]])
+.. class:: RosPack([ros_paths=None])
 
    Query information about ROS packages on the local filesystem. This
    includes information about dependencies, retrieving stack
@@ -23,7 +23,7 @@ other optimizations for repeated querying.
 
    ``RosPack`` can be initialized with the default environment, or
    its environment configuration can be overridden with alternate
-   :envvar:`ROS_ROOT` and :envvar:`ROS_PACKAGE_PATH` settings.
+   ROS path settings.
 
    NOTE 1: for performance reasons, ``RosPack`` caches information about
    packages
@@ -38,26 +38,16 @@ other optimizations for repeated querying.
         depends = rp.get_depends('roscpp')
         depends1 = rp.get_depends('roscpp', implicit=False)
     
-   :param ros_root: override :envvar:`ROS_ROOT`.
-   :param ros_package_path: override :envvar:`ROS_PACKAGE_PATH`.  To
-     specify no :envvar:`ROS_PACKAGE_PATH`, use the empty string.  An
-     assignment of None will use the default path.
+   :param ros_paths: Ordered list of paths to search for
+     resources. If `None` (default), use environment ROS path.
 
-   .. method:: get_ros_root() -> str
+   .. method:: get_ros_paths() -> [str]
 
-      Get the :envvar:`ROS_ROOT` configuration of this instance.
+      Get ROS paths of this instance
 
-   .. method:: get_ros_package_path() -> str
+   .. attribute:: ros_paths
 
-      Get the :envvar:`ROS_PACKAGE_PATH` configuration of this instance.
-        
-   .. attribute:: ros_root
-
-      Get the :envvar:`ROS_ROOT` configuration of this instance. Read-only.
-
-   .. attribute:: ros_package_path
-
-      Get the :envvar:`ROS_PACKAGE_PATH` configuration of this instance. Read-only.
+      Get ROS paths of this instance
 
    .. method:: get_manifest(name) -> Manifest
 

@@ -70,11 +70,10 @@ def delete_cache():
         os.remove(p)
     
 def test_RosStack_list():
-    from rospkg import RosStack, get_ros_root, get_ros_package_path
+    from rospkg import RosStack, get_ros_paths, get_ros_package_path
 
-    print("ROS_ROOT", get_ros_root())
-    print("ROS_PACKAGE_PATH", get_ros_package_path())
-    if get_ros_root() is not None:
+    print("ROS paths", get_ros_paths())
+    if get_ros_paths() is not None:
         r = RosStack()
 
         l = rosstack_list()
@@ -92,16 +91,16 @@ def test_RosStack_list():
         assert set(l) == set(retval), "%s vs %s"%(l, retval)
 
 def test_RosStack_get_path():
-    from rospkg import RosStack, ResourceNotFound, get_ros_root
+    from rospkg import RosStack, ResourceNotFound, get_ros_paths
 
     path = get_stack_test_path()
     bar_path = os.path.join(path, 's1', 'bar')
     baz_path = os.path.join(path, 's2', 'baz')
     
     # point ROS_ROOT at top, should spider entire tree
-    print("ROS_ROOT: %s"%(path))
+    print("ROS_PATHS: %s"%str([path]))
     print("ROS_PACKAGE_PATH: ")
-    r = RosStack(ros_root=path, ros_package_path='')
+    r = RosStack(ros_paths=[path])
     assert bar_path == r.get_path('bar'), "%s vs. %s"%(bar_path, r.get_path('bar'))
     try:
         r.get_path('fake')
@@ -110,10 +109,10 @@ def test_RosStack_get_path():
         pass
     
     # divide tree in half to test precedence
-    print("ROS_ROOT: %s"%(os.path.join(path, 'p1')))
-    print("ROS_PACKAGE_PATH: %s"%(os.path.join(path, 'p2')))
+    print("ROS PATH 1: %s"%(os.path.join(path, 'p1')))
+    print("ROS PATH 2: %s"%(os.path.join(path, 'p2')))
     foo_path = os.path.join(path, 's1', 'foo')
-    r = RosStack(ros_root=os.path.join(path, 's1'), ros_package_path=os.path.join(path, 's2'))
+    r = RosStack(ros_paths=[os.path.join(path, 's1'), os.path.join(path, 's2')])
     assert foo_path == r.get_path('foo'), "%s vs. %s"%(foo_path, r.get_path('foo'))
     assert bar_path == r.get_path('bar')
     assert baz_path == r.get_path('baz')
@@ -122,10 +121,11 @@ def test_RosStack_get_path():
     print("ROS_ROOT: %s"%(os.path.join(path, 'p1')))
     print("ROS_PACKAGE_PATH: %s"%(os.path.join(path, 'p2')))
     foo_path = os.path.join(path, 's2', 'foo')
-    r = RosStack(ros_root=os.path.join(path, 'notapath'), ros_package_path="%s%s%s"%(os.path.join(path, 's2'), os.pathsep, os.path.join(path, 's1')))
+    ros_paths = [os.path.join(path, 'notapath'), os.path.join(path, 's2'), os.path.join(path, 's1')]
+    r = RosStack(ros_paths=ros_paths)
     assert foo_path == r.get_path('foo'), "%s vs. %s"%(foo_path, r.get_path('foo'))
 
-    if get_ros_root() is not None:
+    if get_ros_paths() is not None:
         # stresstest against rospack
         r = RosStack()
         listval = rosstack_list()
@@ -143,18 +143,18 @@ def test_RosStack_get_path():
             assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
 
 def test_RosStack_get_depends():
-    from rospkg import RosStack, ResourceNotFound, get_ros_root
+    from rospkg import RosStack, ResourceNotFound, get_ros_paths
     path = get_stack_test_path()
     s1 = os.path.join(path, 's1')
     s3 = os.path.join(path, 's3')
-    r = RosStack(ros_root=s1, ros_package_path=s3)
+    r = RosStack(ros_paths=[s1, s3])
 
     # TODO: need one more step
     assert set(r.get_depends('baz')) == set(['foo', 'bar'])
     assert r.get_depends('bar') == ['foo']
     assert r.get_depends('foo') == []
 
-    if get_ros_root() is not None:
+    if get_ros_paths() is not None:
         # stress test: test default environment against rosstack
         r = RosStack()
         for p in rosstack_list():
@@ -163,11 +163,11 @@ def test_RosStack_get_depends():
             assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
     
 def test_RosStack_get_depends_explicit():
-    from rospkg import RosStack, ResourceNotFound, get_ros_root
+    from rospkg import RosStack, ResourceNotFound, get_ros_paths
     path = get_stack_test_path()
     s1 = os.path.join(path, 's1')
     s3 = os.path.join(path, 's3')
-    r = RosStack(ros_root=s1, ros_package_path=s3)
+    r = RosStack(ros_paths=[s1, s3])
 
     implicit = False
     assert set(r.get_depends('baz', implicit)) == set(['bar', 'foo'])
@@ -175,7 +175,7 @@ def test_RosStack_get_depends_explicit():
     assert r.get_depends('foo', implicit) == []
 
     # stress test: test default environment against rospack
-    if get_ros_root() is not None:
+    if get_ros_paths() is not None:
         r = RosStack()
         for p in rosstack_list():
             retval = set(r.get_depends(p, implicit))
@@ -185,8 +185,8 @@ def test_RosStack_get_depends_explicit():
 def test_expand_to_packages():
     from rospkg import expand_to_packages, RosPack, RosStack
     path = os.path.join(get_stack_test_path(), 's1')
-    rospack = RosPack(ros_root=path, ros_package_path='')
-    rosstack = RosStack(ros_root=path, ros_package_path='')
+    rospack = RosPack(ros_paths=[path])
+    rosstack = RosStack(ros_paths=[path])
 
     try:
         expand_to_packages('foo', rospack, rosstack)
@@ -225,7 +225,7 @@ def test_expand_to_packages():
 def test_get_stack_version():
     from rospkg import get_stack_version_by_dir, RosStack
     path = os.path.join(get_stack_test_path(), 's1')
-    r = RosStack(ros_root=path, ros_package_path='')
+    r = RosStack(ros_paths=[path])
 
     # test by dir option directly
     foo_dir = r.get_path('foo')
@@ -238,7 +238,7 @@ def test_get_stack_version():
     assert r.get_stack_version('bar') == '1.5.0-cmake'    
 
     path = os.path.join(get_stack_test_path(), 's2')
-    r = RosStack(ros_root=path, ros_package_path='')
+    r = RosStack(ros_paths=[path])
     foo_dir = r.get_path('foo')
     assert get_stack_version_by_dir(foo_dir) == None, get_stack_version_by_dir(foo_dir)
     baz_dir = r.get_path('baz')
@@ -257,8 +257,8 @@ def test_get_cmake_version():
 def test_unary():
     from rospkg import RosStack, RosPack
     path = get_unary_test_path()
-    rospack = RosPack(ros_root=path, ros_package_path='')
-    rosstack = RosStack(ros_root=path, ros_package_path='')
+    rospack = RosPack(ros_paths=[path])
+    rosstack = RosStack(ros_paths=[path])
     assert rospack.get_path('unary') == rosstack.get_path('unary')
 
     assert rosstack.packages_of('unary') == ['unary']

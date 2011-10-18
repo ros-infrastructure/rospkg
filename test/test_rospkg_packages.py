@@ -38,8 +38,30 @@ import time
 import subprocess
 import tempfile
   
+def get_package_test_path():
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), 'package_tests'))
+
+def test__read_rospack_cache():
+    from rospkg.rospack import _read_rospack_cache
+    d = {}
+    ros_paths = ['/tmp']
+    assert False == _read_rospack_cache('/fake/path/to/rospack_cache', d, ros_paths)
+    
+    cache_path = os.path.join(get_package_test_path(), 'rospack_cache')
+    d = {}
+    ros_paths = []
+    assert False == _read_rospack_cache(cache_path, d, ros_paths)
+    assert d == {}
+
+    ros_paths = ['/home/kwc/ros', '/home/kwc/workspace', '/u/kwc/workspace']
+    assert True == _read_rospack_cache(cache_path, d, ros_paths)
+    assert d, "cache is empty"
+    assert len(d.keys()) == 121
+    assert d['mk'] == '/home/kwc/ros/core/mk'
+    assert d['rosgraph_msgs'] == '/home/kwc/workspace/ros_comm/messages/rosgraph_msgs'
+
 def test_ManifestManager_constructor():
-    from rospkg import RosPack, RosStack
+    from rospkg import RosPack, RosStack, get_ros_paths
 
     r = RosPack()
     assert r._manifest_name == 'manifest.xml'
@@ -49,19 +71,16 @@ def test_ManifestManager_constructor():
     assert r._cache_name == 'rosstack_cache'
     for c in [RosPack, RosStack]:
         r = c()
-        assert r.ros_root == os.environ.get('ROS_ROOT', None)
-        assert r.ros_package_path == os.environ.get('ROS_PACKAGE_PATH', None)
+        assert r.ros_paths == get_ros_paths()
 
         import tempfile
         tmp = tempfile.gettempdir()
 
-        r = c(ros_root=tmp)
-        assert r.ros_root == tmp
-        assert r.ros_package_path == os.environ.get('ROS_PACKAGE_PATH', None)
-
-        r = c(ros_package_path=tmp)
-        assert r.ros_root == os.environ.get('ROS_ROOT', None)
-        assert r.ros_package_path == tmp
+        r = c(ros_paths=[tmp])
+        assert r.ros_paths == [tmp]
+        # make sure we can't accidentally mutate the actual data
+        r.ros_paths.append('foo')
+        assert r.ros_paths == [tmp]        
 
 def rospackexec(args):
     rospack_bin = os.path.join(os.environ['ROS_ROOT'], 'bin', 'rospack')
@@ -109,9 +128,6 @@ def test_RosPack_list():
         retval = r.list()
         assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
 
-def get_package_test_path():
-    return os.path.abspath(os.path.join(os.path.dirname(__file__), 'package_tests'))
-
 def test_RosPack_no_env():
     # regression test for #3680
     from rospkg import RosPack, ResourceNotFound
@@ -141,9 +157,8 @@ def test_RosPack_get_path():
     baz_path = os.path.join(path, 'p2', 'baz')
     
     # point ROS_ROOT at top, should spider entire tree
-    print("ROS_ROOT: %s"%(path))
-    print("ROS_PACKAGE_PATH: ")
-    r = RosPack(ros_root=path, ros_package_path='')
+    print("ROS path: %s"%(path))
+    r = RosPack(ros_paths=[path])
     # precedence in this case is undefined as there are two 'foo's in the same path
     assert r.get_path('foo') in [foo_path, foo_path_alt]
     assert bar_path == r.get_path('bar')
@@ -155,9 +170,9 @@ def test_RosPack_get_path():
         pass
     
     # divide tree in half to test precedence
-    print("ROS_ROOT: %s"%(os.path.join(path, 'p1')))
-    print("ROS_PACKAGE_PATH: %s"%(os.path.join(path, 'p2')))
-    r = RosPack(ros_root=os.path.join(path, 'p1'), ros_package_path=os.path.join(path, 'p2'))
+    print("ROS_PATH 1: %s"%(os.path.join(path, 'p1')))
+    print("ROS_PATH 2: %s"%(os.path.join(path, 'p2')))
+    r = RosPack(ros_paths=[os.path.join(path, 'p1'), os.path.join(path, 'p2')])
     assert foo_path == r.get_path('foo'), "%s vs. %s"%(foo_path, r.get_path('foo'))
     assert bar_path == r.get_path('bar')
     assert baz_path == r.get_path('baz')
@@ -173,7 +188,7 @@ def test_RosPack_get_path():
 def test_RosPackage_get_depends():
     from rospkg import RosPack, ResourceNotFound, get_ros_root
     path = get_package_test_path()
-    r = RosPack(ros_root=path, ros_package_path='')
+    r = RosPack(ros_paths=[path])
 
     # test on multiple calls to bad package -- there was an ordering
     # issue in the logic that caused get_depends() to return an empty
@@ -204,7 +219,7 @@ def get_stack_test_path():
 def test_stack_of():
     from rospkg import RosPack, ResourceNotFound
     path = os.path.join(get_stack_test_path(), 's1')
-    r = RosPack(ros_root=path, ros_package_path='')
+    r = RosPack(ros_paths=[path])
 
     # test with actual stacks
     assert r.stack_of('foo_pkg') == 'foo'
@@ -218,7 +233,7 @@ def test_stack_of():
         pass
     
     path = os.path.join(get_package_test_path(), 'p1')
-    r = RosPack(ros_root=path, ros_package_path='')
+    r = RosPack(ros_paths=[path])
 
     # test with actual not stacked-packages
     assert r.stack_of('foo') == None
@@ -226,7 +241,7 @@ def test_stack_of():
 def test_RosPackage_get_depends_explicit():
     from rospkg import RosPack, ResourceNotFound, get_ros_root
     path = get_package_test_path()
-    r = RosPack(ros_root=path, ros_package_path='')
+    r = RosPack(ros_paths=[path])
 
     implicit=False
     assert set(r.get_depends('baz', implicit)) == set(['bar', 'foo'])
@@ -245,7 +260,7 @@ def test_RosPack_get_rosdeps():
     from rospkg import RosPack, ResourceNotFound, get_ros_root    
 
     path = get_package_test_path()    
-    r = RosPack(ros_root=os.path.join(path, 'p1'), ros_package_path=os.path.join(path, 'p2'))
+    r = RosPack(ros_paths=[os.path.join(path, 'p1'), os.path.join(path, 'p2')])
 
     # repeat tests due to caching
     assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3']) == set(r.get_rosdeps('foo', implicit=True)), r.get_rosdeps('foo', implicit=True)
@@ -262,7 +277,7 @@ def test_RosPack_get_rosdeps():
     assert set(['baz_rosdep1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))
 
     # create a brand new instance to test with brand new cache
-    r = RosPack(ros_root=os.path.join(path, 'p1'), ros_package_path=os.path.join(path, 'p2'))
+    r = RosPack(ros_paths=[os.path.join(path, 'p1'), os.path.join(path, 'p2')])
     assert set(['baz_rosdep1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))
     assert set(['baz_rosdep1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))    
 
@@ -284,7 +299,7 @@ def test_get_package_name():
 def test_get_depends_on():
     from rospkg import RosPack, get_ros_root
     test_dir = get_package_test_path()
-    rp = RosPack(ros_root=test_dir, ros_package_path='')
+    rp = RosPack(ros_paths=[test_dir])
     # test direct depends
     val = rp.get_depends_on('foo', implicit=False)
     assert set(['bar', 'baz']) == set(val), val

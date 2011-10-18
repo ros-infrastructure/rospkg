@@ -74,7 +74,17 @@ def _resolve_paths(paths):
     splits = [p for p in paths.split(os.pathsep) if p]
     return os.pathsep.join([_resolve_path(p) for p in splits])
 
-#Public API
+def get_ros_paths(env=None):
+    """
+    Get an ordered list of ROS paths to search for ROS packages,
+    stacks, and other resources.  This is generally computed from
+    :envvar:`ROS_ROOT` and :envvar:`ROS_PACKAGE_PATH`.
+    
+    :param env: override environment dictionary
+    """
+    if env is None:
+        env = os.environ
+    return _compute_package_paths(get_ros_root(), get_ros_package_path())
 
 def get_ros_root(env=None):
     """
@@ -151,16 +161,16 @@ def get_test_results_dir(env=None):
     else:
         return os.path.join(get_ros_home(env), 'test_results')
 
-def compute_package_paths(ros_root, ros_package_path):
+def _compute_package_paths(ros_root, ros_package_path):
     """
-    Get the paths to search for packages in reverse precedence order (i.e. last path wins).
+    Get the paths to search for packages in normal precedence order (i.e. first path wins).
 
     :param ros_root: value of ROS_ROOT parameter, ``str``
     :param ros_package_path: value of ROS_PACKAGE_PATH parameter, ``str``
     :returns: paths to search in reverse order of precedence, ``[str]``
     """
     if ros_package_path:
-        return list(reversed([x for x in ros_package_path.split(os.pathsep) if x])) + [ros_root]
+        return [ros_root] + [x for x in ros_package_path.split(os.pathsep) if x.strip()]
     elif ros_root:
         return [ros_root]
     else:
@@ -179,7 +189,7 @@ def on_ros_path(p, env=None):
         
     package = os.path.realpath(_resolve_path(p))
     # filter out non-paths (e.g. if no ROS environment is configured)
-    paths = [p for p in compute_package_paths(get_ros_root(env), get_ros_package_path(env)) if p is not None]
+    paths = get_ros_paths(env)
     paths = [os.path.realpath(_resolve_path(x)) for x in paths]
     return bool([x for x in paths if package == x or package.startswith(x + os.sep)])
 

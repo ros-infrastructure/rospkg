@@ -25,15 +25,27 @@ default values when environment variable overrides are not active.
 
    Name of :envvar:`ROS_TEST_RESULTS_DIR` environment variable.
 
+.. method:: get_ros_paths([env=None]) -> [str]
+
+   Get an ordered list of ROS paths to search for ROS packages,
+   stacks, and other resources.  This is generally computed from
+   :envvar:`ROS_ROOT` and :envvar:`ROS_PACKAGE_PATH`.
+
+   :param env: override environment dictionary
+
 .. method:: get_ros_root([env=None]) -> str
 
-   Get the current :envvar:`ROS_ROOT`.
+   Get the current :envvar:`ROS_ROOT`.  NOTE: it is preferable to call
+   :meth:`get_ros_paths()` instead of directly querying ROS
+   environment variable values.
 
    :param env: override environment dictionary
 
 .. method:: get_ros_package_path([env=None])
 
-   Get the current :envvar:`ROS_PACKAGE_PATH`.
+   Get the current :envvar:`ROS_PACKAGE_PATH`. NOTE: it is preferable to call
+   :meth:`get_ros_paths()` instead of directly querying ROS
+   environment variable values.
 
    :param env: (optional) environment override.
 

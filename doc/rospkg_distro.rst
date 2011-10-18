@@ -134,24 +134,20 @@ Model
     .. method:: get_stacks([released=False]) -> {str: DistroStack}
 
         :param released: only included released stacks
-        :returns: dictionary of stack names to :class:`DistroStack` instances in
-          this distro.
+        :returns: dictionary of stack names to :class:`DistroStack` instances in this distro.
 
 
     .. attribute:: stacks
 
-        Dictionary of stack names mapped to :class:`DistroStack` instances in
-          this distro.
+        Dictionary of stack names mapped to :class:`DistroStack` instances in this distro.
 
     .. attribute:: released_stacks
 
-        Dictionary of released stack names mapped to :class:`DistroStack` instances in
-          this distro.
+        Dictionary of released stack names mapped to :class:`DistroStack` instances in this distro.
 
     .. attribute:: variants
 
-        Dictionary of variant names mapped to :class:`Variant`
-          instances in this distro.
+        Dictionary of variant names mapped to :class:`Variant` instances in this distro.
 
 
 Source control information

@@ -14,7 +14,7 @@ caching and other optimizations for repeated querying.
 
    Name of stack manifest file, i.e. 'stack.xml'.
 
-.. class:: RosStack([ros_root=None, [ros_package_path=None]])
+.. class:: RosStack([ros_paths=None])
 
    Query information about ROS stacks on the local filesystem. This
    includes information about dependencies, retrieving stack
@@ -23,34 +23,23 @@ caching and other optimizations for repeated querying.
 
    ``RosStack`` can be initialized with the default environment, or
    its environment configuration can be overridden with alternate
-   :envvar:`ROS_ROOT` and :envvar:`ROS_PACKAGE_PATH` settings.
+   ROS path settings.
 
    NOTE: for performance reasons, ``RosStack`` caches information about
    stacks.
 
    NOTE 2: ``RosStack`` is not thread-safe.
 
-   :param ros_root: (optional) override :envvar:`ROS_ROOT`.
-   :param ros_package_path: (optional) override
-     :envvar:`ROS_PACKAGE_PATH`.  To specify no
-     :envvar:`ROS_PACKAGE_PATH`, use the empty string.  An assignment
-     of ``None`` will use the default path.
+   :param ros_paths: Ordered list of paths to search for
+     resources. If `None` (default), use environment ROS path.
             
-   .. method:: get_ros_root() -> str
+   .. method:: get_ros_paths() -> [str]
 
-      Get the :envvar:`ROS_ROOT` configuration of this instance.
+      Get ROS paths of this instance
 
-   .. method:: get_ros_package_path() -> str
+   .. attribute:: ros_paths
 
-      Get the :envvar:`ROS_PACKAGE_PATH` configuration of this instance.
-        
-   .. attribute:: ros_root
-
-      Get the :envvar:`ROS_ROOT` configuration of this instance. Read-only.
-
-   .. attribute:: ros_package_path
-
-      Get the :envvar:`ROS_PACKAGE_PATH` configuration of this instance. Read-only.
+      Get ROS paths of this instance
 
    .. method:: get_manifest(name) -> Manifest
 

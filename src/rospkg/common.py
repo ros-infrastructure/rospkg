@@ -43,16 +43,14 @@ class ResourceNotFound(Exception):
     A ROS filesystem resource was not found.
     """
 
-    def __init__(self, msg, ros_root=None, ros_package_path=None):
+    def __init__(self, msg, ros_paths=None):
         super(ResourceNotFound, self).__init__(msg)
-        self.ros_root = ros_root
-        self.ros_package_path = ros_package_path
+        self.ros_paths = ros_paths
 
     def __str__(self):
         s = self.args[0] #python 2.6
-        if self.ros_root:
-            s = s + '\nROS_ROOT=%s'%(self.ros_root)
-        if self.ros_package_path:
-            s = s + '\nROS_PACKAGE_PATH=%s'%(self.ros_package_path)
+        if self.ros_paths:
+            for i, p in enumerate(self.ros_paths):
+                s = s + '\nROS path [%s]=%s'%(i, p)
         return s
 

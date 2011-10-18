@@ -132,12 +132,14 @@ def test_on_ros_path():
             assert on_ros_path(p), "failed: %s, [%s]"%(p, paths)
 
 def test_compute_package_paths():
-    from rospkg.environment import compute_package_paths
+    from rospkg.environment import _compute_package_paths as compute_package_paths
     assert compute_package_paths(None, None) == []
     assert compute_package_paths('foo', None) == ['foo']
     assert compute_package_paths('foo', '') == ['foo']    
-    assert compute_package_paths('foo', 'bar') == ['bar', 'foo']
-
+    assert compute_package_paths('foo', 'bar') == ['foo', 'bar']
+    assert compute_package_paths('foo', 'bar:bz') == ['foo', 'bar', 'bz']
+    assert compute_package_paths('foo', 'bar:bz::blah') == ['foo', 'bar', 'bz', 'blah']
+    
 def test_resolve_path():
     # mainly for coverage
     from rospkg.environment import _resolve_path

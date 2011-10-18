@@ -30,22 +30,22 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import print_function
+
 def test_ResourceNotFound():
     from rospkg import ResourceNotFound
     r = ResourceNotFound('blah')
     assert 'blah' == str(r)
-    assert None == r.ros_root
-    assert None == r.ros_package_path
+    assert None == r.ros_paths
     s = str(r)
     assert not 'None' in s
     assert 'blah' in s
     
-    r = ResourceNotFound('blah', 'ros_root', 'ros_package_path')
+    r = ResourceNotFound('blah', ['ros_root', 'ros_package_path'])
     assert 'blah' == str(r.args[0])
-    assert 'ros_root' == r.ros_root
-    assert 'ros_package_path' == r.ros_package_path
+    assert ['ros_root', 'ros_package_path'] == r.ros_paths
     s = str(r)
+    print(s)
     assert 'blah' in s
     assert 'ros_root' in s
     assert 'ros_package_path' in s
-

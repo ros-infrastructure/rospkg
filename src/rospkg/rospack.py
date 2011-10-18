@@ -34,27 +34,29 @@ import os
 import sys
 
 from .common import MANIFEST_FILE, STACK_FILE, ROS_STACK, ResourceNotFound
-from .environment import get_ros_root, get_ros_package_path, get_ros_home, compute_package_paths
+from .environment import get_ros_paths, get_ros_home
 from .manifest import parse_manifest_file, InvalidManifest
 
-def _read_rospack_cache(cache_name, cache, ros_root, ros_package_path):
+def _read_rospack_cache(cache_path, cache, ros_paths):
     """
     Read in rospack/rosstack cache data into cache. On-disk cache
     specifies a ROS_ROOT and ROS_PACKAGE_PATH, which must match the
     requested environment.
     
-    :param cache_name: name of cache file, e.g. rospack_cache
+    :param cache_path: path to cache file, e.g. ~/.ros/rospack_cache
     :param cache: empty dictionary to store package list in. 
         The format of the cache is {package_name: file_path}. ``{str: str}``
-    :param ros_package_path: :env:`ROS_ROOT` value to validate cache, ``str``
-    :param ros_package_path: :env:`ROS_PACKAGE_PATH` value or '' if not specified, ``str``
-    :returns: ``True`` if on-disk cache matches and was loaded, ``False`` otherwise, ``bool``
+    :param ros_paths: Ordered list of paths to validate cache with, ``[str]``
+    :returns: ``True`` if on-disk cache matches and was loaded,
+      ``False`` otherwise.  If ``False``, *cache* will be emptied,
+      ``bool``
     """
-    cache_path = os.path.join(get_ros_home(), cache_name)
     if not os.path.exists(cache_path):
+        #TODOXXX
+        print("cache_path DNE %s"%cache_path)
         return False
 
-    ros_root_validated = ros_package_path_validated = False
+    cached_ros_paths = []
     with open(cache_path) as f:
         for l in f.readlines():
             l = l[:-1]
@@ -63,17 +65,19 @@ def _read_rospack_cache(cache_name, cache, ros_root, ros_package_path):
             if l[0] == '#':
                 # check that the cache matches our env
                 if l.startswith('#ROS_ROOT='):
-                    ros_root_validated = True
-                    if not l[len('#ROS_ROOT='):] == ros_root:
-                        return False
+                    cached_ros_paths.insert(0, l[len('#ROS_ROOT='):])
                 elif l.startswith('#ROS_PACKAGE_PATH='):
-                    ros_package_path_validated = True
-                    if not l[len('#ROS_PACKAGE_PATH='):] == ros_package_path:
-                        return False
+                    paths = l[len('#ROS_PACKAGE_PATH='):].split(os.pathsep)
+                    paths = [x for x in paths if x]
+                    cached_ros_paths.extend(paths)
             else:
                 cache[os.path.basename(l)] = l
 
-    if not ros_root_validated or not ros_package_path_validated:
+    if not ros_paths == cached_ros_paths:
+        #TODOXXX
+        print("cache_path validate failed %s vs %s"%(ros_paths, cached_ros_paths))
+
+        cache.clear()
         return False
     return True
     
@@ -124,42 +128,32 @@ class ManifestManager(object):
     """
     
     def __init__(self, manifest_name, cache_name,
-                 ros_root=None, ros_package_path=None):
+                 ros_paths=None):
         """
         ctor. subclasses are expected to use *manifest_name* and
         *cache_name* to customize behavior of ManifestManager.
         
         :param manifest_name: MANIFEST_FILE or STACK_FILE
         :param cache_name: rospack_cache or rosstack_cache
-        :param ros_root: (optional) override :envvar:`ROS_ROOT`.
-        :param ros_package_path: (optional) override
-          :envvar:`ROS_PACKAGE_PATH`.  To specify no
-          :envvar:`ROS_PACKAGE_PATH`, use the empty string.  An
-          assignment of ``None`` will use the default path.
+        :param ros_paths: Ordered list of paths to search for
+          resources. If `None` (default), use environment ROS path.
         """
         self._manifest_name = manifest_name
         self._cache_name = cache_name
-        
-        self._ros_root = ros_root
-        if self._ros_root is None:
-            self._ros_root = get_ros_root()
-        self._ros_package_path = ros_package_path
-        if self._ros_package_path is None:
-            self._ros_package_path = get_ros_package_path()
-        self._package_paths = compute_package_paths(self.ros_root, self.ros_package_path)
+
+        if ros_paths is None:
+            self._ros_paths = get_ros_paths()
+        else:
+            self._ros_paths = ros_paths
         
         self._manifests = {}
         self._depends_cache = {}
         self._rosdeps_cache = {}
         self._location_cache = None
 
-    def get_ros_root(self):
-        return self._ros_root
-    ros_root = property(get_ros_root, doc="Get ROS_ROOT of this instance")
-
-    def get_ros_package_path(self):
-        return self._ros_package_path
-    ros_package_path = property(get_ros_package_path, doc="Get ROS_PACKAGE_PATH of this instance")
+    def get_ros_paths(self):
+        return self._ros_paths[:]
+    ros_paths = property(get_ros_paths, doc="Get ROS paths of this instance")
 
     def get_manifest(self, name):
         """
@@ -176,13 +170,14 @@ class ManifestManager(object):
         # initialize cache
         cache = self._location_cache = {}
         # nothing to search, #3680
-        if not self._package_paths:
+        if not self._ros_paths:
             return
         # - first attempt to read .rospack_cache
-        if _read_rospack_cache(self._cache_name, cache, self._ros_root, self._ros_package_path):
+        cache_path = os.path.join(get_ros_home(), self._cache_name)
+        if _read_rospack_cache(cache_path, cache, self._ros_paths):
             return list(cache.keys()) #py3k
         # - else, crawl paths using our own logic, in reverse order to get correct precedence
-        for path in compute_package_paths(self._ros_root, self._ros_package_path):
+        for path in reversed(self._ros_paths):
             list_by_path(self._manifest_name, path, cache)
     
     def list(self):
@@ -202,7 +197,7 @@ class ManifestManager(object):
         """
         self._update_location_cache()
         if not name in self._location_cache:
-            raise ResourceNotFound(name, ros_root=self._ros_root, ros_package_path=self._ros_package_path)
+            raise ResourceNotFound(name, ros_paths=self._ros_paths)
         else:
             return self._location_cache[name]
         
@@ -311,17 +306,14 @@ class RosPack(ManifestManager):
       direct_depends = rp.get_depends('roscpp', implicit=False)
     """
     
-    def __init__(self, ros_root=None, ros_package_path=None):
+    def __init__(self, ros_paths=None):
         """
-        :param ros_root: (optional) override :envvar:`ROS_ROOT`.
-        :param ros_package_path: (optional) override
-          :envvar:`ROS_PACKAGE_PATH`.  To specify no
-          :envvar:`ROS_PACKAGE_PATH`, use the empty string.  An
-          assignment of ``None`` will use the default path.
+        :param ros_paths: Ordered list of paths to search for
+          resources. If `None` (default), use environment ROS path.
         """
         super(RosPack, self).__init__(MANIFEST_FILE,
                                       'rospack_cache',
-                                      ros_root, ros_package_path)
+                                      ros_paths)
         self._rosdeps_cache = {}
 
     def get_rosdeps(self, package, implicit=True):
@@ -391,16 +383,13 @@ class RosStack(ManifestManager):
     NOTE 2: RosStack is not thread-safe. 
     """
     
-    def __init__(self, ros_root=None, ros_package_path=None):
+    def __init__(self, ros_paths=None):
         """
-        :param ros_root: (optional) override :envvar:`ROS_ROOT`.
-        :param ros_package_path: (optional) override
-          :envvar:`ROS_PACKAGE_PATH`.  To specify no
-          :envvar:`ROS_PACKAGE_PATH`, use the empty string.  An
-          assignment of None will use the default path.
+        :param ros_paths: Ordered list of paths to search for
+          resources. If `None` (default), use environment ROS path.
         """
         super(RosStack, self).__init__(STACK_FILE, 'rosstack_cache',
-                                       ros_root, ros_package_path)
+                                       ros_paths)
             
     def packages_of(self, stack):
         """
