@@ -14,6 +14,16 @@ other optimizations for repeated querying.
 
    Name of package manifest file, i.e. 'manifest.xml'.
 
+.. method:: get_package_name(path) -> str
+
+   Get the name of the ROS package that contains *path*. This is
+   determined by finding the nearest parent ``manifest.xml`` file.
+   This routine may not traverse package setups that rely on internal
+   symlinks within the package itself.
+    
+   :param path: filesystem path
+   :return: Package name or ``None`` if package cannot be found, ``str``
+
 .. class:: RosPack([ros_paths=None])
 
    Query information about ROS packages on the local filesystem. This
