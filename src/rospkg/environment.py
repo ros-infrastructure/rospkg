@@ -84,7 +84,7 @@ def get_ros_paths(env=None):
     """
     if env is None:
         env = os.environ
-    return _compute_package_paths(get_ros_root(), get_ros_package_path())
+    return _compute_package_paths(get_ros_root(env), get_ros_package_path(env))
 
 def get_ros_root(env=None):
     """
