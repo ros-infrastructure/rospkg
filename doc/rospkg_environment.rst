@@ -5,23 +5,23 @@ The environment APIs of :mod:`rospkg` provide convenient access to ROS
 package-related environment variables, including methods that provide
 default values when environment variable overrides are not active.
 
-.. data:: ROS_PACKAGE_PATH
+.. data:: rospkg.environment.ROS_PACKAGE_PATH
 
    Name of :envvar:`ROS_PACKAGE_PATH` environment variable.
 
-.. data:: ROS_ROOT
+.. data:: rospkg.environment.ROS_ROOT
 
    Name of :envvar:`ROS_ROOT` environment variable.
 
-.. data:: ROS_HOME
+.. data:: rospkg.environment.ROS_HOME
 
    Name of :envvar:`ROS_HOME` environment variable.   
 
-.. data:: ROS_LOG_DIR
+.. data:: rospkg.environment.ROS_LOG_DIR
 
    Name of :envvar:`ROS_LOG_DIR` environment variable.
 
-.. data:: ROS_TEST_RESULTS_DIR
+.. data:: rospkg.environment.ROS_TEST_RESULTS_DIR
 
    Name of :envvar:`ROS_TEST_RESULTS_DIR` environment variable.
 
