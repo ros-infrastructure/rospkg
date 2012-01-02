@@ -1,5 +1,7 @@
-cmake_minimum_required(VERSION 2.6.0)
+cmake_minimum_required(VERSION 2.8.0)
 project(rospkg)
 find_package(catkin)
-set(rospkg_PYTHONPATH src)
+catkin_project(rospkg
+  PYTHONPATH src
+  )
 enable_python(rospkg)
