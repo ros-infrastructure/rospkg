@@ -1,0 +1,11 @@
+Catkin-ProjectName: rospkg
+Version: 0.0.1
+Depends: catkin
+Description: ROS Package library
+Author: Ken Conley et al
+Maintainer: Ken Conley <kwc@willowgarage.com>
+Homepage: http://www.ros.org
+
+Catkin-CopyrightType: willowgarage
+Catkin-DebRulesType: +rules.em
+
