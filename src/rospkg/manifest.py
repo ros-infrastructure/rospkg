@@ -127,10 +127,13 @@ def _check_rosdeps(n, filename):
 
     :raises: :exc:`InvalidManifest` If validation fails
     """
-    nodes = _get_nodes_by_name(n, 'rosdep')
-    rosdeps = [e.attributes for e in nodes]
-    names = [d['name'].value for d in rosdeps]
-    return [RosDep(n) for n in names]
+    try:
+        nodes = _get_nodes_by_name(n, 'rosdep')
+        rosdeps = [e.attributes for e in nodes]
+        names = [d['name'].value for d in rosdeps]
+        return [RosDep(n) for n in names]
+    except KeyError:
+        raise InvalidManifest("invalid rosdep tag in [%s]"%(filename))
 
 def _attrs(node):
     attrs = {}
