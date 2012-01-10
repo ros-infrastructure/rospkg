@@ -169,12 +169,12 @@ def _compute_package_paths(ros_root, ros_package_path):
     :param ros_package_path: value of ROS_PACKAGE_PATH parameter, ``str``
     :returns: paths to search in reverse order of precedence, ``[str]``
     """
+    paths = []
+    if ros_root:
+        paths.append(ros_root)
     if ros_package_path:
-        return [ros_root] + [x for x in ros_package_path.split(os.pathsep) if x.strip()]
-    elif ros_root:
-        return [ros_root]
-    else:
-        return []
+        return paths.extend([x for x in ros_package_path.split(os.pathsep) if x.strip()])
+    return paths
 
 def on_ros_path(p, env=None):
     """
