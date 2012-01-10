@@ -45,9 +45,7 @@ def get_unary_test_path():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), 'unary_tests'))
 
 def rosstackexec(args):
-    if 'ROS_ROOT' not in os.environ:
-        return ''
-    rosstack_bin = os.path.join(os.environ['ROS_ROOT'], 'bin', 'rosstack')
+    rosstack_bin = 'rosstack'
     val = subprocess.Popen([rosstack_bin] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=os.environ).communicate()
     val = val[0].strip()
     if val.startswith('rosstack:'): #rosstack error message

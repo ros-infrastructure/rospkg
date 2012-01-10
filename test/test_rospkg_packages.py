@@ -83,7 +83,7 @@ def test_ManifestManager_constructor():
         assert r.ros_paths == [tmp]        
 
 def rospackexec(args):
-    rospack_bin = os.path.join(os.environ['ROS_ROOT'], 'bin', 'rospack')
+    rospack_bin = 'rospack'
     val = (subprocess.Popen([rospack_bin] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0] or '').strip()
     if val.startswith('rospack:'): #rospack error message
         raise Exception(val)

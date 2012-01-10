@@ -173,7 +173,7 @@ def _compute_package_paths(ros_root, ros_package_path):
     if ros_root:
         paths.append(ros_root)
     if ros_package_path:
-        return paths.extend([x for x in ros_package_path.split(os.pathsep) if x.strip()])
+        paths.extend([x for x in ros_package_path.split(os.pathsep) if x.strip()])
     return paths
 
 def on_ros_path(p, env=None):
