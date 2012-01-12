@@ -219,6 +219,5 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    ('index', 'rospkg', u'ROS Packages Documentation',
-     [u'Eric Berger, Ken Conley, Josh Faust, Tully Foote, Brian Gerkey, Jeremy Leibs, Morgan Quigley, Rob Wheeler'], 1)
+    ('man/rosversion', 'rosversion', u'rosverion command', [u'Ken Conley'], 1)
 ]
