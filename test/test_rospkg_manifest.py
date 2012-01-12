@@ -137,6 +137,14 @@ def _subtest_parse_stack_version(m):
 def get_test_dir():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), 'manifest'))
 
+def test_is_catkin():
+    from rospkg.manifest import parse_manifest_file, MANIFEST_FILE, STACK_FILE
+    d = get_test_dir()
+    m = parse_manifest_file(os.path.join(d, 'catkin'), MANIFEST_FILE)
+    assert m.is_catkin
+    m = parse_manifest_file(os.path.join(d, 'example1'), MANIFEST_FILE)
+    assert not m.is_catkin
+
 def test_parse_manifest_file():
     from rospkg.manifest import parse_manifest_file, MANIFEST_FILE, STACK_FILE
 

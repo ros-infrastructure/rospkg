@@ -280,7 +280,8 @@ class Manifest(object):
                  'depends', 'rosdeps','platforms',\
                  'exports', 'version',\
                  'status', 'notes',\
-                 'unknown_tags', 'type', 'filename']
+                 'unknown_tags', 'type', 'filename',\
+                 'is_catkin']
 
     def __init__(self, type_='package', filename=None):
         """
@@ -296,7 +297,8 @@ class Manifest(object):
         self.rosdeps = []
         self.exports = []
         self.platforms = []
-
+        self.is_catkin = False
+        
         self.type = type_
         self.filename = filename
         
@@ -412,6 +414,8 @@ def parse_manifest(manifest_name, string, filename='string'):
         if m.rosdeps:
             raise InvalidManifest("stack manifests are not allowed to have rosdeps") 
 
+    m.is_catkin = bool(_get_nodes_by_name(p, 'catkin'))
+    
     # store unrecognized tags
     m.unknown_tags = [e for e in p.childNodes if e.nodeType == e.ELEMENT_NODE and e.tagName not in VALID]
     return m
