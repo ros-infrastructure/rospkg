@@ -25,6 +25,10 @@ default values when environment variable overrides are not active.
 
    Name of :envvar:`ROS_TEST_RESULTS_DIR` environment variable.
 
+.. data:: rospkg.environment.ROS_ETC_DIR
+
+   Name of :envvar:`ROS_ETC_DIR` environment variable.
+
 .. method:: get_ros_paths([env=None]) -> [str]
 
    Get an ordered list of ROS paths to search for ROS packages,
@@ -88,3 +92,13 @@ default values when environment variable overrides are not active.
 
    :param p: path, ``str``
    :return: True if p is on the ROS path (ROS_ROOT, ROS_PACKAGE_PATH)
+
+.. method:: get_etc_ros_dir([env=None]) -> str
+
+   Get directory location of ``/etc/ros`` directory.  The
+   :envvar:`ROS_ETC_DIR` environment variable has priority. If
+   :envvar:`ROS_ETC_DIR` is not set, ``/etc/ros`` is used.
+
+   :param env: override environment dictionary
+   :return: path to use use for log file directory
+    

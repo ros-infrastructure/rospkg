@@ -38,10 +38,38 @@ import yaml
 def get_test_path():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), 'rosdistro'))
 
+def get_etc_path():
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), 'fakeetcros'))
+
 def test_distro_uri():
     from rospkg.distro import distro_uri
     assert distro_uri('electric') == "https://code.ros.org/svn/release/trunk/distros/electric.rosdistro"
     
+def test_current_distro_codename():
+    import rospkg.environment
+    from rospkg.distro import current_distro_codename
+    assert 'awesome' == current_distro_codename(env={'ROS_DISTRO':'awesome'})
+    env={rospkg.environment.ROS_ETC_DIR: get_etc_path()}
+    val = current_distro_codename(env=env)
+    assert 'rosawesome' == current_distro_codename(env=env), val
+    
+def test__current_distro_electric():
+    from rospkg.distro import _current_distro_electric
+    # tripwire, not allowed to throw
+    _current_distro_electric()
+    
+def test__current_distro_electric_parse_roscore():
+    from rospkg.distro import _current_distro_electric_parse_roscore
+    roscore_file = os.path.join(get_etc_path(), 'roscore-electric.xml')
+    val = _current_distro_electric_parse_roscore(roscore_file)
+    assert 'electric' == val, val
+
+    bad_roscore_file = os.path.join(get_etc_path(), 'roscore-bad.xml')
+    assert None == _current_distro_electric_parse_roscore(bad_roscore_file)
+    
+    no_roscore_file = os.path.join(get_etc_path(), 'non-existent.xml')
+    assert None == _current_distro_electric_parse_roscore(no_roscore_file)
+
 def xtest_Distro_dback(self):
     # TODO: better unit tests. For now this is mostly a tripwire
     from rospkg.distro import Distro, DistroStack, Variant

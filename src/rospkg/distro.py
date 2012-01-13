@@ -42,6 +42,7 @@ import urllib2
 import yaml
 
 from .common import ResourceNotFound
+from .environment import get_etc_ros_dir
 
 TARBALL_URI_EVAL ='https://code.ros.org/svn/release/download/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION/$STACK_NAME-$STACK_VERSION.tar.bz2'
 
@@ -558,3 +559,59 @@ def load_vcs_config(rules, rule_eval):
             vcs_config.load(rules[k], rule_eval)
             break
     return vcs_config
+
+def _current_distro_electric_parse_roscore(roscore_file):
+    if not os.path.exists(roscore_file):
+        return None
+    import xml.dom.minidom
+    try:
+        dom = xml.dom.minidom.parse(roscore_file)
+        tags = dom.getElementsByTagName("param")
+        for t in tags:
+            if t.hasAttribute('name') and t.getAttribute('name') == 'rosdistro':
+                return t.getAttribute('value')
+    except:
+        return None
+    
+# for < fuerte, retrieve from roscore file
+def _current_distro_electric(env=None):
+    if env is None:
+        env = os.environ
+    from . import RosPack, get_ros_paths
+    rospack = RosPack(get_ros_paths(env))
+    # there's some chance that the location of this file changes in the future
+    try:
+        roscore_file = os.path.join(rospack.get_path('roslaunch'), 'roscore.xml')
+        return _current_distro_electric_parse_roscore(roscore_file)
+    except:
+        return None
+
+def current_distro_codename(env=None):
+    """
+    Get the currently active ROS distribution codename, e.g. 'fuerte'
+
+    :param env: override os.environ, ``dict``
+    """
+    if env is None:
+        env = os.enviorn
+        
+    # ROS_DISTRO is only used in ros catkin buildspace.  It is not
+    # meant to be well publicized and thus is not declared in
+    # rospkg.environment.
+    if 'ROS_DISTRO' in env:
+        return env['ROS_DISTRO']
+
+    # check for /etc/ros/distro file
+    distro_name = None
+    etc_ros = get_etc_ros_dir(env=env)
+    distro_file = os.path.join(etc_ros, 'distro')
+    if os.path.isfile(distro_file):
+        with open(distro_file, 'r') as f:
+            distro_name = f.read().strip()
+
+    # fallback logic for pre-Fuerte
+    if distro_name is None:
+        distro_name = _current_distro_electric(env=env)
+
+    return distro_name
+

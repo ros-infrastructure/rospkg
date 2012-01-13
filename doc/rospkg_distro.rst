@@ -68,6 +68,11 @@ Utility functions
 
     :raises: :exc:`KeyError` if branch is invalid or if distro is mis-configured
 
+.. method:: current_distro_codename([env=None]) -> str
+
+    Get the currently active ROS distribution codename, e.g. 'fuerte'
+
+    :param env: override os.environ, ``dict``
 
 
 Model

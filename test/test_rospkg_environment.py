@@ -145,3 +145,18 @@ def test_resolve_path():
     # mainly for coverage
     from rospkg.environment import _resolve_path
     assert os.path.expanduser('~') == _resolve_path('~')
+
+def test_get_etc_ros_dir():
+    from rospkg import get_etc_ros_dir, get_ros_root
+    from rospkg.environment import ROS_ETC_DIR
+    base = tempfile.gettempdir()
+    etc_ros_dir = os.path.join(base, 'etc_ros_dir')
+
+    assert '/etc/ros' == get_etc_ros_dir(env={})
+    
+    # ROS_ETC_DIR has precedence
+    env = {ROS_ETC_DIR: etc_ros_dir}
+    assert etc_ros_dir == get_etc_ros_dir(env=env), get_etc_ros_dir(env=env)
+
+    # test default assignment of env. Don't both checking return value as we would duplicate get_etc_ros_dir
+    assert get_etc_ros_dir() is not None

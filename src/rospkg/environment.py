@@ -43,6 +43,9 @@ ROS_ROOT         = "ROS_ROOT"
 ROS_PACKAGE_PATH = "ROS_PACKAGE_PATH"
 ROS_HOME         = "ROS_HOME"
 
+# override directory path to /etc/ros
+ROS_ETC_DIR      = "ROS_ETC_DIR"
+
 ## directory in which log files are written
 ROS_LOG_DIR      ="ROS_LOG_DIR"
 ## directory in which test result files are written
@@ -193,3 +196,19 @@ def on_ros_path(p, env=None):
     paths = [os.path.realpath(_resolve_path(x)) for x in paths]
     return bool([x for x in paths if package == x or package.startswith(x + os.sep)])
 
+def get_etc_ros_dir(env=None):
+    """
+    Get directory location of ``/etc/ros`` directory.  The
+    :envvar:`ROS_ETC_DIR` environment variable has priority. If
+    :envvar:`ROS_ETC_DIR` is not set, ``/etc/ros`` is used.
+
+    :param env: override environment dictionary
+    :return: path to use use for log file directory
+    """
+    if env is None:
+        env = os.environ
+    if ROS_ETC_DIR in env:
+        return env[ROS_ETC_DIR]
+    else:
+        return '/etc/ros'
+    
