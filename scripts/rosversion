@@ -26,18 +26,14 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-from __future__ import print_function
-
 USAGE = "Usage: rosversion <stack> or rosversion -d"
 
 import os
 import sys
-import re
 import rospkg
+import traceback
 
-
-# right now we can retrieve the distro name from roscore.  It would be
-# great if it could be retrieved more easily
+# for < fuerte, retrieve from roscore file
 def get_distro_name_from_roscore():
     rospack = rospkg.RosPack()
     # there's some chance that the location of this file changes in the future
@@ -59,19 +55,20 @@ def get_distro_name_from_roscore():
             if t.hasAttribute('name') and t.getAttribute('name') == 'rosdistro':
                 return t.getAttribute('value')
     except:
-        import traceback
         traceback.print_exc()
-        pass
     
 if len(sys.argv) == 2:
     stack_name = sys.argv[1]
 
     if stack_name == '-d' or stack_name == '--distro':
-        distro_name = get_distro_name_from_roscore()
-        if distro_name is None:
-            print('<unknown>')
+        if 'ROS_DISTRO' in os.environ:
+            distro_name = os.environ['ROS_DISTRO']
         else:
-            print(distro_name)
+            distro_name = get_distro_name_from_roscore()
+        if not distro_name:
+            sys.stdout.write('<unknown>')
+        else:
+            sys.stdout.write(distro_name)
         sys.exit(0)
     
     rosstack = rospkg.RosStack()
@@ -82,10 +79,9 @@ if len(sys.argv) == 2:
         sys.exit(1)
 
     if version is None:
-        print('<unversioned>')
-        print(rosstack.get_path(stack_name))
+        sys.stdout.write('<unversioned>')
     else:
-        print(version)
+        sys.stdout.write(version)
 else:
     sys.stderr.write(USAGE+'\n')
     sys.exit(os.EX_USAGE)
