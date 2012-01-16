@@ -14,5 +14,6 @@ You can continue reading the sections below to find out more about these concept
 
    packages
    stacks
+   environment
    manifests
    stack_manifests
