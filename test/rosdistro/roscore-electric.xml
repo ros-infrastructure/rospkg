@@ -1,0 +1,11 @@
+<!-- 
+  ROS Core Stack definition
+
+  Before making any modifications to this file, please read:
+  http://ros.org/wiki/roscore
+  -->
+<launch>
+  <param name="rosversion" value="1.6.6" />
+  <param name="rosdistro" value="electric" />
+  <node pkg="rosout" type="rosout" name="rosout" respawn="true"/>
+</launch>
