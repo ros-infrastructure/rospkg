@@ -1,11 +1,11 @@
 Catkin-ProjectName: rospkg
-Version: 0.0.1
+Version: 0.12.0
 Depends: catkin
-Description: ROS Package library
+Description: Standalone Python library for the ROS package system.
 Author: Ken Conley et al
 Maintainer: Ken Conley <kwc@willowgarage.com>
-Homepage: http://www.ros.org
+Homepage: http://www.ros.org/wiki/rospkg
 
 Catkin-CopyrightType: willowgarage
-Catkin-DebRulesType: +rules.em
+Catkin-DebRulesType: catkin
 

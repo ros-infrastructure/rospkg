@@ -195,12 +195,14 @@ def load_distro(source_uri):
         version = _distro_version(raw_data.get('version', '0'))
         release_name = raw_data['release']
         stacks = _load_distro_stacks(raw_data, release_name)
-        variants = _load_variants(raw_data['variants'], stacks)
+        variants = _load_variants(raw_data.get('variants', {}), stacks)
         return Distro(stacks, variants, release_name, version, raw_data)
     except KeyError as e:
         raise InvalidDistro("distro is missing required '%s' key"%(str(e)))
 
 def _load_variants(raw_data, stacks):
+    if not raw_data:
+        return {}
     all_variants_raw_data = {}
     for v in raw_data:
         if type(v) != dict or len(v.keys()) != 1:
