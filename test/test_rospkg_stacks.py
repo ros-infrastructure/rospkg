@@ -243,13 +243,16 @@ def test_get_stack_version():
     # test via rosstack
     assert r.get_stack_version('foo') == '1.6.0-manifest'    
     assert r.get_stack_version('bar') == '1.5.0-cmake'    
-
+    
     path = os.path.join(get_stack_test_path(), 's2')
     r = RosStack(ros_paths=[path])
     foo_dir = r.get_path('foo')
     assert get_stack_version_by_dir(foo_dir) == None, get_stack_version_by_dir(foo_dir)
+
+    # test reading from stack.yaml
     baz_dir = r.get_path('baz')
-    assert get_stack_version_by_dir(baz_dir) == None
+    assert get_stack_version_by_dir(baz_dir) == '1.7.3', get_stack_version_by_dir(baz_dir)
+    assert r.get_stack_version('baz') == '1.7.3'
 
 def test_get_cmake_version():
     from rospkg.rospack import _get_cmake_version
