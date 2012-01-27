@@ -52,6 +52,13 @@ def rosstackexec(args):
         raise Exception(val)
     return val
 
+def rosstack_is_available():
+    try:
+        rosstackexec(['-h'])
+        return True
+    except:
+        return False
+
 # for comparing against 'ground truth'
 def rosstack_list():
     return [s.strip() for s in rosstackexec(['list-names']).split('\n') if s.strip()]
@@ -73,7 +80,7 @@ def test_RosStack_list():
     from rospkg import RosStack, get_ros_paths, get_ros_package_path
 
     print("ROS paths", get_ros_paths())
-    if get_ros_paths() is not None:
+    if get_ros_paths() is not None and rosstack_is_available():
         r = RosStack()
 
         l = rosstack_list()
@@ -125,7 +132,7 @@ def test_RosStack_get_path():
     r = RosStack(ros_paths=ros_paths)
     assert foo_path == r.get_path('foo'), "%s vs. %s"%(foo_path, r.get_path('foo'))
 
-    if get_ros_paths():
+    if get_ros_paths() and rosstack_is_available():
         # stresstest against rospack
         r = RosStack()
         listval = rosstack_list()
@@ -154,7 +161,7 @@ def test_RosStack_get_depends():
     assert r.get_depends('bar') == ['foo']
     assert r.get_depends('foo') == []
 
-    if get_ros_paths():
+    if get_ros_paths() and rosstack_is_available():
         # stress test: test default environment against rosstack
         r = RosStack()
         for p in rosstack_list():
@@ -175,7 +182,7 @@ def test_RosStack_get_depends_explicit():
     assert r.get_depends('foo', implicit) == []
 
     # stress test: test default environment against rospack
-    if get_ros_paths():
+    if get_ros_paths() and rosstack_is_available():
         r = RosStack()
         for p in rosstack_list():
             retval = set(r.get_depends(p, implicit))
@@ -236,13 +243,16 @@ def test_get_stack_version():
     # test via rosstack
     assert r.get_stack_version('foo') == '1.6.0-manifest'    
     assert r.get_stack_version('bar') == '1.5.0-cmake'    
-
+    
     path = os.path.join(get_stack_test_path(), 's2')
     r = RosStack(ros_paths=[path])
     foo_dir = r.get_path('foo')
     assert get_stack_version_by_dir(foo_dir) == None, get_stack_version_by_dir(foo_dir)
+
+    # test reading from stack.yaml
     baz_dir = r.get_path('baz')
-    assert get_stack_version_by_dir(baz_dir) == None
+    assert get_stack_version_by_dir(baz_dir) == '1.7.3', get_stack_version_by_dir(baz_dir)
+    assert r.get_stack_version('baz') == '1.7.3'
 
 def test_get_cmake_version():
     from rospkg.rospack import _get_cmake_version

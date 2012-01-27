@@ -32,6 +32,7 @@
 
 import os
 import sys
+import yaml
 
 from .common import MANIFEST_FILE, STACK_FILE, ROS_STACK, ResourceNotFound
 from .environment import get_ros_paths, get_ros_home
@@ -438,6 +439,18 @@ def get_stack_version_by_dir(stack_dir):
 
     :returns: version number of stack, or None if stack is unversioned, ``str``
     """
+    # REP TODO: stack.yaml now has precedence
+    catkin_stack_filename = os.path.join(stack_dir, 'stack.yaml')
+    if os.path.isfile(catkin_stack_filename):
+        with open(catkin_stack_filename) as f:
+            try:
+                d = yaml.load(f)
+                if 'Version' in d:
+                    return d['Version']
+            except:
+                raise
+                pass
+    
     # REP 109: check for <version> tag first, then CMakeLists.txt
     manifest_filename = os.path.join(stack_dir, STACK_FILE)
     if os.path.isfile(manifest_filename):

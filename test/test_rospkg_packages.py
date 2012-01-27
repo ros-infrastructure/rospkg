@@ -109,9 +109,16 @@ def delete_cache():
     if os.path.exists(p):
         os.remove(p)
     
+def rospack_is_available():
+    try:
+        rospackexec(['-h'])
+        return True
+    except:
+        return False
+
 def test_RosPack_list():
     from rospkg import RosPack, get_ros_root
-    if get_ros_root() is not None:
+    if get_ros_root() is not None and rospack_is_available():
         r = RosPack()
 
         pkgs = rospack_list()
@@ -177,7 +184,7 @@ def test_RosPack_get_path():
     assert bar_path == r.get_path('bar')
     assert baz_path == r.get_path('baz')
 
-    if get_ros_root():
+    if get_ros_root() and rospack_is_available():
         # stresstest against rospack
         r = RosPack()
         for p in rospack_list():
@@ -205,7 +212,7 @@ def test_RosPackage_get_depends():
     assert r.get_depends('bar') == ['foo']
     assert r.get_depends('foo') == []
 
-    if get_ros_root():
+    if get_ros_root() and rospack_is_available():
         # stress test: test default environment against rospack
         r = RosPack()
         for p in rospack_list():
@@ -248,7 +255,7 @@ def test_RosPackage_get_depends_explicit():
     assert r.get_depends('bar', implicit) == ['foo']
     assert r.get_depends('foo', implicit) == []
 
-    if get_ros_root():
+    if get_ros_root() and rospack_is_available():
         # stress test: test default environment against rospack
         r = RosPack()
         for p in rospack_list():
@@ -316,7 +323,7 @@ def test_get_depends_on():
     val = rp.get_depends_on('baz', implicit=True) 
     assert [] == val, val
 
-    if get_ros_root():
+    if get_ros_root() and rospack_is_available():
         # stress test: test default environment against rospack
         r = RosPack()
         for p in rospack_list():

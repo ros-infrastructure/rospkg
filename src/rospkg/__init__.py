@@ -34,7 +34,7 @@
 Base ROS python library for manipulating ROS packages and stacks.
 """
 
-__version__ = '0.12.0'
+__version__ = '0.12.2'
 
 from .common import MANIFEST_FILE, STACK_FILE, ResourceNotFound
 from .environment import get_ros_root, get_ros_package_path, get_ros_home, \

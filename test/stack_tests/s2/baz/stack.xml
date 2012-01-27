@@ -2,6 +2,7 @@
   <description brief="foo">
      foo
   </description>
+  <version>1-manifest</version>
   <author>Ken Conley</author>
   <license>BSD</license>
 </stack>

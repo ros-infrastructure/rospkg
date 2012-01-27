@@ -60,14 +60,15 @@ def test__current_distro_electric():
     
 def test__current_distro_electric_parse_roscore():
     from rospkg.distro import _current_distro_electric_parse_roscore
-    roscore_file = os.path.join(get_etc_path(), 'roscore-electric.xml')
+    roscore_file = os.path.join(get_test_path(), 'roscore-electric.xml')
+    assert os.path.exists(roscore_file), roscore_file
     val = _current_distro_electric_parse_roscore(roscore_file)
     assert 'electric' == val, val
 
-    bad_roscore_file = os.path.join(get_etc_path(), 'roscore-bad.xml')
+    bad_roscore_file = os.path.join(get_test_path(), 'roscore-bad.xml')
     assert None == _current_distro_electric_parse_roscore(bad_roscore_file)
     
-    no_roscore_file = os.path.join(get_etc_path(), 'non-existent.xml')
+    no_roscore_file = os.path.join(get_test_path(), 'non-existent.xml')
     assert None == _current_distro_electric_parse_roscore(no_roscore_file)
 
 def xtest_Distro_dback(self):
@@ -257,6 +258,16 @@ def test_load_distro_bad_data():
             load_distro(p)
             assert False, "should have raised: %s"%(filename)
         except InvalidDistro: pass
+    
+def test_load_distro_variants():
+    # test with no and empty variants (issue found in fuerte bringup)
+    from rospkg.distro import load_distro, Distro
+    d = get_test_path()
+    for name in ['no_variants.rosdistro', 'empty_variants.rosdistro']:
+        p = os.path.join(d, name)
+        distro = load_distro(p)
+        assert distro.release_name == 'simple', distro.release_name
+        assert distro.variants.keys() == []
     
 def test_load_distro_simple():
     from rospkg.distro import load_distro, Distro
