@@ -47,7 +47,8 @@ REQUIRED = ['license']
 ALLOWXHTML = ['description']
 OPTIONAL = ['author', 'logo', 'url', 'brief', 'description', 'status',
             'notes', 'depend', 'rosdep', 'export', 'review',
-            'versioncontrol', 'platform', 'version', 'rosbuild2']
+            'versioncontrol', 'platform', 'version', 'rosbuild2',
+            'catkin']
 VALID = REQUIRED + OPTIONAL
 
 class InvalidManifest(Exception):
