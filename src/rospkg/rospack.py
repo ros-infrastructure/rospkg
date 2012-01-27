@@ -38,6 +38,11 @@ from .common import MANIFEST_FILE, STACK_FILE, ROS_STACK, ResourceNotFound
 from .environment import get_ros_paths, get_ros_home
 from .manifest import parse_manifest_file, InvalidManifest
 
+# disabling reading the .rospack_cache for now as the Fuerte codebase
+# doesn't invoke rospack/stack as promisciously as before.  This means
+# the cache is often invalid now.
+ROSPACK_CACHE_ENABLED = False
+
 def _read_rospack_cache(cache_path, cache, ros_paths):
     """
     Read in rospack/rosstack cache data into cache. On-disk cache
@@ -52,6 +57,8 @@ def _read_rospack_cache(cache_path, cache, ros_paths):
       ``False`` otherwise.  If ``False``, *cache* will be emptied,
       ``bool``
     """
+    if not ROSPACK_CACHE_ENABLED:
+        return False
     if not os.path.exists(cache_path):
         return False
 
