@@ -87,11 +87,11 @@ Model
     :param release_name: name of distribution release.  Necessary for rule expansion.
     :param rules: raw ``_rules`` data.  Will be converted into appropriate vcs config instance.
 
-    .. attribute:: stack_name
+    .. attribute:: name
 
       Name of stack.
 
-    .. attribute:: stack_version
+    .. attribute:: version
 
       Version number of stack.
 
