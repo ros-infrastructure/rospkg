@@ -595,7 +595,7 @@ def current_distro_codename(env=None):
     :param env: override os.environ, ``dict``
     """
     if env is None:
-        env = os.enviorn
+        env = os.environ
         
     # ROS_DISTRO is only used in ros catkin buildspace.  It is not
     # meant to be well publicized and thus is not declared in
