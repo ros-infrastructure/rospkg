@@ -1,5 +1,5 @@
 Catkin-ProjectName: rospkg
-Version: 0.12.4
+Version: 0.12.6
 Depends: catkin, python-yaml
 Description: Standalone Python library for the ROS package system.
 Author: Ken Conley et al
