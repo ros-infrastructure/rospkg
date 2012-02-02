@@ -271,6 +271,9 @@ class ManifestManager(object):
                 except InvalidManifest:
                     # robust to bad packages
                     pass
+                except ResourceNotFound:
+                    # robust to bad packages
+                    pass
         else:
             # Computing implicit dependencies requires examining the
             # dependencies of all packages.  As we already implement
@@ -286,6 +289,9 @@ class ManifestManager(object):
                     if name in depends:
                         depends_on.append(r)
                 except InvalidManifest:
+                    # robust to bad packages
+                    pass
+                except ResourceNotFound:
                     # robust to bad packages
                     pass
         return depends_on
