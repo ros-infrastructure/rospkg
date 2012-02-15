@@ -438,7 +438,7 @@ def expand_to_packages(names, rospack, rosstack):
         if not n in package_list:
             try:
                 valid.extend(rosstack.packages_of(n))
-            except ResourceNotFound as e:
+            except ResourceNotFound:
                 invalid.append(n)
         else:
             valid.append(n)
