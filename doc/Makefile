@@ -129,7 +129,7 @@ doctest:
 	@echo "Testing of doctests in the sources finished, look at the " \
 	      "results in $(BUILDDIR)/doctest/output.txt."
 
-upload:
+upload: html
 	scp -r _build/html/ wgs32.willowgarage.com:/var/www/www.ros.org/html/doc/api/rospkg/
 	scp -r _build/html/ wgs32.willowgarage.com:/var/www/www.ros.org/html/doc/fuerte/api/rospkg/
 
