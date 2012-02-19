@@ -115,6 +115,42 @@ stdout.  Any errors or warnings go to stderr.  This separation ensures
 that error output does not confuse programs that execute ``rospack``
 as a subprocess to, for example, recover build flags for a package.
 
+::
+
+    USAGE: rospack <command> [options] [package]
+      Allowed commands:
+        help [subcommand]
+        cflags-only-I     [--deps-only] [package]
+        cflags-only-other [--deps-only] [package]
+        depends           [package] (alias: deps)
+        depends-indent    [package] (alias: deps-indent)
+        depends-manifests [package] (alias: deps-manifests)
+        depends-msgsrv    [package] (alias: deps-msgsrv)
+        depends-on        [package]
+        depends-on1       [package]
+        depends-why --target=<target> [package] (alias: deps-why)
+        depends1          [package] (alias: deps1)
+        export [--deps-only] --lang=<lang> --attrib=<attrib> [package]
+        find [package]
+        langs
+        libs-only-L     [--deps-only] [package]
+        libs-only-l     [--deps-only] [package]
+        libs-only-other [--deps-only] [package]
+        list
+        list-duplicates
+        list-names
+        plugins --attrib=<attrib> [--top=<toppkg>] [package]
+        profile [--length=<length>] [--zombie-only]
+        rosdep  [package] (alias: rosdeps)
+        rosdep0 [package] (alias: rosdeps0)
+        vcs  [package]
+        vcs0 [package]
+      Extra options:
+        -q     Quiets error reports.
+
+     If [package] is omitted, the current working directory
+     is used (if it contains a manifest.xml).
+
 .. program:: rospack
 
 General options
@@ -134,10 +170,11 @@ working directory is used.
 
 .. program:: rospack help
 
-rospack help
-------------
+rospack help [subcommand]
+-------------------------
 
-Print help message.
+Print help message.  Since 2.0.9, you can give a subcommand as an argument
+to get more specific help.
 
 .. _rospack_find:
 .. program:: rospack find
@@ -154,6 +191,7 @@ Example::
   
 
 .. program:: rospack list
+
 rospack list
 ------------
 
@@ -171,7 +209,18 @@ Example::
 
 .. program:: rospack list-names
 
+rospack list-names
+------------------
+
 Print newline-separated list of packages names for all packages.
+
+.. program:: rospack list-duplicates
+
+rospack list-duplicates
+-----------------------
+
+Print newline-separated list of names of packages that appear more than
+once during the search.
 
 .. program:: rospack langs
 
@@ -269,6 +318,43 @@ Example::
     rosoct
     roslisp
 
+.. program:: rospack rosdep
+
+rospack rosdep [package]
+------------------------
+
+Print newline-separated list of all `rosdep` tags from the manifest.xml
+of the package and all of its dependencies. 
+
+.. program:: rospack rosdep0
+
+rospack rosdep0 [package]
+-------------------------
+
+Print newline-separated list of all `rosdep` tags from the manifest.xml
+of just the package itself.
+
+.. program:: rospack vcs
+
+rospack vcs [package]
+---------------------
+
+Print newline-separated list of all `versioncontrol` tags from the
+manifest.xml of the package and all of its dependencies. This is useful for
+pre-caching SSL certificates for https SVN servers that will be contacted
+during the build, to avoid having to manually accept the certificates
+during the build.
+
+.. program:: rospack vcs0
+
+rospack vcs0 [package]
+----------------------
+
+Print newline-separated list of all `versioncontrol` tags from the
+manifest.xml of just the package itself. This is useful for
+pre-caching SSL certificates for https SVN servers that will be contacted
+during the build, to avoid having to manually accept the certificates
+during the build.
  
 .. _rospack_export:
 .. program:: rospack export
