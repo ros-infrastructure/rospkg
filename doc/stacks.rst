@@ -38,13 +38,9 @@ A *unary stack* is simply a stack that is also a package.
 Command-line Tools
 ------------------
 
-`rosstack <http://www.ros.org/wiki/rosstack>`_ is the primary ROS tool
-for interacting with ROS stacks. It is the stack-level analogue of the
-`rospack <http://www.ros.org/wiki/rospack>`_ tool for packages.
-
-`roscreate-stack <http://ros.org/wiki/roscreate>`_ helps automate the
-process of creating a stack, including generating a valid
-``stack.xml`` file with correct dependencies.
+:ref:`rosstack <rosstack>` is the primary ROS tool for interacting
+with ROS stacks. It is the stack-level analogue of the :ref:`rospack <rospack>`
+tool for packages.
 
 There are also extensions to common Unix shells that provide
 additional functionality to help you navigate and use packages. The

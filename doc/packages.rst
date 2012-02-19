@@ -50,7 +50,7 @@ Packages are a very central concept to how files in ROS are organized,
 so there are quite a few tools in ROS that help you manage them. This
 includes:
 
- * `rospack <http://www.ros.org/wiki/rospack>`_: find and retrieve information about packages. The ROS build system also uses ``rospack`` to locate a package and build its dependencies.
+ * :ref:`rospack`: find and retrieve information about packages. The ROS build system also uses ``rospack`` to locate a package and build its dependencies.
  * `roscreate-pkg <http://www.ros.org/wiki/roscreate>`_: create a new package.
  * `rosmake <http://www.ros.org/wiki/rosmake>`_: build a package and its dependencies.
  * `rosdep <http://www.ros.org/wiki/rosdep>`_: install system dependencies of a package.
