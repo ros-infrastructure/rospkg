@@ -454,18 +454,3 @@ then ``rospack plugins --attrib=cmake rosbuild`` will return (at least)::
 .. cmdoption:: --top=<toppkg>
 
   If :option:`--top` is given, then in addition to depending directly on the given package, to be scanned for exports, a package must also be a dependency of ``<toppkg>``, or be ``<toppkg>`` itself.
-
-
-
-
-rospack developers' guide
-=========================
-
-Dependencies
-------------
-
-rospack contains a copy of the TinyXML library.  Unit tests, instead
-of using the copy available in 3rdparty.  For the same reason, unit
-tests for rospack, which require gtest, are in a separate package,
-called ``rospack_test``.
-

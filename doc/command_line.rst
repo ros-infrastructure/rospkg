@@ -5,6 +5,7 @@ Command-line Tools
    :maxdepth: 2
 
    rospack
+   rosstack
 
 
 .. seealso::
