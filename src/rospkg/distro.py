@@ -45,6 +45,7 @@ from .common import ResourceNotFound
 from .environment import get_etc_ros_dir
 
 TARBALL_URI_EVAL ='https://code.ros.org/svn/release/download/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION/$STACK_NAME-$STACK_VERSION.tar.bz2'
+TARBALL_VERSION_EVAL = '$STACK_NAME-$STACK_VERSION'
 
 class InvalidDistro(Exception):
     """
@@ -335,7 +336,7 @@ class VcsConfig(object):
 
     def __init__(self, type_):
         self.type = type_
-        self.tarball_url = None
+        self.tarball_url = self.tarball_version = None
         
     def to_rosinstall(self, local_name, branch, anonymous):
         uri, version_tag = self.get_branch(branch, anonymous)
@@ -358,13 +359,14 @@ class VcsConfig(object):
         :param rule_eval: function to evaluate rule values, ``fn(str) -> str``
         """
         self.tarball_url = rule_eval(TARBALL_URI_EVAL)
+        self.tarball_version = rule_eval(TARBALL_VERSION_EVAL)
         
     def get_branch(self, branch, anonymous):
         """
         :raises: :exc:`ValueError` If branch is invalid
         """
         if branch == 'release-tar':
-            return self.tarball_url, None
+            return self.tarball_url, self.tarball_version
         else:
             raise ValueError(branch)
 

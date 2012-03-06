@@ -42,7 +42,9 @@ def get_package_test_path():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), 'package_tests'))
 
 def test__read_rospack_cache():
-    from rospkg.rospack import _read_rospack_cache
+    from rospkg.rospack import _read_rospack_cache, ROSPACK_CACHE_ENABLED
+    if not ROSPACK_CACHE_ENABLED:
+        return
     d = {}
     ros_paths = ['/tmp']
     assert False == _read_rospack_cache('/fake/path/to/rospack_cache', d, ros_paths)
