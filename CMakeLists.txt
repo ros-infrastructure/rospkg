@@ -4,6 +4,6 @@ find_package(catkin)
 catkin_stack()
 catkin_project(rospkg
   )
-catkin_export_python(src)
+catkin_python_setup()
 
 install(FILES stack.yaml DESTINATION share/${PROJECT_NAME})
