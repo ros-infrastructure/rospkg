@@ -7,3 +7,5 @@ catkin_project(rospkg
 catkin_python_setup()
 
 install(FILES stack.yaml DESTINATION share/${PROJECT_NAME})
+
+add_nosetests(${PROJECT_SOURCE_DIR})
