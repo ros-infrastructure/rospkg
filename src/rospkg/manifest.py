@@ -36,8 +36,6 @@ stack.xml.
 """
 
 import os
-import sys
-import xml.dom
 import xml.dom.minidom as dom
 
 from .common import MANIFEST_FILE, STACK_FILE
@@ -82,7 +80,6 @@ def _check_required(name, allowXHTML=False):
     def check(n, filename):
         n = _get_nodes_by_name(n, name)
         if not n:
-            #print >> sys.stderr, "Invalid manifest file[%s]: missing required '%s' element"%(filename, name)
             return ''
         if len(n) != 1:
             raise InvalidManifest("Invalid manifest file: must have only one '%s' element"%name)
