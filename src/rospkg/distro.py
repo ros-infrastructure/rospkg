@@ -37,7 +37,6 @@ Representation/model of rosdistro format.
 import os
 import re
 import string
-import sys
 import urllib2
 import yaml
 

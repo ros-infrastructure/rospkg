@@ -36,7 +36,6 @@ Linux distributions.
 from __future__ import print_function
 
 import os
-import sys
 import subprocess
 
 def _read_stdout(cmd):

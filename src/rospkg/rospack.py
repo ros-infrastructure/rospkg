@@ -31,10 +31,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import sys
 import yaml
 
-from .common import MANIFEST_FILE, STACK_FILE, ROS_STACK, ResourceNotFound
+from .common import MANIFEST_FILE, STACK_FILE, ResourceNotFound
 from .environment import get_ros_paths, get_ros_home
 from .manifest import parse_manifest_file, InvalidManifest
 
