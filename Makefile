@@ -39,7 +39,10 @@ binary_deb: dsc
 	cd deb_dist/${NAME}-${VERSION} && dpkg-buildpackage -sa -k84C5CECD
 
 upload: source_deb
-	cd deb_dist && dput ppa:tully.foote/tully-test-ppa ../${NAME}_${VERSION}-1_source.changes 
+	cd deb_dist && dput building ../${NAME}_${VERSION}-1_source.changes 
+	cd deb_dist && dput shadow ../${NAME}_${VERSION}-1_source.changes
+	cd deb_dist && dput shadow-fixed ../${NAME}_${VERSION}-1_source.changes
+	cd deb_dist && dput public ../${NAME}_${VERSION}-1_source.changes
 
 testsetup:
 	echo "running rospkg tests"
