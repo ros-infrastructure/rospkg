@@ -27,25 +27,16 @@ clean: clean_dist
 install: distro
 	sudo checkinstall python setup.py install
 
-dsc: distro
-	python setup.py --command-packages=stdeb.command sdist_dsc
-
-source_deb: dsc
-	# need to convert unstable to each distro and repeat
-	cd deb_dist/${NAME}-${VERSION} && dpkg-buildpackage -sa -k84C5CECD
-
 binary_deb: dsc
 	# need to convert unstable to each distro and repeat
-	cd deb_dist/${NAME}-${VERSION} && dpkg-buildpackage -sa -k84C5CECD
+	python setup.py --command-packages=stdeb.command bdist_deb 
 
 upload: source_deb
-	cd deb_dist && dput building ../${NAME}_${VERSION}-1_source.changes 
-	cd deb_dist && dput shadow ../${NAME}_${VERSION}-1_source.changes
-	cd deb_dist && dput shadow-fixed ../${NAME}_${VERSION}-1_source.changes
-	cd deb_dist && dput public ../${NAME}_${VERSION}-1_source.changes
+	cd deb_dist && dput building ../${NAME}_${VERSION}-1_amd64.changes 
+	cd deb_dist && dput ppa:tully.foote/tully-test-ppa ../${NAME}_${VERSION}-1_amd64.changes
 
 testsetup:
 	echo "running rospkg tests"
 
 test: testsetup
-	nosetests --with-coverage --cover-package=rospkg --with-xunit
+	cd test && nosetests
