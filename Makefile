@@ -3,6 +3,9 @@
 NAME='rospkg'
 VERSION=`./setup.py --version`
 
+OUTPUT_DIR='deb_dist'
+
+
 all:
 	echo "noop for debbuild"
 
@@ -31,9 +34,9 @@ binary_deb: dsc
 	# need to convert unstable to each distro and repeat
 	python setup.py --command-packages=stdeb.command bdist_deb 
 
-upload: source_deb
-	cd deb_dist && dput building ../${NAME}_${VERSION}-1_amd64.changes 
-	cd deb_dist && dput ppa:tully.foote/tully-test-ppa ../${NAME}_${VERSION}-1_amd64.changes
+
+upload: binary_deb 
+	dput -u -c dput.cf lucid ${OUTPUT_DIR}/${NAME}_${VERSION}-1_amd64.changes 
 
 testsetup:
 	echo "running rospkg tests"

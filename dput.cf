@@ -1,0 +1,20 @@
+[lucid]
+method                  = scp
+fqdn                    = 50.28.27.175
+incoming                = /var/www/repos/building/queue/lucid
+run_dinstall            = 0
+post_upload_command     = ssh rosbuild@50.28.27.175 -- /usr/bin/reprepro -b /var/www/repos/building --ignore=emptyfilenamepart -V processincoming lucid
+
+[oneiric]
+method                  = scp
+fqdn                    = 50.28.27.175
+incoming                = /var/www/repos/building/queue/oneiric
+run_dinstall            = 0
+post_upload_command     = ssh rosbuild@50.28.27.175 -- /usr/bin/reprepro -b /var/www/repos/building --ignore=emptyfilenamepart -V processincoming oneiric
+
+[precise]
+method                  = scp
+fqdn                    = 50.28.27.175
+incoming                = /var/www/repos/building/queue/precise
+run_dinstall            = 0
+post_upload_command     = ssh rosbuild@50.28.27.175 -- /usr/bin/reprepro -b /var/www/repos/building --ignore=emptyfilenamepart -V processincoming precise
