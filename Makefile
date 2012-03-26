@@ -1,9 +1,9 @@
 .PHONY: all setup clean_dist distro clean install dsc source_deb upload
 
-NAME='rospkg'
+NAME=rospkg
 VERSION=`./setup.py --version`
 
-OUTPUT_DIR='deb_dist'
+OUTPUT_DIR=deb_dist
 
 
 all:
@@ -36,7 +36,10 @@ binary_deb: dsc
 
 
 upload: binary_deb 
-	dput -u -c dput.cf lucid ${OUTPUT_DIR}/${NAME}_${VERSION}-1_amd64.changes 
+	dput -u -c dput.cf all-shadow ${OUTPUT_DIR}/${NAME}_${VERSION}-1_amd64.changes 
+#	dput -u -c dput.cf oneiric-shadow ${OUTPUT_DIR}/${NAME}_${VERSION}-1_amd64.changes 
+	#dput -u -c dput.cf lucid ${OUTPUT_DIR}/${NAME}_${VERSION}-1_amd64.changes 
+
 
 testsetup:
 	echo "running rospkg tests"

@@ -18,3 +18,38 @@ fqdn                    = 50.28.27.175
 incoming                = /var/www/repos/building/queue/precise
 run_dinstall            = 0
 post_upload_command     = ssh rosbuild@50.28.27.175 -- /usr/bin/reprepro -b /var/www/repos/building --ignore=emptyfilenamepart -V processincoming precise
+
+[lucid-shadow]
+method                  = scp
+login                   = rosbuild
+fqdn                    = pub8
+incoming                = /var/packages/ros-shadow/ubuntu/queue/lucid
+run_dinstall            = 0
+post_upload_command     = ssh rosbuild@pub8 -- /usr/bin/reprepro -b /var/packages/ros-shadow/ubuntu --ignore=emptyfilenamepart -V processincoming lucid
+
+
+[oneiric-shadow]
+method                  = scp
+login                   = rosbuild
+fqdn                    = pub8
+incoming                = /var/packages/ros-shadow/ubuntu/queue/oneiric
+run_dinstall            = 0
+post_upload_command     = ssh rosbuild@pub8 -- /usr/bin/reprepro -b /var/packages/ros-shadow/ubuntu --ignore=emptyfilenamepart -V processincoming oneiric
+
+
+[precise-shadow]
+method                  = scp
+login                   = rosbuild
+fqdn                    = pub8
+incoming                = /var/packages/ros-shadow/ubuntu/queue/precise
+run_dinstall            = 0
+post_upload_command     = ssh rosbuild@pub8 -- /usr/bin/reprepro -b /var/packages/ros-shadow/ubuntu --ignore=emptyfilenamepart -V processincoming precise
+
+
+[all-shadow]
+method                  = scp
+login                   = rosbuild
+fqdn                    = pub8
+incoming                = /var/packages/ros-shadow/ubuntu/queue/all
+run_dinstall            = 0
+post_upload_command     = ssh rosbuild@pub8 -- /usr/bin/reprepro -b /var/packages/ros-shadow/ubuntu --ignore=emptyfilenamepart -V processincoming all
