@@ -1,4 +1,4 @@
-.PHONY: all setup clean_dist distro clean install dsc source_deb upload
+.PHONY: all setup clean_dist distro clean install upload push
 
 NAME=rospkg
 VERSION=`./setup.py --version`
@@ -30,16 +30,19 @@ clean: clean_dist
 install: distro
 	sudo checkinstall python setup.py install
 
-binary_deb: dsc
+deb_dist:
 	# need to convert unstable to each distro and repeat
 	python setup.py --command-packages=stdeb.command bdist_deb 
 
-
-upload: binary_deb 
+upload-packages: deb_dist
 	dput -u -c dput.cf all-shadow ${OUTPUT_DIR}/${NAME}_${VERSION}-1_amd64.changes 
-#	dput -u -c dput.cf oneiric-shadow ${OUTPUT_DIR}/${NAME}_${VERSION}-1_amd64.changes 
-	#dput -u -c dput.cf lucid ${OUTPUT_DIR}/${NAME}_${VERSION}-1_amd64.changes 
+	dput -u -c dput.cf all-shadow-fixed ${OUTPUT_DIR}/${NAME}_${VERSION}-1_amd64.changes 
+	#dput -u -c dput.cf all-ros ${OUTPUT_DIR}/${NAME}_${VERSION}-1_amd64.changes 
 
+upload-building: deb_dist
+	dput -u -c dput.cf all-building ${OUTPUT_DIR}/${NAME}_${VERSION}-1_amd64.changes 
+
+upload: upload-building upload-packages
 
 testsetup:
 	echo "running rospkg tests"
