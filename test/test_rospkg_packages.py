@@ -41,41 +41,17 @@ import tempfile
 def get_package_test_path():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), 'package_tests'))
 
-def test__read_rospack_cache():
-    from rospkg.rospack import _read_rospack_cache, ROSPACK_CACHE_ENABLED
-    if not ROSPACK_CACHE_ENABLED:
-        return
-    d = {}
-    ros_paths = ['/tmp']
-    assert False == _read_rospack_cache('/fake/path/to/rospack_cache', d, ros_paths)
-    
-    cache_path = os.path.join(get_package_test_path(), 'rospack_cache')
-    d = {}
-    ros_paths = []
-    assert False == _read_rospack_cache(cache_path, d, ros_paths)
-    assert d == {}
-
-    ros_paths = ['/home/kwc/ros', '/home/kwc/workspace', '/u/kwc/workspace']
-    assert True == _read_rospack_cache(cache_path, d, ros_paths)
-    assert d, "cache is empty"
-    assert len(d.keys()) == 121
-    assert d['mk'] == '/home/kwc/ros/core/mk'
-    assert d['rosgraph_msgs'] == '/home/kwc/workspace/ros_comm/messages/rosgraph_msgs'
-
 def test_ManifestManager_constructor():
     from rospkg import RosPack, RosStack, get_ros_paths
 
     r = RosPack()
     assert r._manifest_name == 'manifest.xml'
-    assert r._cache_name == 'rospack_cache'
     r = RosStack()
     assert r._manifest_name == 'stack.xml'
-    assert r._cache_name == 'rosstack_cache'
     for c in [RosPack, RosStack]:
         r = c()
         assert r.ros_paths == get_ros_paths()
 
-        import tempfile
         tmp = tempfile.gettempdir()
 
         r = c(ros_paths=[tmp])
@@ -248,7 +224,7 @@ def test_stack_of():
     assert r.stack_of('foo') == None
 
 def test_RosPackage_get_depends_explicit():
-    from rospkg import RosPack, ResourceNotFound, get_ros_root
+    from rospkg import RosPack, get_ros_root
     path = get_package_test_path()
     r = RosPack(ros_paths=[path])
 
@@ -266,9 +242,9 @@ def test_RosPackage_get_depends_explicit():
             assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
 
 def test_RosPack_get_rosdeps():
-    from rospkg import RosPack, ResourceNotFound, get_ros_root    
+    from rospkg import RosPack
 
-    path = get_package_test_path()    
+    path = get_package_test_path()
     r = RosPack(ros_paths=[os.path.join(path, 'p1'), os.path.join(path, 'p2')])
 
     # repeat tests due to caching

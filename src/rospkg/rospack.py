@@ -37,52 +37,6 @@ from .common import MANIFEST_FILE, STACK_FILE, ResourceNotFound
 from .environment import get_ros_paths, get_ros_home
 from .manifest import parse_manifest_file, InvalidManifest
 
-# disabling reading the .rospack_cache for now as the Fuerte codebase
-# doesn't invoke rospack/stack as promisciously as before.  This means
-# the cache is often invalid now.
-ROSPACK_CACHE_ENABLED = False
-
-def _read_rospack_cache(cache_path, cache, ros_paths):
-    """
-    Read in rospack/rosstack cache data into cache. On-disk cache
-    specifies a ROS_ROOT and ROS_PACKAGE_PATH, which must match the
-    requested environment.
-    
-    :param cache_path: path to cache file, e.g. ~/.ros/rospack_cache
-    :param cache: empty dictionary to store package list in. 
-        The format of the cache is {package_name: file_path}. ``{str: str}``
-    :param ros_paths: Ordered list of paths to validate cache with, ``[str]``
-    :returns: ``True`` if on-disk cache matches and was loaded,
-      ``False`` otherwise.  If ``False``, *cache* will be emptied,
-      ``bool``
-    """
-    if not ROSPACK_CACHE_ENABLED:
-        return False
-    if not os.path.exists(cache_path):
-        return False
-
-    cached_ros_paths = []
-    with open(cache_path) as f:
-        for l in f.readlines():
-            l = l[:-1]
-            if not len(l):
-                continue
-            if l[0] == '#':
-                # check that the cache matches our env
-                if l.startswith('#ROS_ROOT='):
-                    cached_ros_paths.insert(0, l[len('#ROS_ROOT='):])
-                elif l.startswith('#ROS_PACKAGE_PATH='):
-                    paths = l[len('#ROS_PACKAGE_PATH='):].split(os.pathsep)
-                    paths = [x for x in paths if x]
-                    cached_ros_paths.extend(paths)
-            else:
-                cache[os.path.basename(l)] = l
-
-    if not ros_paths == cached_ros_paths:
-        cache.clear()
-        return False
-    return True
-    
 def list_by_path(manifest_name, path, cache):
     """
     List ROS stacks or packages within the specified path.
@@ -129,19 +83,16 @@ class ManifestManager(object):
     reflect changes made on disk or to environment configuration.
     """
     
-    def __init__(self, manifest_name, cache_name,
-                 ros_paths=None):
+    def __init__(self, manifest_name, ros_paths=None):
         """
-        ctor. subclasses are expected to use *manifest_name* and
-        *cache_name* to customize behavior of ManifestManager.
+        ctor. subclasses are expected to use *manifest_name* 
+        to customize behavior of ManifestManager.
         
         :param manifest_name: MANIFEST_FILE or STACK_FILE
-        :param cache_name: rospack_cache or rosstack_cache
         :param ros_paths: Ordered list of paths to search for
           resources. If `None` (default), use environment ROS path.
         """
         self._manifest_name = manifest_name
-        self._cache_name = cache_name
 
         if ros_paths is None:
             self._ros_paths = get_ros_paths()
@@ -174,11 +125,7 @@ class ManifestManager(object):
         # nothing to search, #3680
         if not self._ros_paths:
             return
-        # - first attempt to read .rospack_cache
-        cache_path = os.path.join(get_ros_home(), self._cache_name)
-        if _read_rospack_cache(cache_path, cache, self._ros_paths):
-            return list(cache.keys()) #py3k
-        # - else, crawl paths using our own logic, in reverse order to get correct precedence
+        # crawl paths using our own logic, in reverse order to get correct precedence
         for path in reversed(self._ros_paths):
             list_by_path(self._manifest_name, path, cache)
     
@@ -320,7 +267,6 @@ class RosPack(ManifestManager):
           resources. If `None` (default), use environment ROS path.
         """
         super(RosPack, self).__init__(MANIFEST_FILE,
-                                      'rospack_cache',
                                       ros_paths)
         self._rosdeps_cache = {}
 
@@ -396,8 +342,7 @@ class RosStack(ManifestManager):
         :param ros_paths: Ordered list of paths to search for
           resources. If `None` (default), use environment ROS path.
         """
-        super(RosStack, self).__init__(STACK_FILE, 'rosstack_cache',
-                                       ros_paths)
+        super(RosStack, self).__init__(STACK_FILE, ros_paths)
             
     def packages_of(self, stack):
         """
@@ -450,18 +395,16 @@ def get_stack_version_by_dir(stack_dir):
     :param env: override environment variables, ``{str: str}``
 
     :returns: version number of stack, or None if stack is unversioned, ``str``
+    :raises: :exc:`IOError`
+    :raises: :exc:`yaml.YAMLError`
     """
     # REP TODO: stack.yaml now has precedence
     catkin_stack_filename = os.path.join(stack_dir, 'stack.yaml')
     if os.path.isfile(catkin_stack_filename):
         with open(catkin_stack_filename) as f:
-            try:
-                d = yaml.load(f)
-                if 'Version' in d:
-                    return d['Version']
-            except:
-                raise
-                pass
+            d = yaml.load(f)
+            if 'Version' in d:
+                return d['Version']
     
     # REP 109: check for <version> tag first, then CMakeLists.txt
     manifest_filename = os.path.join(stack_dir, STACK_FILE)
