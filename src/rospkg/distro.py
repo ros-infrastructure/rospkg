@@ -276,15 +276,13 @@ def distro_to_rosinstall(distro, branch, variant_name=None, implicit=True, relea
     :param implicit: if variant_name is provided, include full (recursive) dependencies of variant, default True
     :param released_only: only included released stacks, default True.
     :param anonymous: create for anonymous access rules
+    :returns: rosinstall data in Python list format, ``[dict]``
 
     :raises: :exc:`KeyError` If branch is invalid or if distro is mis-configured
     """
     variant = distro.variants.get(variant_name, None)
     if variant_name:
-        if implicit:
-            stack_names = set(variant.stack_names)
-        else:
-            stack_names = set(variant.stack_names_explicit)
+        stack_names = set(variant.get_stack_names(implicit=implicit))
     else:
         stack_names = distro.released_stacks.keys()
     rosinstall_data = []

@@ -261,7 +261,7 @@ def test_load_distro_bad_data():
     
 def test_load_distro_variants():
     # test with no and empty variants (issue found in fuerte bringup)
-    from rospkg.distro import load_distro, Distro
+    from rospkg.distro import load_distro
     d = get_test_path()
     for name in ['no_variants.rosdistro', 'empty_variants.rosdistro']:
         p = os.path.join(d, name)
@@ -269,6 +269,23 @@ def test_load_distro_variants():
         assert distro.release_name == 'simple', distro.release_name
         assert distro.variants.keys() == []
     
+def test_distro_to_rosinstall():
+    from rospkg.distro import distro_to_rosinstall, load_distro
+    d = get_test_path()
+    distro = load_distro(os.path.join(d, 'simple.rosdistro'))
+    data = distro_to_rosinstall(distro, 'devel', variant_name='base', implicit=False, released_only=True, anonymous=True)
+    # should only have a single stack
+    assert len(data) == 1
+    url = 'https://simple.com/svn/trunk/stack1'
+    assert data[0] == dict(svn={'uri': url, 'local-name': 'stack1'})
+    data = distro_to_rosinstall(distro, 'devel', variant_name=None, implicit=False, released_only=True, anonymous=True)
+    assert len(data) == 1
+    assert data[0] == dict(svn={'uri': url, 'local-name': 'stack1'})
+    data = distro_to_rosinstall(distro, 'devel', variant_name=None, implicit=False, released_only=False, anonymous=True)
+    assert len(data) == 1
+    assert data[0] == dict(svn={'uri': url, 'local-name': 'stack1'})
+    #TODO: need more complete tests with more complicated files
+
 def test_load_distro_simple():
     from rospkg.distro import load_distro, Distro
     d = get_test_path()
