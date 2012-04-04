@@ -261,6 +261,7 @@ def test_fedora():
     detect = Fedora(release_file, issue_file)
     assert detect.is_os()
     assert detect.get_version() == '1'
+    assert detect.get_codename() == 'bordeaux', detect.get_codename()
     
     detect = Fedora()
     if not detect.is_os():

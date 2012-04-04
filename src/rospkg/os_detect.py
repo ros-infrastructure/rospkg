@@ -175,6 +175,17 @@ class Fedora(OsDetector):
                 return os_list[idx+1]
         raise OsNotDetected('cannot get version on this OS')
 
+    def get_codename(self):
+        if self.is_os():
+            os_list = read_issue(self._release_file)
+            idx = os_list.index('release')
+            matches = [x for x in os_list if x[0] == '(']
+            codename = matches[0][1:]
+            if codename[-1] == ')':
+                codename = codename[:-1]
+            return codename.lower()
+        raise OsNotDetected('called in incorrect OS')
+
 class Rhel(Fedora):
     """
     Detect Redhat OS.
