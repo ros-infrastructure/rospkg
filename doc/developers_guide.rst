@@ -15,6 +15,14 @@ Bug reports and feature requests
 - `Submit a bug report <https://code.ros.org/trac/ros/newticket?component=rospkg&type=defect&&rospkg>`_
 - `Submit a feature request <https://code.ros.org/trac/ros/newticket?component=rospkg&type=enhancement&rospkg>`_
 
+Getting the code
+----------------
+
+rospkg is hosted on GitHub.  To start developing for it, please create a fork:
+
+https://github.com/ros/rospkg
+
+
 Developing new OsDetectors
 --------------------------
 
