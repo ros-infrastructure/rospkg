@@ -84,4 +84,7 @@ if len(sys.argv) == 2:
         sys.stdout.write(version)
 else:
     sys.stderr.write(USAGE+'\n')
-    sys.exit(os.EX_USAGE)
+    try:
+        sys.exit(os.EX_USAGE)
+    except AttributeError:
+        sys.exit(1)
