@@ -34,14 +34,16 @@
 Library for processing stack.xml created post-catkin
 """
 
+import collections
 import os
 import xml.dom.minidom as dom
 
 # as defined on http://ros.org/doc/fuerte/api/catkin/html/stack_xml.html
 REQUIRED = [ 'name', 'version', 'description', 'author', 'maintainer', 'license', 'copyright' ]
 ALLOWXHTML = [ 'description' ]
-OPTIONAL = [ 'url', 'review', 'build_depends', 'depends', 'build_type', 'message_generator' ]
-ATTRIBUTES = [ 'brief', 'status', 'notes' ]
+OPTIONAL = [ 'description_brief', 'version_abi', 'url', 'review_notes', 'review_status', 'build_depends', 'depends', 'build_type', 'message_generator' ]
+
+LISTED_ATTRIBUTES = { 'Author': ['name', 'email'], 'Maintainer': ['name', 'email'], 'Depend': ['name', 'version']}
 
 VALID = REQUIRED + OPTIONAL
 
@@ -90,6 +92,23 @@ def _check_depends(n, key, filename):
     nodes = _get_nodes_by_name(n, key)
     return set([_get_text(n.childNodes).strip() for n in nodes])
 
+def _build_list_attributes(n, key, object_type):
+    """
+    Validator for stack.xml depends.
+    :raise: :exc:`InvalidStack` If validation fails
+    """
+    members = set()
+    for node in _get_nodes_by_name(n, key):
+        # The first field is always supposed to be the value
+        attribute_dict = { object_type._fields[0] : _get_text(n.childNodes).strip()}
+        for field in object_type._fields:
+            try:
+                attribute_dict[field] = node.getAttribute(field)
+            except:
+                pass
+        members.add(object_type(**attribute_dict))
+    return members
+
 def _attrs(node):
     attrs = {}
     for k in node.attributes.keys(): 
@@ -109,21 +128,25 @@ class Stack(object):
     """
     Object representation of a ROS ``stack.xml`` file
     """
-    __slots__ = REQUIRED + OPTIONAL + ATTRIBUTES + [ 'unknown_tags' ]
+    __slots__ = [ 'name', 'version', 'description', 'authors', 'maintainers', 'license', 'copyright',
+                'description_brief', 'version_abi', 'url', 'review_notes', 'review_status', 'build_depends', 'depends', 'build_type', 'message_generator',
+                'unknown_tags' ]
 
     def __init__(self, filename=None):
         """
         :param filename: location of stack.xml.  Necessary if
           converting ``${prefix}`` in ``<export>`` values, ``str``.
         """
-        self.description = self.name = self.version = \
-                           self.description = author = \
-                           self.maintainer = self.license = \
-                           self.copyright =''
-        self.url = self.review = ''
+        self.description = self.description_brief = self.name = \
+                           self.version = self.version_abi = \
+                           self.license = self.copyright = ''
+        self.url = ''
+        self.authors = []
+        self.maintainers = []
         self.depends = []
         self.build_depends = []
         self.build_type = self.message_generator = ''
+        self.review_notes = self.review_status = ''
 
         # store unrecognized tags during parsing
         self.unknown_tags = []
@@ -158,6 +181,11 @@ def parse_stack(string, filename):
     :param filename: full file path for debugging, ``str``
     :returns: return parsed :class:`Stack`
     """
+    # Create some classes to hold some members
+    new_tuples = {}
+    for key, members in LISTED_ATTRIBUTES.items():
+        new_tuples[key] = collections.namedtuple(key, members)
+
     try:
         d = dom.parseString(string)
     except Exception as e:
@@ -168,30 +196,31 @@ def parse_stack(string, filename):
     if len(p) != 1:
         raise InvalidStack("stack.xml [%s] must have a single 'stack' element"%(filename))
     p = p[0]
-    for attr in [ 'name', 'version', 'description', 'author', 'maintainer',
+    for attr in [ 'name', 'version', 'description',
                     'license', 'copyright', 'url', 'build_type', 'message_generator' ]:
         setattr(s, attr, _check(attr)(p, filename))
-    s.brief = ''
+
     try:
         tag = _get_nodes_by_name(p, 'description')[0]
-        s.brief = tag.getAttribute('brief') or ''
+        s.description_brief = tag.getAttribute('brief') or ''
     except:
         # means that 'description' tag is missing
         pass
-    
-    s.depends = _check_depends(p, 'depends', filename)
-    s.build_depends = _check_depends(p, 'build_depends', filename)
+
+    s.authors = _build_list_attributes(p, 'author', new_tuples['Author'])
+    s.maintainers = _build_list_attributes(p, 'maintainer', new_tuples['Maintainer'])
+    s.depends = _build_list_attributes(p, 'depends', new_tuples['Depend'])
+    s.build_depends = _build_list_attributes(p, 'build_depends', new_tuples['Depend'])
 
     try:
         tag = _get_nodes_by_name(p, 'review')[0]
-        s.status = tag.getAttribute('status') or ''
+        s.review_status = tag.getAttribute('status') or ''
     except:
         pass #stack.xml is missing optional 'review status' tag
 
-    s.notes = ''
     try:
         tag = _get_nodes_by_name(p, 'review')[0]
-        s.notes = tag.getAttribute('notes') or ''
+        s.review_notes = tag.getAttribute('notes') or ''
     except:
         pass #stack.xml is missing optional 'review notes' tag
 
