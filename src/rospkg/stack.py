@@ -145,8 +145,9 @@ class Stack(object):
         self.maintainers = []
         self.depends = []
         self.build_depends = []
-        self.build_type = self.message_generator = ''
         self.review_notes = self.review_status = ''
+        self.build_type = 'cmake'
+        self.message_generator = ''
 
         # store unrecognized tags during parsing
         self.unknown_tags = []
