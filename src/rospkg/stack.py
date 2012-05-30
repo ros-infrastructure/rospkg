@@ -123,7 +123,8 @@ class Stack(object):
         self.url = self.review = ''
         self.depends = []
         self.build_depends = []
-        self.build_type = self.message_generator = ''
+        self.build_type = 'cmake'
+        self.message_generator = ''
 
         # store unrecognized tags during parsing
         self.unknown_tags = []
