@@ -41,7 +41,7 @@ import xml.dom.minidom as dom
 # as defined on http://ros.org/doc/fuerte/api/catkin/html/stack_xml.html
 REQUIRED = [ 'name', 'version', 'description', 'author', 'maintainer', 'license', 'copyright' ]
 ALLOWXHTML = [ 'description' ]
-OPTIONAL = [ 'description_brief', 'version_abi', 'url', 'review_notes', 'review_status', 'build_depends', 'depends', 'build_type', 'message_generator' ]
+OPTIONAL = [ 'description_brief', 'version_abi', 'url', 'review_notes', 'review_status', 'build_depends', 'depends', 'build_type', 'message_generator', 'review' ]
 
 LISTED_ATTRIBUTES = { 'Author': ['name', 'email'], 'Maintainer': ['name', 'email'], 'Depend': ['name', 'version']}
 
