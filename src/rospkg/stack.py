@@ -92,7 +92,7 @@ def _check_depends(n, key, filename):
     nodes = _get_nodes_by_name(n, key)
     return set([_get_text(n.childNodes).strip() for n in nodes])
 
-def _build_list_attributes(n, key, object_type):
+def _build_listed_attributes(n, key, object_type):
     """
     Validator for stack.xml depends.
     :raise: :exc:`InvalidStack` If validation fails
@@ -100,12 +100,13 @@ def _build_list_attributes(n, key, object_type):
     members = set()
     for node in _get_nodes_by_name(n, key):
         # The first field is always supposed to be the value
-        attribute_dict = { object_type._fields[0] : _get_text(n.childNodes).strip()}
+        attribute_dict = {}
         for field in object_type._fields:
             try:
                 attribute_dict[field] = node.getAttribute(field)
             except:
                 pass
+        attribute_dict[object_type._fields[0]] = _get_text(node.childNodes).strip()
         members.add(object_type(**attribute_dict))
     return members
 
@@ -208,10 +209,10 @@ def parse_stack(string, filename):
         # means that 'description' tag is missing
         pass
 
-    s.authors = _build_list_attributes(p, 'author', new_tuples['Author'])
-    s.maintainers = _build_list_attributes(p, 'maintainer', new_tuples['Maintainer'])
-    s.depends = _build_list_attributes(p, 'depends', new_tuples['Depend'])
-    s.build_depends = _build_list_attributes(p, 'build_depends', new_tuples['Depend'])
+    s.authors = _build_listed_attributes(p, 'author', new_tuples['Author'])
+    s.maintainers = _build_listed_attributes(p, 'maintainer', new_tuples['Maintainer'])
+    s.depends = _build_listed_attributes(p, 'depends', new_tuples['Depend'])
+    s.build_depends = _build_listed_attributes(p, 'build_depends', new_tuples['Depend'])
 
     try:
         tag = _get_nodes_by_name(p, 'review')[0]
