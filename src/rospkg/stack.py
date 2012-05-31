@@ -200,7 +200,9 @@ def parse_stack(string, filename):
     p = p[0]
     for attr in [ 'name', 'version', 'description',
                     'license', 'copyright', 'url', 'build_type', 'message_generator' ]:
-        setattr(s, attr, _check(attr)(p, filename))
+        val = _check(attr)(p, filename)
+        if val:
+            setattr(s, attr, val)
 
     try:
         tag = _get_nodes_by_name(p, 'description')[0]
