@@ -130,7 +130,8 @@ class Stack(object):
     Object representation of a ROS ``stack.xml`` file
     """
     __slots__ = [ 'name', 'version', 'description', 'authors', 'maintainers', 'license', 'copyright',
-                'description_brief', 'version_abi', 'url', 'review_notes', 'review_status', 'build_depends', 'depends', 'build_type', 'message_generator',
+                'description_brief', 'version_abi', 'url', 'review_notes', 'review_status', 'build_depends',
+                'depends', 'build_type', 'build_type_file', 'message_generator',
                 'unknown_tags' ]
 
     def __init__(self, filename=None):
@@ -148,6 +149,7 @@ class Stack(object):
         self.build_depends = []
         self.review_notes = self.review_status = ''
         self.build_type = 'cmake'
+        self.build_type_file = ''
         self.message_generator = ''
 
         # store unrecognized tags during parsing
@@ -227,6 +229,12 @@ def parse_stack(string, filename):
         s.review_notes = tag.getAttribute('notes') or ''
     except:
         pass #stack.xml is missing optional 'review notes' tag
+
+    try:
+        tag = _get_nodes_by_name(p, 'build_type')[0]
+        s.build_type_file = tag.getAttribute('file') or ''
+    except:
+        pass #stack.xml is missing optional 'build_type file' tag
 
     # store unrecognized tags
     s.unknown_tags = [e.nodeName for e in p.childNodes if e.nodeType == e.ELEMENT_NODE and e.tagName not in VALID]
