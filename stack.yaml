@@ -3,7 +3,7 @@ Version: 1.0.4
 Depends: catkin, python-yaml
 Description: Standalone Python library for the ROS package system.
 Author: Ken Conley et al
-Maintainer: Ken Conley <kwc@willowgarage.com>
+Maintainer: Tully Foote <tfoote@willowgarage.com>
 Homepage: http://www.ros.org/wiki/rospkg
 
 Catkin-CopyrightType: willowgarage
