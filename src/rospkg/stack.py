@@ -165,7 +165,7 @@ def parse_stack_file(stack_path):
     """
     Parse stack file.
     
-    :param stack_path: The path of the stack.sml file
+    :param stack_path: The path of the stack.xml file
 
     :returns: return :class:`Stack` instance, populated with parsed fields
     :raises: :exc:`InvalidStack`

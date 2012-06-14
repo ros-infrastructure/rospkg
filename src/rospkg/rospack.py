@@ -31,11 +31,11 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import yaml
 
 from .common import MANIFEST_FILE, STACK_FILE, ResourceNotFound
 from .environment import get_ros_paths, get_ros_home
 from .manifest import parse_manifest_file, InvalidManifest
+from .stack import parse_stack_file, InvalidStack
 
 def list_by_path(manifest_name, path, cache):
     """
@@ -396,22 +396,15 @@ def get_stack_version_by_dir(stack_dir):
 
     :returns: version number of stack, or None if stack is unversioned, ``str``
     :raises: :exc:`IOError`
-    :raises: :exc:`yaml.YAMLError`
+    :raises: :exc:`InvalidStack`
     """
-    # REP TODO: stack.yaml now has precedence
-    catkin_stack_filename = os.path.join(stack_dir, 'stack.yaml')
+    catkin_stack_filename = os.path.join(stack_dir, 'stack.xml')
     if os.path.isfile(catkin_stack_filename):
-        with open(catkin_stack_filename) as f:
-            d = yaml.load(f)
-            if 'Version' in d:
-                return d['Version']
-    
-    # REP 109: check for <version> tag first, then CMakeLists.txt
-    manifest_filename = os.path.join(stack_dir, STACK_FILE)
-    if os.path.isfile(manifest_filename):
-        m = parse_manifest_file(stack_dir, STACK_FILE)
-        if m.version:
-            return m.version
+        try:
+            stack = parse_stack_file(catkin_stack_filename)
+            return stack.version
+        except InvalidStack:
+            pass
     
     cmake_filename = os.path.join(stack_dir, 'CMakeLists.txt')
     if os.path.isfile(cmake_filename):
