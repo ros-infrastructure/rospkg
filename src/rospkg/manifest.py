@@ -55,7 +55,7 @@ class InvalidManifest(Exception):
 def _get_nodes_by_name(n, name):
     return [t for t in n.childNodes if t.nodeType == t.ELEMENT_NODE and t.tagName == name]
     
-def _check_optional(name, allowXHTML=False):
+def _check_optional(name, allowXHTML=False, merge_multiple=False):
     """
     Validator for optional elements.
 
@@ -63,15 +63,19 @@ def _check_optional(name, allowXHTML=False):
     """
     def check(n, filename):
         n = _get_nodes_by_name(n, name)
-        if len(n) > 1:
+        if len(n) > 1 and not merge_multiple:
             raise InvalidManifest("Invalid manifest file [%s]: must have a single '%s' element"%(filename, name))
         if n:
-            if allowXHTML:
-                return ''.join([x.toxml() for x in n[0].childNodes])
-            return _get_text(n[0].childNodes).strip()
+            values = []
+            for child in n:
+                if allowXHTML:
+                    values.append(''.join([x.toxml() for x in child.childNodes]))
+                else:
+                    values.append(_get_text(child.childNodes).strip())
+            return ', '.join(values)
     return check
 
-def _check_required(name, allowXHTML=False):
+def _check_required(name, allowXHTML=False, merge_multiple=False):
     """
     Validator for required elements.
 
@@ -81,11 +85,15 @@ def _check_required(name, allowXHTML=False):
         n = _get_nodes_by_name(n, name)
         if not n:
             return ''
-        if len(n) != 1:
+        if len(n) != 1 and not merge_multiple:
             raise InvalidManifest("Invalid manifest file: must have only one '%s' element"%name)
-        if allowXHTML:
-            return ''.join([x.toxml() for x in n[0].childNodes])
-        return _get_text(n[0].childNodes).strip()
+        values = []
+        for child in n:
+            if allowXHTML:
+                values.append(''.join([x.toxml() for x in child.childNodes]))
+            else:
+                values.append(_get_text(child.childNodes).strip())
+        return ', '.join(values)
     return check
 
 def _check_platform(n, filename):
@@ -146,18 +154,18 @@ def _check_exports(n, filename):
         ret_val.extend([Export(t.tagName, _attrs(t), _get_text(t.childNodes)) for t in elements])
     return ret_val 
 
-def _check(name):
+def _check(name, merge_multiple=False):
     """
     Generic validator for text-based tags.
     """
     if name in REQUIRED:
         if name in ALLOWXHTML:
-            return _check_required(name, True)
-        return _check_required(name)            
+            return _check_required(name, True, merge_multiple)
+        return _check_required(name, merge_multiple=merge_multiple)
     elif name in OPTIONAL:
         if name in ALLOWXHTML:
-            return _check_optional(name, True)
-        return _check_optional(name)
+            return _check_optional(name, True, merge_multiple)
+        return _check_optional(name, merge_multiple=merge_multiple)
     
 class Export(object):
     """
@@ -401,7 +409,7 @@ def parse_manifest(manifest_name, string, filename='string'):
     except:
         pass #manifest is missing optional 'review notes' tag
 
-    m.author = _check('author')(p, filename)
+    m.author = _check('author', True)(p, filename)
     m.url = _check('url')(p, filename)
     m.version = _check('version')(p, filename)
 
