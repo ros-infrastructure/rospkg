@@ -306,7 +306,7 @@ External API documentation::
 
 Using an external config file::
 
-    <rosdoc builder="rosdoc.yaml"/>
+    <rosdoc config="rosdoc.yaml"/>
 
 
 Attributes
