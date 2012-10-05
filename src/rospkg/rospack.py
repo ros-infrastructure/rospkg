@@ -32,7 +32,7 @@
 
 import os
 
-from .common import MANIFEST_FILE, STACK_FILE, ResourceNotFound
+from .common import MANIFEST_FILE, PACKAGE_FILE, STACK_FILE, ResourceNotFound
 from .environment import get_ros_paths, get_ros_home
 from .manifest import parse_manifest_file, InvalidManifest
 from .stack import parse_stack_file, InvalidStack
@@ -54,7 +54,7 @@ def list_by_path(manifest_name, path, cache):
     path = os.path.abspath(path)
     basename = os.path.basename
     for d, dirs, files in os.walk(path, topdown=True, followlinks=True):
-        if manifest_name in files:
+        if manifest_name in files or (manifest_name == MANIFEST_FILE and PACKAGE_FILE in files):
             resource_name = basename(d)
             if resource_name not in resources:
                 resources.append(resource_name)
@@ -62,12 +62,12 @@ def list_by_path(manifest_name, path, cache):
                     cache[resource_name] = d
             del dirs[:]
             continue #leaf
-        elif MANIFEST_FILE in files:
+        elif MANIFEST_FILE in files or PACKAGE_FILE in files:
             # noop if manifest_name==MANIFEST_FILE, but a good
             # optimization for stacks.
             del dirs[:]
             continue #leaf     
-        elif 'rospack_nosubdirs' in files:
+        elif 'rospack_nosubdirs' in files or 'CATKIN_NO_SUBDIRS' in files:
             del dirs[:]
             continue  #leaf
         # remove hidden dirs (esp. .svn/.git)
