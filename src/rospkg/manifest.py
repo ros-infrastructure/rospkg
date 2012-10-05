@@ -345,11 +345,12 @@ def parse_manifest_file(dirpath, manifest_name):
     """
     filename = os.path.join(dirpath, manifest_name)
     if not os.path.isfile(filename):
+        # temporary hack for backward compatibility, should be replaced with a catkin_pkg invocation
         if manifest_name == MANIFEST_FILE:
             package_filename = os.path.join(dirpath, PACKAGE_FILE)
             if not os.path.isfile(package_filename):
                 raise IOError("Invalid/non-existent manifest file: %s"%(filename))
-            filename = package_filename
+            return Manifest(filename=filename)
     
     with open(filename, 'r') as f:
         return parse_manifest(manifest_name, f.read(), filename)

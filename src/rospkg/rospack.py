@@ -54,7 +54,7 @@ def list_by_path(manifest_name, path, cache):
     path = os.path.abspath(path)
     basename = os.path.basename
     for d, dirs, files in os.walk(path, topdown=True, followlinks=True):
-        if manifest_name in files or (manifest_name == MANIFEST_FILE and PACKAGE_FILE in files):
+        if manifest_name in files or PACKAGE_FILE in files:
             resource_name = basename(d)
             if resource_name not in resources:
                 resources.append(resource_name)
