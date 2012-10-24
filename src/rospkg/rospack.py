@@ -31,6 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from xml.etree.ElementTree import ElementTree
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, STACK_FILE, ResourceNotFound
 from .environment import get_ros_paths, get_ros_home
@@ -54,6 +55,19 @@ def list_by_path(manifest_name, path, cache):
     path = os.path.abspath(path)
     basename = os.path.basename
     for d, dirs, files in os.walk(path, topdown=True, followlinks=True):
+        if PACKAGE_FILE in files:
+            # parse package.xml and decide if it matches the search criteria
+            root = ElementTree(None, os.path.join(d, PACKAGE_FILE))
+            metapackage = root.find('./export/metapackage')
+            if ((manifest_name == STACK_FILE and metapackage) or
+                (manifest_name == PACKAGE_FILE and not metapackage)):
+                resource_name = root.findtext('name')
+                if resource_name not in resources:
+                    resources.append(resource_name)
+                    if cache is not None:
+                        cache[resource_name] = d
+                del dirs[:]
+                continue #leaf
         if manifest_name in files or PACKAGE_FILE in files:
             resource_name = basename(d)
             if resource_name not in resources:
