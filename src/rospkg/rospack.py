@@ -58,9 +58,9 @@ def list_by_path(manifest_name, path, cache):
         if PACKAGE_FILE in files:
             # parse package.xml and decide if it matches the search criteria
             root = ElementTree(None, os.path.join(d, PACKAGE_FILE))
-            metapackage = root.find('./export/metapackage')
-            if ((manifest_name == STACK_FILE and metapackage) or
-                (manifest_name == PACKAGE_FILE and not metapackage)):
+            is_metapackage = root.find('./export/metapackage') is not None
+            if ((manifest_name == STACK_FILE and is_metapackage) or
+                (manifest_name == PACKAGE_FILE and not is_metapackage)):
                 resource_name = root.findtext('name')
                 if resource_name not in resources:
                     resources.append(resource_name)
