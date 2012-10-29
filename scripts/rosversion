@@ -26,7 +26,7 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-USAGE = "Usage: rosversion <stack> or rosversion -d"
+USAGE = "Usage: rosversion <package/stack> or rosversion -d"
 
 import os
 import sys
@@ -74,6 +74,17 @@ if len(sys.argv) == 2:
     rosstack = rospkg.RosStack()
     try:
         version = rosstack.get_stack_version(stack_name)
+        if not version:
+            # hack to make it work with wet packages
+            path = rosstack.get_path(stack_name)
+            package_manifest = os.path.join(path, 'package.xml')
+            if os.path.exists(package_manifest):
+                from xml.etree.ElementTree import ElementTree
+                try:
+                    root = ElementTree(None, package_manifest)
+                    version = root.findtext('version')
+                except Exception:
+                    pass
     except rospkg.ResourceNotFound as e:
         sys.stderr.write("Cannot locate [%s]"%(stack_name))
         sys.exit(1)

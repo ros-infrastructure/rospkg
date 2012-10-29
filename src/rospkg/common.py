@@ -35,6 +35,7 @@ Common definitions for rospkg modules.
 """
 
 MANIFEST_FILE = 'manifest.xml'
+PACKAGE_FILE = 'package.xml'
 STACK_FILE = 'stack.xml'
 ROS_STACK = 'ros'
 

@@ -38,7 +38,7 @@ stack.xml.
 import os
 import xml.dom.minidom as dom
 
-from .common import MANIFEST_FILE, STACK_FILE
+from .common import MANIFEST_FILE, PACKAGE_FILE, STACK_FILE
 
 # stack.xml and manifest.xml have the same internal tags right now
 REQUIRED = ['license']
@@ -345,7 +345,11 @@ def parse_manifest_file(dirpath, manifest_name):
     """
     filename = os.path.join(dirpath, manifest_name)
     if not os.path.isfile(filename):
-        raise IOError("Invalid/non-existent manifest file: %s"%(filename))
+        # temporary hack for backward compatibility, should be replaced with a catkin_pkg invocation
+        package_filename = os.path.join(dirpath, PACKAGE_FILE)
+        if not os.path.isfile(package_filename):
+            raise IOError("Invalid/non-existent manifest file: %s"%(filename))
+        return Manifest(filename=filename)
     
     with open(filename, 'r') as f:
         return parse_manifest(manifest_name, f.read(), filename)
