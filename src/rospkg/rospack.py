@@ -60,7 +60,8 @@ def list_by_path(manifest_name, path, cache):
             root = ElementTree(None, os.path.join(d, PACKAGE_FILE))
             is_metapackage = root.find('./export/metapackage') is not None
             if ((manifest_name == STACK_FILE and is_metapackage) or
-                (manifest_name == PACKAGE_FILE and not is_metapackage)):
+                (manifest_name == MANIFEST_FILE and not is_metapackage) or
+                manifest_name == PACKAGE_FILE):
                 resource_name = root.findtext('name')
                 if resource_name not in resources:
                     resources.append(resource_name)
@@ -461,12 +462,15 @@ def get_package_name(path):
     #likely.
     parent = os.path.dirname(os.path.realpath(path))
     #walk up until we hit ros root or ros/pkg
-    while not os.path.exists(os.path.join(path, MANIFEST_FILE)) and parent != path:
+    while not os.path.exists(os.path.join(path, MANIFEST_FILE)) and not os.path.exists(os.path.join(path, PACKAGE_FILE)) and parent != path:
         path = parent
         parent = os.path.dirname(path)
     # check termination condition
     if os.path.exists(os.path.join(path, MANIFEST_FILE)):
         return os.path.basename(os.path.abspath(path))
+    elif os.path.exists(os.path.join(path, PACKAGE_FILE)):
+        root = ElementTree(None, os.path.join(path, PACKAGE_FILE))
+        return root.findtext('name')
     else:
         return None
     
