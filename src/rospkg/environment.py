@@ -97,7 +97,10 @@ def get_ros_root(env=None):
     """
     if env is None:
         env = os.environ
-    return env.get(ROS_ROOT, None)
+    ros_root = env.get(ROS_ROOT, None)
+    if ros_root:
+        ros_root = os.path.normpath(ros_root)
+    return ros_root
 
 def get_ros_package_path(env=None):
     """
