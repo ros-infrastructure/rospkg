@@ -69,7 +69,7 @@ def list_by_path(manifest_name, path, cache):
                         cache[resource_name] = d
                 del dirs[:]
                 continue #leaf
-        if manifest_name in files or PACKAGE_FILE in files:
+        if manifest_name in files:
             resource_name = basename(d)
             if resource_name not in resources:
                 resources.append(resource_name)
