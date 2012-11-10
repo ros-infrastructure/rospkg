@@ -44,7 +44,8 @@ def test_find_packages():
     search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
 
     manager = rospkg.rospack.ManifestManager(rospkg.common.MANIFEST_FILE, ros_paths=[search_path])
-    assert(len(manager.list()) == 0)
+    # for backward compatibility a wet package which is not a metapackage is found when searching for MANIFEST_FILE
+    assert(len(manager.list()) == 1)
     manager = rospkg.rospack.ManifestManager(rospkg.common.STACK_FILE, ros_paths=[search_path])
     assert(len(manager.list()) == 0)
     manager = rospkg.rospack.ManifestManager(rospkg.common.PACKAGE_FILE, ros_paths=[search_path])
