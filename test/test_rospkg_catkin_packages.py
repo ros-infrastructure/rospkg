@@ -30,27 +30,26 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
-"""
-Base ROS python library for manipulating ROS packages and stacks.
-"""
+from __future__ import print_function
 
-__version__ = '1.0.12'
+import os
+import sys
+import time
+import subprocess
+import tempfile
 
-from .common import MANIFEST_FILE, STACK_FILE, ResourceNotFound
-from .environment import get_ros_root, get_ros_package_path, get_ros_home, \
-     get_log_dir, get_test_results_dir, on_ros_path, get_ros_paths, get_etc_ros_dir
-from .manifest import parse_manifest_file, Manifest, InvalidManifest
-from .rospack import RosPack, RosStack, \
-     list_by_path, expand_to_packages, get_stack_version_by_dir, \
-     get_package_name
+import rospkg
+  
+def test_find_packages():
+    search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
 
-__all__ = ['MANIFEST_FILE', 'STACK_FILE', 'ResourceNotFound',
-        'get_ros_root', 'get_ros_package_path', 'get_ros_home',
-        'get_log_dir', 'get_test_results_dir', 'on_ros_path',
-        'get_ros_paths', 'get_etc_ros_dir', 
-        'parse_manifest_file', 'Manifest', 'InvalidManifest',
-        'RosPack', 'RosStack', 
-        'list_by_path', 'expand_to_packages', 'get_stack_version_by_dir',
-        'get_package_name',
-        ]
+    manager = rospkg.rospack.ManifestManager(rospkg.common.MANIFEST_FILE, ros_paths=[search_path])
+    assert(len(manager.list()) == 0)
+    manager = rospkg.rospack.ManifestManager(rospkg.common.STACK_FILE, ros_paths=[search_path])
+    assert(len(manager.list()) == 0)
+    manager = rospkg.rospack.ManifestManager(rospkg.common.PACKAGE_FILE, ros_paths=[search_path])
 
+    for pkg_name in manager.list():
+        assert(pkg_name == 'foo')
+        path = manager.get_path(pkg_name)
+        assert(path == os.path.join(search_path,'p1','foo'))
