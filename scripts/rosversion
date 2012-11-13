@@ -31,6 +31,8 @@ USAGE = "Usage: rosversion <package/stack> or rosversion -d"
 import os
 import sys
 import rospkg
+from rospkg.common import PACKAGE_FILE
+from rospkg.rospack import ManifestManager
 import traceback
 
 # for < fuerte, retrieve from roscore file
@@ -74,9 +76,11 @@ if len(sys.argv) == 2:
     rosstack = rospkg.RosStack()
     try:
         version = rosstack.get_stack_version(stack_name)
-        if not version:
+    except rospkg.ResourceNotFound as e:
+        try:
             # hack to make it work with wet packages
-            path = rosstack.get_path(stack_name)
+            mm = ManifestManager(PACKAGE_FILE)
+            path = mm.get_path(stack_name)
             package_manifest = os.path.join(path, 'package.xml')
             if os.path.exists(package_manifest):
                 from xml.etree.ElementTree import ElementTree
@@ -85,9 +89,9 @@ if len(sys.argv) == 2:
                     version = root.findtext('version')
                 except Exception:
                     pass
-    except rospkg.ResourceNotFound as e:
-        sys.stderr.write("Cannot locate [%s]"%(stack_name))
-        sys.exit(1)
+        except rospkg.ResourceNotFound as e:
+            sys.stderr.write("Cannot locate [%s]"%(stack_name))
+            sys.exit(1)
 
     if version is None:
         sys.stdout.write('<unversioned>')
