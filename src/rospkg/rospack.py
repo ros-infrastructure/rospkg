@@ -34,7 +34,7 @@ import os
 from xml.etree.ElementTree import ElementTree
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, STACK_FILE, ResourceNotFound
-from .environment import get_ros_paths, get_ros_home
+from .environment import get_ros_paths
 from .manifest import parse_manifest_file, InvalidManifest
 from .stack import parse_stack_file, InvalidStack
 

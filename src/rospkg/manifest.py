@@ -289,7 +289,7 @@ class Manifest(object):
                  'unknown_tags', 'type', 'filename',\
                  'is_catkin']
 
-    def __init__(self, type_='package', filename=None):
+    def __init__(self, type_='package', filename=None, is_catkin=False):
         """
         :param type: `'package'` or `'stack'`
         :param filename: location of manifest file.  Necessary if
@@ -303,7 +303,7 @@ class Manifest(object):
         self.rosdeps = []
         self.exports = []
         self.platforms = []
-        self.is_catkin = False
+        self.is_catkin = is_catkin
         
         self.type = type_
         self.filename = filename
@@ -349,7 +349,7 @@ def parse_manifest_file(dirpath, manifest_name):
         package_filename = os.path.join(dirpath, PACKAGE_FILE)
         if not os.path.isfile(package_filename):
             raise IOError("Invalid/non-existent manifest file: %s"%(filename))
-        return Manifest(filename=filename)
+        return Manifest(filename=filename, is_catkin=True)
     
     with open(filename, 'r') as f:
         return parse_manifest(manifest_name, f.read(), filename)
