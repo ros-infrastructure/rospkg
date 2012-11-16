@@ -212,10 +212,12 @@ def _load_variants(raw_data, stacks):
     variants = {}
     for variant_name in all_variants_raw_data.keys():
         variants[variant_name] = _load_variant(variant_name, all_variants_raw_data)
+        
+        # Disabling validation to support variants which include wet packages.  
         # validate
-        for stack_name in variants[variant_name].get_stack_names(implicit=False):
-            if stack_name not in stacks:
-                raise InvalidDistro("variant [%s] refers to non-existent stack [%s]"%(variant_name, stack_name))
+        #for stack_name in variants[variant_name].get_stack_names(implicit=False):
+        #    if stack_name not in stacks:
+        #        raise InvalidDistro("variant [%s] refers to non-existent stack [%s]"%(variant_name, stack_name))
     return variants
         
 def _load_variant(variant_name, all_variants_raw_data):
