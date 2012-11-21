@@ -424,7 +424,7 @@ def parse_manifest(manifest_name, string, filename='string'):
         if m.rosdeps:
             raise InvalidManifest("stack manifests are not allowed to have rosdeps") 
 
-    m.is_catkin = bool(_get_nodes_by_name(p, 'name'))
+    m.is_catkin = bool(_get_nodes_by_name(p, 'catkin')) or bool(_get_nodes_by_name(p, 'name'))
     
     # store unrecognized tags
     m.unknown_tags = [e for e in p.childNodes if e.nodeType == e.ELEMENT_NODE and e.tagName not in VALID]
