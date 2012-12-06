@@ -127,9 +127,10 @@ def test_on_ros_path():
     if get_ros_root() is not None:
         assert on_ros_path(get_ros_root())
 
-        paths = _resolve_paths(get_ros_package_path()).split(os.pathsep)
-        for p in paths:
-            assert on_ros_path(p), "failed: %s, [%s]"%(p, paths)
+        if get_ros_package_path() is not None:
+            paths = _resolve_paths(get_ros_package_path()).split(os.pathsep)
+            for p in paths:
+                assert on_ros_path(p), "failed: %s, [%s]"%(p, paths)
 
 def test_compute_package_paths():
     from rospkg.environment import _compute_package_paths as compute_package_paths
