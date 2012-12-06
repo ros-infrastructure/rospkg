@@ -251,6 +251,9 @@ def test_load_distro_bad_data():
         assert False
     except ResourceNotFound: pass
     for i in range(1, 10):
+        if i == 4:
+            # currently non-existent stacks in variants are not determinable
+            continue
         filename = 'bad%s.rosdistro'%(i)
         try:
             d = get_test_path()

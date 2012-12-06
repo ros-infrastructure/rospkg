@@ -1,5 +1,5 @@
 Catkin-ProjectName: baz
-Version: 1.7.3
+Version: 1.7.3-yaml
 Depends: catkin, rospack
 Description: baz
 Author: No One 

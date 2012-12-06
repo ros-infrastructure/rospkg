@@ -251,8 +251,8 @@ def test_get_stack_version():
 
     # test reading from stack.yaml
     baz_dir = r.get_path('baz')
-    assert get_stack_version_by_dir(baz_dir) == '1.7.3', get_stack_version_by_dir(baz_dir)
-    assert r.get_stack_version('baz') == '1.7.3'
+    assert get_stack_version_by_dir(baz_dir) == '1-manifest', get_stack_version_by_dir(baz_dir)
+    assert r.get_stack_version('baz') == '1-manifest'
 
 def test_get_cmake_version():
     from rospkg.rospack import _get_cmake_version

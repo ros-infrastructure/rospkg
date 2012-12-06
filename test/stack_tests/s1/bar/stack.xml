@@ -1,9 +1,11 @@
 <stack>
+  <name>bar</name>
   <description brief="bar">
      bar
   </description>
   <author>Ken Conley</author>
   <license>BSD</license>
+  <copyright>Willow Garage</copyright>
   <depend stack="foo" />
 </stack>
 
