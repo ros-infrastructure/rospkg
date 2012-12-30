@@ -372,15 +372,17 @@ def parse_manifest_file(dirpath, manifest_name):
             from rosdep2.rospack import init_rospack_interface, is_ros_package, is_view_empty
             global _static_rosdep_view
             # initialize rosdep view once
-            if not _static_rosdep_view:
+            if _static_rosdep_view is None:
                 _static_rosdep_view = init_rospack_interface()
                 if is_view_empty(_static_rosdep_view):
                     sys.stderr.write("the rosdep view is empty: call 'sudo rosdep init' and 'rosdep update'\n")
-            for d in (p.buildtool_depends + p.build_depends + p.run_depends):
-                if is_ros_package(_static_rosdep_view, d.name):
-                    manifest.depends.append(Depend(d.name, 'package'))
-                else:
-                    manifest.rosdeps.append(RosDep(d.name))
+                    _static_rosdep_view = False
+            if _static_rosdep_view:
+                for d in (p.buildtool_depends + p.build_depends + p.run_depends):
+                    if is_ros_package(_static_rosdep_view, d.name):
+                        manifest.depends.append(Depend(d.name, 'package'))
+                    else:
+                        manifest.rosdeps.append(RosDep(d.name))
         except ImportError:
             pass
 
