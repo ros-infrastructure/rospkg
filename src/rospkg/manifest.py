@@ -369,7 +369,7 @@ def parse_manifest_file(dirpath, manifest_name):
 
         # split ros and system dependencies (using rosdep)
         try:
-            from rosdep2.rospack import init_rospack_interface, is_ros_package, is_view_empty
+            from rosdep2.rospack import init_rospack_interface, is_ros_package, is_system_dependency, is_view_empty
             global _static_rosdep_view
             # initialize rosdep view once
             if _static_rosdep_view is None:
@@ -381,7 +381,7 @@ def parse_manifest_file(dirpath, manifest_name):
                 for d in (p.buildtool_depends + p.build_depends + p.run_depends):
                     if is_ros_package(_static_rosdep_view, d.name):
                         manifest.depends.append(Depend(d.name, 'package'))
-                    else:
+                    if is_system_dependency(_static_rosdep_view, d.name):
                         manifest.rosdeps.append(RosDep(d.name))
         except ImportError:
             pass
