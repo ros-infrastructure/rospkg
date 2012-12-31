@@ -36,6 +36,7 @@ stack.xml.
 """
 
 import os
+import sys
 import xml.dom.minidom as dom
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, STACK_FILE
@@ -332,6 +333,8 @@ def _get_text(nodes):
     """
     return "".join([n.data for n in nodes if n.nodeType == n.TEXT_NODE])
 
+_static_rosdep_view = None
+
 def parse_manifest_file(dirpath, manifest_name):
     """
     Parse manifest file (package, stack).  Type will be inferred from manifest_name.
@@ -345,12 +348,46 @@ def parse_manifest_file(dirpath, manifest_name):
     """
     filename = os.path.join(dirpath, manifest_name)
     if not os.path.isfile(filename):
-        # temporary hack for backward compatibility, should be replaced with a catkin_pkg invocation
+        # hack for backward compatibility
         package_filename = os.path.join(dirpath, PACKAGE_FILE)
         if not os.path.isfile(package_filename):
-            raise IOError("Invalid/non-existent manifest file: %s"%(filename))
-        return Manifest(filename=filename, is_catkin=True)
-    
+            raise IOError("Invalid/non-existent manifest file: %s" % filename)
+        manifest = Manifest(filename=filename, is_catkin=True)
+
+        # extract all information from package.xml
+        from catkin_pkg.package import parse_package
+        p = parse_package(package_filename)
+        # put these into manifest
+        manifest.description = p.description
+        manifest.author = ', '.join([('Maintainer: %s' % str(m)) for m in p.maintainers] + [str(a) for a in p.authors])
+        manifest.license = ', '.join(p.licenses)
+        if p.urls:
+            manifest.url = str(p.urls[0])
+        manifest.version = p.version
+        for export in p.exports:
+            manifest.exports.append(Export(export.tagname, export.attributes, export.content))
+
+        # split ros and system dependencies (using rosdep)
+        try:
+            from rosdep2.rospack import init_rospack_interface, is_ros_package, is_system_dependency, is_view_empty
+            global _static_rosdep_view
+            # initialize rosdep view once
+            if _static_rosdep_view is None:
+                _static_rosdep_view = init_rospack_interface()
+                if is_view_empty(_static_rosdep_view):
+                    sys.stderr.write("the rosdep view is empty: call 'sudo rosdep init' and 'rosdep update'\n")
+                    _static_rosdep_view = False
+            if _static_rosdep_view:
+                for d in (p.buildtool_depends + p.build_depends + p.run_depends):
+                    if is_ros_package(_static_rosdep_view, d.name):
+                        manifest.depends.append(Depend(d.name, 'package'))
+                    if is_system_dependency(_static_rosdep_view, d.name):
+                        manifest.rosdeps.append(RosDep(d.name))
+        except ImportError:
+            pass
+
+        return manifest
+
     with open(filename, 'r') as f:
         return parse_manifest(manifest_name, f.read(), filename)
 
