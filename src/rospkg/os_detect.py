@@ -138,8 +138,9 @@ class OpenSuse(OsDetector):
     """
     Detect OpenSuse OS.
     """
-    def __init__(self, brand_file="/etc/SuSE-brand"):
+    def __init__(self, brand_file="/etc/SuSE-brand", release_file="/etc/SuSE-release"):
         self._brand_file = brand_file
+        self._release_file = release_file
         
     def is_os(self):
         os_list = read_issue(self._brand_file)
@@ -154,6 +155,16 @@ class OpenSuse(OsDetector):
                     if os_list[0] == "VERSION":
                         return os_list[1]
         raise OsNotDetected('cannot get version on this OS')
+
+    def get_codename(self):
+        if self.is_os() and os.path.exists(self._release_file):
+            with open(self._release_file, 'r') as fh:
+                os_list = fh.read().strip().split('\n')
+                for line in os_list:
+                   kv = line.split(' = ')
+                   if kv[0] == "CODENAME":
+                     return kv[1]
+        raise OsNotDetected('called in incorrect OS')
 
 class Fedora(OsDetector):
     """
