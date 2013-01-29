@@ -14,6 +14,7 @@
 import sys, os
 sys.path.insert(0, os.path.abspath('../src'))
 import rospkg
+import catkin_sphinx
 
 # If extensions (or modules to document with autodoc) are in another directory,
 # add these directories to sys.path here. If the directory is relative to the
@@ -99,6 +100,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
+html_theme_path = [os.path.join(os.path.dirname(catkin_sphinx.__file__), 'theme')]
 html_theme = 'ros-theme'
 
 # Theme options are theme-specific and customize the look and feel of a theme
@@ -107,7 +109,6 @@ html_theme = 'ros-theme'
 #html_theme_options = {}
 
 html_logo = 'ros.png'
-html_theme_path = [os.path.join(os.path.expanduser('~'), 'sphinx'), 'themes']
 
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
