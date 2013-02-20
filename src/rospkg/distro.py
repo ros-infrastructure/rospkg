@@ -183,7 +183,11 @@ def load_distro(source_uri):
                 raw_data = yaml.load(f.read())
         else:
             try:
-                raw_data = yaml.load(urllib2.urlopen(source_uri))
+                request = urllib2.urlopen(source_uri)
+            except Exception as e:
+                raise ResourceNotFound('%s (%s)' % (str(e), source_uri))
+            try:
+                raw_data = yaml.load(request)
             except ValueError:
                 raise ResourceNotFound(source_uri)
         if not type(raw_data) == dict:
