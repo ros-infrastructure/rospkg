@@ -26,6 +26,8 @@
 # ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import print_function
+
 USAGE = "Usage: rosversion <package/stack> or rosversion -d"
 
 import os
@@ -68,9 +70,9 @@ if len(sys.argv) == 2:
         else:
             distro_name = get_distro_name_from_roscore()
         if not distro_name:
-            sys.stdout.write('<unknown>')
+            print('<unknown>')
         else:
-            sys.stdout.write(distro_name)
+            print(distro_name)
         sys.exit(0)
     
     rosstack = rospkg.RosStack()
@@ -90,15 +92,15 @@ if len(sys.argv) == 2:
                 except Exception:
                     pass
         except rospkg.ResourceNotFound as e:
-            sys.stderr.write("Cannot locate [%s]"%(stack_name))
+            print("Cannot locate [%s]"%(stack_name))
             sys.exit(1)
 
     if version is None:
-        sys.stdout.write('<unversioned>')
+        print('<unversioned>')
     else:
-        sys.stdout.write(version)
+        print(version)
 else:
-    sys.stderr.write(USAGE+'\n')
+    print(USAGE)
     try:
         sys.exit(os.EX_USAGE)
     except AttributeError:
