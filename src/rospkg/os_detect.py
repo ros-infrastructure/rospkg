@@ -120,16 +120,22 @@ class LsbDetect(OsDetector):
         self.lsb_info = _lsb_info_cache
 
     def is_os(self):
-        return self.lsb_info["DISTRIB_ID"] == self.lsb_name
+        return "DISTRIB_ID" in self.lsb_info and self.lsb_info["DISTRIB_ID"] == self.lsb_name
 
     def get_version(self):
         if self.is_os():
-            return self.lsb_info["DISTRIB_RELEASE"]
+            if "DISTRIB_RELEASE" in self.lsb_info:
+                return self.lsb_info["DISTRIB_RELEASE"]
+            else:
+                return ""
         raise OsNotDetected('called in incorrect OS')
         
     def get_codename(self):
         if self.is_os():
-            return self.lsb_info["DISTRIB_CODENAME"]
+            if "DISTRIB_CODENAME" in self.lsb_info:
+                return self.lsb_info["DISTRIB_CODENAME"]
+            else:
+                return ""
         raise OsNotDetected('called in incorrect OS')
 
 class OpenSuse(OsDetector):
