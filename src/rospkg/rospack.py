@@ -31,7 +31,7 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from xml.etree.ElementTree import ElementTree
+from xml.etree.cElementTree import ElementTree
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, STACK_FILE, ResourceNotFound
 from .environment import get_ros_paths
