@@ -46,27 +46,6 @@ def _read_stdout(cmd):
     except:
         return None
     
-# for test mocking
-_lsb_release = 'lsb_release'
-
-def lsb_get_os():
-    """
-    Linux: wrapper around lsb_release to get the current OS
-    """
-    return _read_stdout([_lsb_release, '-si'])
-    
-def lsb_get_codename():
-    """
-    Linux: wrapper around lsb_release to get the current OS codename
-    """
-    return _read_stdout([_lsb_release, '-sc'])
-    
-def lsb_get_version():
-    """
-    Linux: wrapper around lsb_release to get the current OS version
-    """
-    return _read_stdout([_lsb_release, '-sr'])
-
 def uname_get_machine():
     """
     Linux: wrapper around uname to determine if OS is 64-bit
@@ -81,6 +60,18 @@ def read_issue(filename="/etc/issue"):
         with open(filename, 'r') as f:
             return f.read().split()
     return None
+
+def read_key_value(filename):
+    """
+    :returns: dict of key-value pairs from a file
+    """
+    result = {}
+    if os.path.exists(filename):
+        with open(filename, 'r') as f:
+            for line in f:
+                key, value = line.partition("=")[::2]
+                result[key.strip()] = value.strip()
+    return result
 
 class OsNotDetected(Exception):
     """
@@ -114,24 +105,31 @@ class OsDetector:
         """
         raise NotImplementedError("get_codename unimplemented")
 
+
+_lsb_info_cache = None
+
 class LsbDetect(OsDetector):
     """
     Generic detector for Debian, Ubuntu, and Mint
     """
     def __init__(self, lsb_name, get_version_fn=None):
+        global _lsb_info_cache
         self.lsb_name = lsb_name
+        if _lsb_info_cache is None:
+            _lsb_info_cache = read_key_value("/etc/lsb-release")
+        self.lsb_info = _lsb_info_cache
 
     def is_os(self):
-        return lsb_get_os() == self.lsb_name
+        return self.lsb_info["DISTRIB_ID"] == self.lsb_name
 
     def get_version(self):
         if self.is_os():
-            return lsb_get_version()
+            return self.lsb_info["DISTRIB_RELEASE"]
         raise OsNotDetected('called in incorrect OS')
         
     def get_codename(self):
         if self.is_os():
-            return lsb_get_codename()
+            return self.lsb_info["DISTRIB_CODENAME"]
         raise OsNotDetected('called in incorrect OS')
 
 class OpenSuse(OsDetector):
