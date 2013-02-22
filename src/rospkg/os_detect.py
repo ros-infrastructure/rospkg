@@ -37,6 +37,7 @@ from __future__ import print_function
 
 import os
 import subprocess
+import platform
 
 def _read_stdout(cmd):
     try:
@@ -60,18 +61,6 @@ def read_issue(filename="/etc/issue"):
         with open(filename, 'r') as f:
             return f.read().split()
     return None
-
-def read_key_value(filename):
-    """
-    :returns: dict of key-value pairs from a file
-    """
-    result = {}
-    if os.path.exists(filename):
-        with open(filename, 'r') as f:
-            for line in f:
-                key, value = line.partition("=")[::2]
-                result[key.strip()] = value.strip()
-    return result
 
 class OsNotDetected(Exception):
     """
@@ -106,36 +95,30 @@ class OsDetector:
         raise NotImplementedError("get_codename unimplemented")
 
 
-_lsb_info_cache = None
-
 class LsbDetect(OsDetector):
     """
     Generic detector for Debian, Ubuntu, and Mint
     """
     def __init__(self, lsb_name, get_version_fn=None):
-        global _lsb_info_cache
         self.lsb_name = lsb_name
-        if _lsb_info_cache is None:
-            _lsb_info_cache = read_key_value("/etc/lsb-release")
-        self.lsb_info = _lsb_info_cache
+        if hasattr(platform,"linux_distribution"):
+            self.lsb_info = platform.linux_distribution(full_distribution_name=0)
+        elif hasattr(platform,"dist"):
+            self.lsb_info = platform.dist()
+        else:
+            self.lsb_info = None
 
     def is_os(self):
-        return "DISTRIB_ID" in self.lsb_info and self.lsb_info["DISTRIB_ID"] == self.lsb_name
+        return self.lsb_info is not None and self.lsb_info[0] == self.lsb_name
 
     def get_version(self):
         if self.is_os():
-            if "DISTRIB_RELEASE" in self.lsb_info:
-                return self.lsb_info["DISTRIB_RELEASE"]
-            else:
-                return ""
+            return self.lsb_info[1]
         raise OsNotDetected('called in incorrect OS')
         
     def get_codename(self):
         if self.is_os():
-            if "DISTRIB_CODENAME" in self.lsb_info:
-                return self.lsb_info["DISTRIB_CODENAME"]
-            else:
-                return ""
+            return self.lsb_info[2]
         raise OsNotDetected('called in incorrect OS')
 
 class OpenSuse(OsDetector):
@@ -474,7 +457,7 @@ OS_UBUNTU='ubuntu'
 
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
-OsDetect.register_default(OS_DEBIAN, LsbDetect("Debian"))
+OsDetect.register_default(OS_DEBIAN, LsbDetect("debian"))
 OsDetect.register_default(OS_FEDORA, Fedora())
 OsDetect.register_default(OS_FREEBSD, FreeBSD())
 OsDetect.register_default(OS_GENTOO, Gentoo())
