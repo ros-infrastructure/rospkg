@@ -70,7 +70,7 @@ def test_tripwire_ubuntu():
     
 def test_LsbDetect():
     import rospkg.os_detect
-    from rospkg.os_detect import LsbDetect, OsDetect, OsNotDetected, lsb_get_os
+    from rospkg.os_detect import LsbDetect, OsDetect, OsNotDetected
 
     # test non-match
     detect = LsbDetect('bad')
@@ -89,7 +89,7 @@ def test_LsbDetect():
     rospkg.os_detect._lsb_release = os.path.join(test_dir, 'lsb_release')
 
     detect = LsbDetect('Ubuntu')
-    assert detect.is_os(), lsb_get_os()
+    assert detect.is_os(), "should be Ubuntu"
     assert detect.get_codename() == 'lucid'
 
     # test freely
@@ -292,17 +292,7 @@ def test_OsDetector():
         assert False
     except NotImplementedError: pass
     
-def test_tripwire_lsb_get_version():
-    # value is platform dependent, so just make sure it doesn't throw
-    from rospkg.os_detect import lsb_get_version
-    retval = lsb_get_version()
-    assert retval == None or type(retval) == str
     
-def test_tripwire_lsb_get_codename():
-    # value is platform dependent, so just make sure it doesn't throw
-    from rospkg.os_detect import lsb_get_codename
-    retval = lsb_get_codename()
-    assert retval == None or type(retval) == str
 
 def test_tripwire_uname_get_machine():
     from rospkg.os_detect import uname_get_machine
