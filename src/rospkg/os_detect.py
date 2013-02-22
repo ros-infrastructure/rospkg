@@ -37,6 +37,7 @@ from __future__ import print_function
 
 import os
 import subprocess
+import platform
 
 def _read_stdout(cmd):
     try:
@@ -46,27 +47,6 @@ def _read_stdout(cmd):
     except:
         return None
     
-# for test mocking
-_lsb_release = 'lsb_release'
-
-def lsb_get_os():
-    """
-    Linux: wrapper around lsb_release to get the current OS
-    """
-    return _read_stdout([_lsb_release, '-si'])
-    
-def lsb_get_codename():
-    """
-    Linux: wrapper around lsb_release to get the current OS codename
-    """
-    return _read_stdout([_lsb_release, '-sc'])
-    
-def lsb_get_version():
-    """
-    Linux: wrapper around lsb_release to get the current OS version
-    """
-    return _read_stdout([_lsb_release, '-sr'])
-
 def uname_get_machine():
     """
     Linux: wrapper around uname to determine if OS is 64-bit
@@ -114,24 +94,31 @@ class OsDetector:
         """
         raise NotImplementedError("get_codename unimplemented")
 
+
 class LsbDetect(OsDetector):
     """
     Generic detector for Debian, Ubuntu, and Mint
     """
     def __init__(self, lsb_name, get_version_fn=None):
         self.lsb_name = lsb_name
+        if hasattr(platform,"linux_distribution"):
+            self.lsb_info = platform.linux_distribution(full_distribution_name=0)
+        elif hasattr(platform,"dist"):
+            self.lsb_info = platform.dist()
+        else:
+            self.lsb_info = None
 
     def is_os(self):
-        return lsb_get_os() == self.lsb_name
+        return self.lsb_info is not None and self.lsb_info[0] == self.lsb_name
 
     def get_version(self):
         if self.is_os():
-            return lsb_get_version()
+            return self.lsb_info[1]
         raise OsNotDetected('called in incorrect OS')
         
     def get_codename(self):
         if self.is_os():
-            return lsb_get_codename()
+            return self.lsb_info[2]
         raise OsNotDetected('called in incorrect OS')
 
 class OpenSuse(OsDetector):
@@ -470,7 +457,7 @@ OS_UBUNTU='ubuntu'
 
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
-OsDetect.register_default(OS_DEBIAN, LsbDetect("Debian"))
+OsDetect.register_default(OS_DEBIAN, LsbDetect("debian"))
 OsDetect.register_default(OS_FEDORA, Fedora())
 OsDetect.register_default(OS_FREEBSD, FreeBSD())
 OsDetect.register_default(OS_GENTOO, Gentoo())
