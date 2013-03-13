@@ -33,6 +33,7 @@
 import os
 import sys
 import unittest
+import mock
 
 class TrueOs():
     def is_os(self):
@@ -86,11 +87,13 @@ def test_LsbDetect():
 
     # test match
     test_dir = os.path.join(get_test_dir(), 'ubuntu')
-    rospkg.os_detect._lsb_release = os.path.join(test_dir, 'lsb_release')
+    import platform
+    platform.linux_distribution = mock.Mock(return_value=('Ubuntu','10.04','lucid'))
+    platform.dist = mock.Mock(return_value=('Ubuntu','10.04', 'lucid'))
 
     detect = LsbDetect('Ubuntu')
     assert detect.is_os(), "should be Ubuntu"
-    assert detect.get_codename() == 'lucid'
+    assert detect.get_codename() == 'lucid', detect.get_codename()
 
     # test freely
     if not detect.is_os():
@@ -98,16 +101,19 @@ def test_LsbDetect():
             detect.get_version()
             assert False
         except OsNotDetected: pass
-    
+
 def test_ubuntu():
     import rospkg.os_detect
     from rospkg.os_detect import LsbDetect, OsDetect, OsNotDetected
-    test_dir = os.path.join(get_test_dir(), 'ubuntu')
-    rospkg.os_detect._lsb_release = os.path.join(test_dir, 'lsb_release')
-    detect = OsDetect().get_detector('ubuntu')
-    assert detect.is_os()
-    assert detect.get_version() == '10.04'
-    assert detect.get_codename() == 'lucid'
+
+    os_detector = OsDetect()
+    detect = os_detector.get_detector('ubuntu')
+    detect.lsb_info = ('Ubuntu','10.04', 'lucid')
+    print detect.get_codename()
+
+    
+    assert detect.get_version() == '10.04', detect.get_version()
+    assert detect.get_codename() == 'lucid', detect.get_codename()
 
     # test freely
     if not detect.is_os():
