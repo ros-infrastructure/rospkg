@@ -74,7 +74,7 @@ def list_by_path(manifest_name, path, cache):
                     del dirs[:]
                     continue #leaf
             except ParseError as e:
-                print ("Warning: Invalid package manifest \"%s\": %s" % (os.path.join(d, PACKAGE_FILE), str(e)), file=sys.stderr)
+                print ('Warning: Invalid package manifest "%s": %s' % (os.path.join(d, PACKAGE_FILE), str(e)), file=sys.stderr)
                 continue
         if manifest_name in files:
             resource_name = basename(d)
