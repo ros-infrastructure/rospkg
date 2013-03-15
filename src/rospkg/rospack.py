@@ -30,8 +30,11 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import print_function
+
 import os
-from xml.etree.cElementTree import ElementTree
+import sys
+from xml.etree.cElementTree import ElementTree, ParseError
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, STACK_FILE, ResourceNotFound
 from .environment import get_ros_paths
@@ -57,18 +60,22 @@ def list_by_path(manifest_name, path, cache):
     for d, dirs, files in os.walk(path, topdown=True, followlinks=True):
         if PACKAGE_FILE in files:
             # parse package.xml and decide if it matches the search criteria
-            root = ElementTree(None, os.path.join(d, PACKAGE_FILE))
-            is_metapackage = root.find('./export/metapackage') is not None
-            if ((manifest_name == STACK_FILE and is_metapackage) or
-                (manifest_name == MANIFEST_FILE and not is_metapackage) or
-                manifest_name == PACKAGE_FILE):
-                resource_name = root.findtext('name')
-                if resource_name not in resources:
-                    resources.append(resource_name)
-                    if cache is not None:
-                        cache[resource_name] = d
-                del dirs[:]
-                continue #leaf
+            try:
+                root = ElementTree(None, os.path.join(d, PACKAGE_FILE))
+                is_metapackage = root.find('./export/metapackage') is not None
+                if ((manifest_name == STACK_FILE and is_metapackage) or
+                    (manifest_name == MANIFEST_FILE and not is_metapackage) or
+                    manifest_name == PACKAGE_FILE):
+                    resource_name = root.findtext('name')
+                    if resource_name not in resources:
+                        resources.append(resource_name)
+                        if cache is not None:
+                            cache[resource_name] = d
+                    del dirs[:]
+                    continue #leaf
+            except ParseError as e:
+                print ("Warning: Invalid package manifest \"%s\": %s" % (os.path.join(d, PACKAGE_FILE), str(e)), file=sys.stderr)
+                continue
         if manifest_name in files:
             resource_name = basename(d)
             if resource_name not in resources:
