@@ -335,6 +335,23 @@ class FreeBSD(OsDetector):
             return ''
         raise OsNotDetected('called in incorrect OS')        
 
+class Windows(OsDetector):
+    """
+    Detect Windows OS.
+    """
+    def is_os(self):
+        return platform.system() == "Windows"
+    
+    def get_version(self):
+        if self.is_os():
+            return platform.version()
+        raise OsNotDetected('called in incorrect OS')        
+
+    def get_codename(self):
+        if self.is_os():
+            return platform.release()
+        raise OsNotDetected('called in incorrect OS')        
+
 class OsDetect:
     """
     This class will iterate over registered classes to lookup the
@@ -454,6 +471,7 @@ OS_OPENSUSE='opensuse'
 OS_OSX='osx'
 OS_RHEL='rhel'
 OS_UBUNTU='ubuntu'
+OS_WINDOWS='windows'
 
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
@@ -466,6 +484,7 @@ OsDetect.register_default(OS_OPENSUSE, OpenSuse())
 OsDetect.register_default(OS_OSX, OSX())
 OsDetect.register_default(OS_RHEL, Rhel())
 OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
+OsDetect.register_default(OS_WINDOWS, Windows())    
     
 
 if __name__ == '__main__':
