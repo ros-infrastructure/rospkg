@@ -228,6 +228,14 @@ class Platform(object):
             return False
         return self.os == obj.os and self.version == obj.version and self.notes == obj.notes 
 
+    def __hash__(self):
+        """
+        :returns: an integer, which must be the same for two equal instances.
+
+        Since __eq__ is defined, Python 3 requires that this class also provide a __hash__ method.
+        """
+        return hash(self.os) ^ hash(self.version) ^ hash(self.notes)
+
 class Depend(object):
     """
     Manifest 'depend' tag
@@ -261,6 +269,14 @@ class Depend(object):
         if not isinstance(obj, Depend):
             return False
         return self.name == obj.name and self.type == obj.type
+
+    def __hash__(self):
+        """
+        :returns: an integer, which must be the same for two equal instances.
+
+        Since __eq__ is defined, Python 3 requires that this class also provide a __hash__ method.
+        """
+        return hash(self.name) ^ hash(self.type)
 
 class RosDep(object):
     """
