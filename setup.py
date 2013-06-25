@@ -1,11 +1,9 @@
 #!/usr/bin/env python
 
+import os
 from setuptools import setup
 
-import sys
-sys.path.insert(0, 'src')
-
-from rospkg import __version__
+exec(open(os.path.join(os.path.dirname(__file__), 'src', 'rospkg', '_version.py')).read())
 
 setup(name='rospkg',
       version=__version__,
