@@ -20,7 +20,7 @@ Getting the code
 
 rospkg is hosted on GitHub.  To start developing for it, please create a fork:
 
-https://github.com/ros/rospkg
+https://github.com/ros-infrastructure/rospkg
 
 
 Developing new OsDetectors
