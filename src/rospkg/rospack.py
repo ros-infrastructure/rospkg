@@ -55,6 +55,9 @@ def list_by_path(manifest_name, path, cache):
     path = os.path.abspath(path)
     basename = os.path.basename
     for d, dirs, files in os.walk(path, topdown=True, followlinks=True):
+        if 'CATKIN_IGNORE' in files:
+            del dirs[:]
+            continue  #leaf
         if PACKAGE_FILE in files:
             # parse package.xml and decide if it matches the search criteria
             root = ElementTree(None, os.path.join(d, PACKAGE_FILE))
@@ -82,7 +85,7 @@ def list_by_path(manifest_name, path, cache):
             # optimization for stacks.
             del dirs[:]
             continue #leaf     
-        elif 'rospack_nosubdirs' in files or 'CATKIN_IGNORE' in files:
+        elif 'rospack_nosubdirs' in files:
             del dirs[:]
             continue  #leaf
         # remove hidden dirs (esp. .svn/.git)
