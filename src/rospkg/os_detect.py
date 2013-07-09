@@ -251,6 +251,38 @@ class OSX(OsDetector):
             return _read_stdout([self._sw_vers_file,'-productVersion']).strip()
         raise OsNotDetected('called in incorrect OS')
 
+
+class QNX(OsDetector):
+    '''
+    Detect QNX realtime OS.
+    @author: Isaac Saito
+    '''
+    def __init__(self, uname_file='/bin/uname'):
+        '''
+        @param uname_file: An executable that can be used for detecting
+                           OS name and version.
+        '''
+        self._os_name_qnx = 'QNX'
+        self._uname_file = uname_file
+
+    def is_os(self):
+        if os.path.exists(self._uname_file):
+            std_out = _read_stdout([self._uname_file])
+            return std_out.strip() == self._os_name_qnx
+        else:
+            return False
+
+    def get_codename(self):
+        if self.is_os():
+            return ''
+        raise OsNotDetected('called in incorrect OS')
+
+    def get_version(self):
+        if self.is_os() and os.path.exists(self._uname_file):
+            return _read_stdout([self._uname_file, "-r"])
+        raise OsNotDetected('called in incorrect OS')
+
+
 class Arch(OsDetector):
     """
     Detect Arch Linux.
@@ -469,6 +501,7 @@ OS_GENTOO='gentoo'
 OS_MINT='mint'
 OS_OPENSUSE='opensuse'
 OS_OSX='osx'
+OS_QNX='qnx'
 OS_RHEL='rhel'
 OS_UBUNTU='ubuntu'
 OS_WINDOWS='windows'
@@ -482,6 +515,7 @@ OsDetect.register_default(OS_GENTOO, Gentoo())
 OsDetect.register_default(OS_MINT, LsbDetect("LinuxMint"))
 OsDetect.register_default(OS_OPENSUSE, OpenSuse())
 OsDetect.register_default(OS_OSX, OSX())
+OsDetect.register_default(OS_QNX, QNX())
 OsDetect.register_default(OS_RHEL, Rhel())
 OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
 OsDetect.register_default(OS_WINDOWS, Windows())    
