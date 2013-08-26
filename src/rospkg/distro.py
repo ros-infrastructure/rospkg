@@ -246,6 +246,7 @@ def _load_distro_stacks(distro_doc, release_name):
     stacks = {}
     try:
         stack_props = distro_doc['stacks']
+        stack_props = stack_props or {}
         stack_names = [x for x in stack_props.keys() if not x[0] == '_']
     except KeyError:
         raise InvalidDistro("distro is missing required 'stacks' key")
