@@ -59,7 +59,7 @@ def read_issue(filename="/etc/issue"):
     """
     if os.path.exists(filename):
         with open(filename, 'r') as f:
-            return f.read().split()
+            return f.read().decode('utf8').split()
     return None
 
 class OsNotDetected(Exception):
