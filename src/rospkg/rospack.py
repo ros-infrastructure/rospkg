@@ -122,6 +122,29 @@ class ManifestManager(object):
         self._rosdeps_cache = {}
         self._location_cache = None
 
+    @classmethod
+    def get_instance(cls, ros_paths=None):
+        """
+        Reuse an existing instance for the specified ros_paths instead of creating a new one.
+        Only works for subclasses, as the ManifestManager itself expects two args for the ctor.
+
+        :param ros_paths: Ordered list of paths to search for
+          resources. If `None` (default), use environment ROS path.
+        """
+        if not hasattr(cls, '_instances'):
+            # add class variable _instances to cls
+            cls._instances = {}
+
+        # generate instance_key from ros_paths variable
+        if ros_paths is None:
+            ros_paths = get_ros_paths()
+        instance_key = str(tuple(ros_paths))
+
+        if instance_key not in cls._instances:
+            # create and cache new instance
+            cls._instances[instance_key] = cls(ros_paths)
+        return cls._instances[instance_key]
+
     def get_ros_paths(self):
         return self._ros_paths[:]
     ros_paths = property(get_ros_paths, doc="Get ROS paths of this instance")
