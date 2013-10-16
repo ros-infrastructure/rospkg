@@ -60,6 +60,26 @@ def test_ManifestManager_constructor():
         r.ros_paths.append('foo')
         assert r.ros_paths == [tmp]        
 
+def test_ManifestManager_get_instance():
+    from rospkg import RosPack, RosStack, get_ros_paths
+
+    for c in [RosPack, RosStack]:
+        # make sure we get the same instance for defaults ros_paths
+        r1 = c.get_instance()
+        assert r1.ros_paths == get_ros_paths()
+        r2 = c.get_instance()
+        assert r1 is r2
+
+        # make sure we get the same instance for identical custom ros_paths
+        tmp = tempfile.gettempdir()
+        r3 = c.get_instance(ros_paths=[tmp])
+        assert r3.ros_paths == [tmp]
+        r4 = c.get_instance(ros_paths=[tmp])
+        assert r3 is r4
+
+        # make sure for different ros_paths we got different instances
+        assert r1 is not r3
+
 def rospackexec(args):
     rospack_bin = 'rospack'
     val = (subprocess.Popen([rospack_bin] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0] or '').strip()
