@@ -29,7 +29,6 @@
 # LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
-
 import os
 from xml.etree.cElementTree import ElementTree
 
@@ -260,6 +259,21 @@ class ManifestManager(object):
                     pass
         return depends_on
 
+class RosPackCache(type):
+    _instances = {}
+
+    def __call__(cls, ros_paths=None, *args, **kwargs):
+        if ros_paths is None:
+            ros_paths = get_ros_paths()
+
+        instance_key = str(tuple(ros_paths))
+        try:
+            return RosPackCache._instances[instance_key]
+        except KeyError:
+            print 'RosPackMeta: creating instance for:', instance_key
+            RosPackCache._instances[instance_key] = super(RosPackCache, cls).__call__(ros_paths, *args, **kwargs)
+            return RosPackCache._instances[instance_key]
+
 class RosPack(ManifestManager):
     """
     Utility class for querying properties about ROS packages. This
@@ -278,7 +292,8 @@ class RosPack(ManifestManager):
       depends = rp.get_depends('roscpp')
       direct_depends = rp.get_depends('roscpp', implicit=False)
     """
-    
+    __metaclass__ = RosPackCache
+
     def __init__(self, ros_paths=None):
         """
         :param ros_paths: Ordered list of paths to search for
@@ -476,4 +491,4 @@ def get_package_name(path):
         return root.findtext('name')
     else:
         return None
-    
+
