@@ -65,7 +65,7 @@ def list_by_path(manifest_name, path, cache):
             if ((manifest_name == STACK_FILE and is_metapackage) or
                 (manifest_name == MANIFEST_FILE and not is_metapackage) or
                 manifest_name == PACKAGE_FILE):
-                resource_name = root.findtext('name')
+                resource_name = root.findtext('name').strip(' \n\r\t')
                 if resource_name not in resources:
                     resources.append(resource_name)
                     if cache is not None:
