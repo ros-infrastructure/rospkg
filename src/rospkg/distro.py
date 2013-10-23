@@ -37,7 +37,10 @@ Representation/model of rosdistro format.
 import os
 import re
 import string
-import urllib2
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
 import yaml
 
 from .common import ResourceNotFound
@@ -183,7 +186,7 @@ def load_distro(source_uri):
                 raw_data = yaml.load(f.read())
         else:
             try:
-                request = urllib2.urlopen(source_uri)
+                request = urlopen(source_uri)
             except Exception as e:
                 raise ResourceNotFound('%s (%s)' % (str(e), source_uri))
             try:
@@ -211,7 +214,7 @@ def _load_variants(raw_data, stacks):
     for v in raw_data:
         if type(v) != dict or len(v.keys()) != 1:
             raise InvalidDistro("invalid variant spec: %s"%v)
-        variant_name = v.keys()[0]
+        variant_name = list(v.keys())[0]
         all_variants_raw_data[variant_name] = v[variant_name]
     variants = {}
     for variant_name in all_variants_raw_data.keys():
@@ -329,7 +332,7 @@ def _get_rules(distro_doc, stack_name):
         except KeyError:
             raise InvalidDistro("no _rules named [%s]"%(update_r))
     if not type(update_r) == dict:
-        raise InvalidDistro("invalid rules: %s %s"%(d, type(d)))
+        raise InvalidDistro("invalid rules: %s %s"%(update_r, type(update_r)))
     return update_r
         
 ################################################################################
