@@ -43,7 +43,10 @@ def _read_stdout(cmd):
     try:
         pop = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (std_out, std_err) = pop.communicate()
-        return std_out.strip()
+        # Python 2.6 compatability
+        if isinstance(std_out, str):
+            return std_out.strip()
+        return std_out.decode(encoding='UTF-8').strip()
     except:
         return None
     
@@ -249,7 +252,7 @@ class OSX(OsDetector):
         
     def get_version(self):
         if self.is_os():
-            return _read_stdout([self._sw_vers_file,'-productVersion']).strip()
+            return _read_stdout([self._sw_vers_file,'-productVersion'])
         raise OsNotDetected('called in incorrect OS')
 
 
