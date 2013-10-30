@@ -96,9 +96,12 @@ class DistroStack(object):
         return expand_rule(rule, self.name, self.version, self.release_name)
         
     def __eq__(self, other):
-        return self.name == other.name and \
-            self.version == other.version and \
-            self.vcs_config == other.vcs_config
+        try:
+            return self.name == other.name and \
+                self.version == other.version and \
+                self.vcs_config == other.vcs_config
+        except AttributeError:
+            return False
 
 class Variant(object):
     """

@@ -71,7 +71,7 @@ class FalseOs(object):
 
 def test__read_stdout():
     from rospkg.os_detect import _read_stdout
-    assert 'hello' == _read_stdout(['echo', 'hello']).decode()
+    assert 'hello' == _read_stdout(['echo', 'hello'])
     assert None == _read_stdout(['bad-command-input-for-rospkg-os-detect'])
 
 
@@ -349,7 +349,7 @@ def test_OsDetector():
 def test_tripwire_uname_get_machine():
     from rospkg.os_detect import uname_get_machine
     retval = uname_get_machine()
-    assert retval.decode() in [None, 'i386', 'x86_64']
+    assert retval in [None, 'i386', 'x86_64']
 
 
 def test_tripwire_rhel():
