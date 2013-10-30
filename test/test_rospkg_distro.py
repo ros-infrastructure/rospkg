@@ -270,7 +270,7 @@ def test_load_distro_variants():
         p = os.path.join(d, name)
         distro = load_distro(p)
         assert distro.release_name == 'simple', distro.release_name
-        assert distro.variants.keys() == []
+        assert set(distro.variants.keys()) == set([])
     
 def test_distro_to_rosinstall():
     from rospkg.distro import distro_to_rosinstall, load_distro
@@ -299,8 +299,8 @@ def test_load_distro_simple():
     assert distro.release_name == 'simple', distro.release_name
     assert distro.version == '1', distro.version
     assert yaml.load(open(p)) == distro.raw_data, distro.raw_data
-    assert distro.variants.keys() == ['base']
-    assert distro.stacks.keys() == ['stack1']
+    assert set(distro.variants.keys()) == set(['base'])
+    assert set(distro.stacks.keys()) == set(['stack1'])
 
     stack1 = distro.stacks['stack1']
     assert stack1.vcs_config.get_branch('devel', False) == ('https://simple.com/svn/trunk/stack1', None)
