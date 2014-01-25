@@ -388,6 +388,21 @@ class Windows(OsDetector):
             return platform.release()
         raise OsNotDetected('called in incorrect OS')        
 
+class Unknown(OsDetector):
+    """
+    Detect OS as unknown.
+    """
+    def __init__(self, release_file=""):
+        self._release_file = release_file
+
+    def is_os(self):
+        return True
+    def get_version(self):
+        return '0.0'
+    def get_codename(self):
+        if self.is_os():
+            return 'unknown'
+
 class OsDetect:
     """
     This class will iterate over registered classes to lookup the
@@ -509,6 +524,7 @@ OS_QNX='qnx'
 OS_RHEL='rhel'
 OS_UBUNTU='ubuntu'
 OS_WINDOWS='windows'
+OS_UNKNOWN='unknown'
 
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
@@ -523,7 +539,7 @@ OsDetect.register_default(OS_QNX, QNX())
 OsDetect.register_default(OS_RHEL, Rhel())
 OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
 OsDetect.register_default(OS_WINDOWS, Windows())    
-    
+OsDetect.register_default(OS_UNKNOWN, Unknown())
 
 if __name__ == '__main__':
     detect = OsDetect()
