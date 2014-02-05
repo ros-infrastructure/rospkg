@@ -38,6 +38,8 @@ from __future__ import print_function
 import os
 import subprocess
 import platform
+import locale
+import codecs
 
 def _read_stdout(cmd):
     try:
@@ -61,7 +63,7 @@ def read_issue(filename="/etc/issue"):
     :returns: list of strings in issue file, or None if issue file cannot be read/split
     """
     if os.path.exists(filename):
-        with open(filename, 'r') as f:
+        with codecs.open(filename, 'r', encoding=locale.getpreferredencoding()) as f:
             return f.read().split()
     return None
 
