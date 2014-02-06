@@ -363,7 +363,8 @@ def parse_manifest_file(dirpath, manifest_name):
     :raises: :exc:`IOError`
     """
     filename = os.path.join(dirpath, manifest_name)
-    if not os.path.isfile(filename):
+    package_filename = os.path.join(dirpath, PACKAGE_FILE)
+    if os.path.isfile(package_filename):
         # hack for backward compatibility
         package_filename = os.path.join(dirpath, PACKAGE_FILE)
         if not os.path.isfile(package_filename):
