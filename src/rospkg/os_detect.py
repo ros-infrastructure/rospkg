@@ -225,7 +225,8 @@ _osx_codename_map = {4: 'tiger',
                      6: 'snow',
                      7: 'lion',
                      8: 'mountain lion',
-                     9: 'mavericks'}
+                     9: 'mavericks',
+                     10: 'yosemite'}
 def _osx_codename(major, minor):
     if major != 10 or minor not in _osx_codename_map:
         raise OsNotDetected("unrecognized version: %s.%s"%(major, minor))
