@@ -351,12 +351,13 @@ def _get_text(nodes):
 
 _static_rosdep_view = None
 
-def parse_manifest_file(dirpath, manifest_name):
+def parse_manifest_file(dirpath, manifest_name, rospack=None):
     """
     Parse manifest file (package, stack).  Type will be inferred from manifest_name.
     
     :param dirpath: directory of manifest file, ``str``
     :param manifest_name: ``MANIFEST_FILE`` or ``STACK_FILE``, ``str``
+    :param rospack: a RosPack instance to identify local packages as ROS packages
 
     :returns: return :class:`Manifest` instance, populated with parsed fields
     :raises: :exc:`InvalidManifest`
@@ -397,7 +398,7 @@ def parse_manifest_file(dirpath, manifest_name):
                 depends = set([])
                 rosdeps = set([])
                 for d in (p.buildtool_depends + p.build_depends + p.run_depends + p.test_depends):
-                    if is_ros_package(_static_rosdep_view, d.name):
+                    if (rospack and d.name in rospack.list()) or is_ros_package(_static_rosdep_view, d.name):
                         depends.add(d.name)
                     if is_system_dependency(_static_rosdep_view, d.name):
                         rosdeps.add(d.name)

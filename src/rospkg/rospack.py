@@ -195,7 +195,7 @@ class ManifestManager(object):
         """
         :raises: :exc:`ResourceNotFound`
         """
-        retval = self._manifests[name] = parse_manifest_file(self.get_path(name), self._manifest_name)
+        retval = self._manifests[name] = parse_manifest_file(self.get_path(name), self._manifest_name, rospack=self)
         return retval
         
     def get_depends(self, name, implicit=True):
