@@ -104,7 +104,7 @@ class LsbDetect(OsDetector):
     """
     Generic detector for Debian, Ubuntu, and Mint
     """
-    def __init__(self, lsb_name, get_version_fn=None):
+    def __init__(self, lsb_name, get_version_fn=None, use_upstream=False):
         self.lsb_name = lsb_name
         if hasattr(platform,"linux_distribution"):
             self.lsb_info = platform.linux_distribution(full_distribution_name=0)
@@ -112,6 +112,9 @@ class LsbDetect(OsDetector):
             self.lsb_info = platform.dist()
         else:
             self.lsb_info = None
+        # use upstream info only if necessary or requested
+        if not self.is_os() or use_upstream:
+            self.lsb_info = self.load_upstream_info()
 
     def is_os(self):
         return self.lsb_info is not None and self.lsb_info[0] == self.lsb_name
@@ -125,6 +128,22 @@ class LsbDetect(OsDetector):
         if self.is_os():
             return self.lsb_info[2]
         raise OsNotDetected('called in incorrect OS')
+
+    def load_upstream_info(self, release_file='/etc/upstream-release/lsb-release'):
+        upstream_info = read_issue(filename=release_file)
+        if upstream_info is None:
+            return None
+        # use bit of code from lsb_release
+        info = {}
+        for line in upstream_info[:3]:
+            var, arg = line.split('=', 1)
+            if var.startswith('DISTRIB_'):
+                var = var[8:]
+                if arg.startswith('"') and arg.endswith('"'):
+                    arg = arg[1:-1]
+                if arg: # Ignore empty arguments
+                    info[var] = arg
+        return (info['ID'], info['RELEASE'], info['CODENAME'])
 
 class OpenSuse(OsDetector):
     """
