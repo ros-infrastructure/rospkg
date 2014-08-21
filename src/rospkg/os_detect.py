@@ -130,20 +130,10 @@ class LsbDetect(OsDetector):
         raise OsNotDetected('called in incorrect OS')
 
     def load_upstream_info(self, release_file='/etc/upstream-release/lsb-release'):
-        upstream_info = read_issue(filename=release_file)
-        if upstream_info is None:
+        up_os_list = read_issue(filename=release_file)
+        if up_os_list is None or len(up_os_list) < 3:
             return None
-        # use bit of code from lsb_release
-        info = {}
-        for line in upstream_info[:3]:
-            var, arg = line.split('=', 1)
-            if var.startswith('DISTRIB_'):
-                var = var[8:]
-                if arg.startswith('"') and arg.endswith('"'):
-                    arg = arg[1:-1]
-                if arg: # Ignore empty arguments
-                    info[var] = arg
-        return (info['ID'], info['RELEASE'], info['CODENAME'])
+        return [line.split('=')[1] for line in up_os_list[:3]]
 
 class OpenSuse(OsDetector):
     """
