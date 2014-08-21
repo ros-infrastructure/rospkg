@@ -112,8 +112,7 @@ class LsbDetect(OsDetector):
             self.lsb_info = platform.dist()
         else:
             self.lsb_info = None
-        # use upstream info only if necessary or requested
-        if not self.is_os() or use_upstream:
+        if use_upstream:
             self.lsb_info = self.load_upstream_info()
 
     def is_os(self):
@@ -520,6 +519,7 @@ OS_OSX='osx'
 OS_QNX='qnx'
 OS_RHEL='rhel'
 OS_UBUNTU='ubuntu'
+OS_UBUNTU_DERIVATIVE='ubuntu'
 OS_WINDOWS='windows'
 
 OsDetect.register_default(OS_ARCH, Arch())
@@ -534,6 +534,7 @@ OsDetect.register_default(OS_OSX, OSX())
 OsDetect.register_default(OS_QNX, QNX())
 OsDetect.register_default(OS_RHEL, Rhel())
 OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
+OsDetect.register_default(OS_UBUNTU_DERIVATIVE, LsbDetect("Ubuntu", use_upstream=True))
 OsDetect.register_default(OS_WINDOWS, Windows())    
     
 
