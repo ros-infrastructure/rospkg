@@ -259,6 +259,22 @@ def test_opensuse():
             pass
 
 
+def test_opensuse13():
+    from rospkg.os_detect import OpenSuse, OsNotDetected
+    test_dir = os.path.join(get_test_dir(), 'opensuse13')
+    detect = OpenSuse(os.path.join(test_dir, "SUSE-brand"))
+    assert detect.is_os()
+    assert detect.get_version() == '13.1'
+
+    detect = OpenSuse()
+    if not detect.is_os():
+        try:
+            detect.get_version()
+            assert False
+        except OsNotDetected:
+            pass
+
+
 def test_tripwire_gentoo():
     from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
