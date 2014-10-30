@@ -507,6 +507,7 @@ OS_FREEBSD='freebsd'
 OS_GENTOO='gentoo'
 OS_MINT='mint'
 OS_OPENSUSE='opensuse'
+OS_OPENSUSE13='opensuse'
 OS_OSX='osx'
 OS_QNX='qnx'
 OS_RHEL='rhel'
@@ -521,6 +522,7 @@ OsDetect.register_default(OS_FREEBSD, FreeBSD())
 OsDetect.register_default(OS_GENTOO, Gentoo())
 OsDetect.register_default(OS_MINT, LsbDetect("LinuxMint"))
 OsDetect.register_default(OS_OPENSUSE, OpenSuse())
+OsDetect.register_default(OS_OPENSUSE13, OpenSuse(brand_file='/etc/SUSE-brand'))
 OsDetect.register_default(OS_OSX, OSX())
 OsDetect.register_default(OS_QNX, QNX())
 OsDetect.register_default(OS_RHEL, Rhel())
