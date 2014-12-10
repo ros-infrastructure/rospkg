@@ -165,7 +165,7 @@ class ManifestManager(object):
     def _update_location_cache(self):
         # ensure self._location_cache is not checked while it is being updated
         # (i.e. while it is not None, but also not completely populated)
-        with _cache_lock:
+        with global _cache_lock:
             if self._location_cache is not None:
                 return
             # initialize cache
