@@ -31,12 +31,16 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
+from threading import Lock
 from xml.etree.cElementTree import ElementTree
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, STACK_FILE, ResourceNotFound
 from .environment import get_ros_paths
 from .manifest import parse_manifest_file, InvalidManifest
 from .stack import parse_stack_file, InvalidStack
+
+_cache_lock = Lock()
+
 
 def list_by_path(manifest_name, path, cache):
     """
@@ -45,7 +49,7 @@ def list_by_path(manifest_name, path, cache):
     The cache will be updated with the resource->path
     mappings. list_by_path() does NOT returned cached results
     -- it only updates the cache.
-    
+
     :param manifest_name: MANIFEST_FILE or STACK_FILE, ``str``
     :param path: path to list resources in, ``str``
     :param cache: path cache to update. Maps resource name to directory path, ``{str: str}``
@@ -84,7 +88,7 @@ def list_by_path(manifest_name, path, cache):
             # noop if manifest_name==MANIFEST_FILE, but a good
             # optimization for stacks.
             del dirs[:]
-            continue #leaf     
+            continue #leaf
         elif 'rospack_nosubdirs' in files:
             del dirs[:]
             continue  #leaf
@@ -100,12 +104,12 @@ class ManifestManager(object):
     performance reasons, instances cache information and will not
     reflect changes made on disk or to environment configuration.
     """
-    
+
     def __init__(self, manifest_name, ros_paths=None):
         """
-        ctor. subclasses are expected to use *manifest_name* 
+        ctor. subclasses are expected to use *manifest_name*
         to customize behavior of ManifestManager.
-        
+
         :param manifest_name: MANIFEST_FILE or STACK_FILE
         :param ros_paths: Ordered list of paths to search for
           resources. If `None` (default), use environment ROS path.
@@ -116,7 +120,7 @@ class ManifestManager(object):
             self._ros_paths = get_ros_paths()
         else:
             self._ros_paths = ros_paths
-        
+
         self._manifests = {}
         self._depends_cache = {}
         self._rosdeps_cache = {}
@@ -157,19 +161,24 @@ class ManifestManager(object):
             return self._manifests[name]
         else:
             return self._load_manifest(name)
-            
+
     def _update_location_cache(self):
-        if self._location_cache is not None:
-            return
-        # initialize cache
-        cache = self._location_cache = {}
-        # nothing to search, #3680
-        if not self._ros_paths:
-            return
-        # crawl paths using our own logic, in reverse order to get correct precedence
-        for path in reversed(self._ros_paths):
-            list_by_path(self._manifest_name, path, cache)
-    
+        global _cache_lock
+        # ensure self._location_cache is not checked while it is being updated
+        # (i.e. while it is not None, but also not completely populated)
+        with _cache_lock:
+            if self._location_cache is not None:
+                return
+            # initialize cache
+            cache = self._location_cache = {}
+            # nothing to search, #3680
+            if not self._ros_paths:
+                return
+            # crawl paths using our own logic, in reverse order to get
+            # correct precedence
+            for path in reversed(self._ros_paths):
+                list_by_path(self._manifest_name, path, cache)
+
     def list(self):
         """
         List resources.
@@ -190,14 +199,14 @@ class ManifestManager(object):
             raise ResourceNotFound(name, ros_paths=self._ros_paths)
         else:
             return self._location_cache[name]
-        
+
     def _load_manifest(self, name):
         """
         :raises: :exc:`ResourceNotFound`
         """
         retval = self._manifests[name] = parse_manifest_file(self.get_path(name), self._manifest_name, rospack=self)
         return retval
-        
+
     def get_depends(self, name, implicit=True):
         """
         Get dependencies of a resource.  If implicit is ``True``, this
@@ -231,7 +240,7 @@ class ManifestManager(object):
             s = list(s)
             self._depends_cache[name] = s
             return s
-    
+
     def get_depends_on(self, name, implicit=True):
         """
         Get resources that depend on a resource.  If implicit is ``True``, this
@@ -292,7 +301,7 @@ class RosPack(ManifestManager):
     NOTE 1: for performance reasons, RosPack caches information about
     packages.
 
-    NOTE 2: RosPack is not thread-safe. 
+    NOTE 2: RosPack is not thread-safe.
 
     Example::
       rp = RosPack()
@@ -301,7 +310,7 @@ class RosPack(ManifestManager):
       depends = rp.get_depends('roscpp')
       direct_depends = rp.get_depends('roscpp', implicit=False)
     """
-    
+
     def __init__(self, ros_paths=None):
         """
         :param ros_paths: Ordered list of paths to search for
@@ -314,10 +323,10 @@ class RosPack(ManifestManager):
     def get_rosdeps(self, package, implicit=True):
         """
         Collect rosdeps of specified package into a dictionary.
-        
+
         :param package: package name, ``str``
         :param implicit: include implicit (recursive) rosdeps, ``bool``
-        
+
         :returns: list of rosdep names, ``[str]``
         """
         if implicit:
@@ -325,7 +334,7 @@ class RosPack(ManifestManager):
         else:
             m = self.get_manifest(package)
             return [d.name for d in m.rosdeps]
-        
+
     def _implicit_rosdeps(self, package):
         """
         Compute recursive rosdeps of a single package and cache the
@@ -351,7 +360,7 @@ class RosPack(ManifestManager):
         s = list(s)
         self._rosdeps_cache[package] = s
         return s
-        
+
     def stack_of(self, package):
         """
         :param package: package name, ``str``
@@ -375,16 +384,16 @@ class RosStack(ManifestManager):
     NOTE 1: for performance reasons, RosStack caches information about
     stacks.
 
-    NOTE 2: RosStack is not thread-safe. 
+    NOTE 2: RosStack is not thread-safe.
     """
-    
+
     def __init__(self, ros_paths=None):
         """
         :param ros_paths: Ordered list of paths to search for
           resources. If `None` (default), use environment ROS path.
         """
         super(RosStack, self).__init__(STACK_FILE, ros_paths)
-            
+
     def packages_of(self, stack):
         """
         :returns: name of packages that are part of stack, ``[str]``
@@ -432,7 +441,7 @@ def expand_to_packages(names, rospack, rosstack):
 def get_stack_version_by_dir(stack_dir):
     """
     Get stack version where stack_dir points to root directory of stack.
-    
+
     :param env: override environment variables, ``{str: str}``
 
     :returns: version number of stack, or None if stack is unversioned, ``str``
@@ -446,7 +455,7 @@ def get_stack_version_by_dir(stack_dir):
             return stack.version
         except InvalidStack:
             pass
-    
+
     cmake_filename = os.path.join(stack_dir, 'CMakeLists.txt')
     if os.path.isfile(cmake_filename):
         with open(cmake_filename) as f:
@@ -480,7 +489,7 @@ def get_package_name(path):
     determined by finding the nearest parent ``manifest.xml`` file.
     This routine may not traverse package setups that rely on internal
     symlinks within the package itself.
-    
+
     :param path: filesystem path
     :return: Package name or ``None`` if package cannot be found, ``str``
     """
@@ -499,4 +508,4 @@ def get_package_name(path):
         return root.findtext('name')
     else:
         return None
-    
+
