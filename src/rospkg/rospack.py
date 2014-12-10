@@ -31,8 +31,8 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
-from xml.etree.cElementTree import ElementTree
 from threading import Lock
+from xml.etree.cElementTree import ElementTree
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, STACK_FILE, ResourceNotFound
 from .environment import get_ros_paths
@@ -40,6 +40,7 @@ from .manifest import parse_manifest_file, InvalidManifest
 from .stack import parse_stack_file, InvalidStack
 
 _cache_lock = Lock()
+
 
 def list_by_path(manifest_name, path, cache):
     """
@@ -162,7 +163,7 @@ class ManifestManager(object):
             return self._load_manifest(name)
 
     def _update_location_cache(self):
-        # make sure self._location_cache is not checked while it is updated
+        # ensure self._location_cache is not checked while it is being updated
         # (i.e. while it is not None, but also not completely populated)
         with _cache_lock:
             if self._location_cache is not None:
@@ -172,7 +173,8 @@ class ManifestManager(object):
             # nothing to search, #3680
             if not self._ros_paths:
                 return
-            # crawl paths using our own logic, in reverse order to get correct precedence
+            # crawl paths using our own logic, in reverse order to get
+            # correct precedence
             for path in reversed(self._ros_paths):
                 list_by_path(self._manifest_name, path, cache)
 
