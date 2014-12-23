@@ -288,11 +288,12 @@ def test_RosPack_get_rosdeps():
 
 
 def test_get_package_name():
+    from rospkg import __version__
     from rospkg import get_package_name
 
     # test dir is a subdirectory of this package
     test_dir = get_package_test_path()
-    assert 'rospkg' == get_package_name(test_dir), get_package_name(test_dir)
+    assert get_package_name(test_dir) in ['rospkg', 'rospkg-%s' % __version__], get_package_name(test_dir)
 
     test_dir_foo = os.path.join(test_dir, 'p1', 'foo')
     assert 'foo' == get_package_name(test_dir_foo)
