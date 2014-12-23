@@ -459,7 +459,6 @@ class OsDetect:
         :returns: (os_name, os_version, os_codename), ``(str, str, str)``
         :raises: :exc:`OsNotDetected` if OS could not be detected
         """
-
         if env is None:
             env = os.environ
         if 'ROS_OS_OVERRIDE' in env:
