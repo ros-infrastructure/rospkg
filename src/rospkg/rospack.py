@@ -42,7 +42,7 @@ from .stack import parse_stack_file, InvalidStack
 _cache_lock = Lock()
 
 
-def list_by_path(manifest_name, path, cache):
+def list_by_path(manifest_name, path, cache, recurse=True):
     """
     List ROS stacks or packages within the specified path.
 
@@ -53,6 +53,7 @@ def list_by_path(manifest_name, path, cache):
     :param manifest_name: MANIFEST_FILE or STACK_FILE, ``str``
     :param path: path to list resources in, ``str``
     :param cache: path cache to update. Maps resource name to directory path, ``{str: str}``
+    :param recurse: search recursively in subdirectories ``bool``
     :returns: complete list of resources in ROS environment, ``[str]``
     """
     resources = []
@@ -89,9 +90,15 @@ def list_by_path(manifest_name, path, cache):
             # optimization for stacks.
             del dirs[:]
             continue #leaf     
-        elif 'rospack_nosubdirs' in files:
+        elif 'rospack_nosubdirs' in files or not recurse:
             del dirs[:]
             continue  #leaf
+        elif 'rospack_norecurse' in files:
+            for sd in dirs:
+                spath = os.path.join(d, sd)
+                resources += list_by_path(manifest_name, spath, cache, False)
+            del dirs[:]
+            continue
         # remove hidden dirs (esp. .svn/.git)
         [dirs.remove(di) for di in dirs if di[0] == '.']
     return resources
