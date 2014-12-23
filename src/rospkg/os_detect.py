@@ -391,6 +391,35 @@ class Windows(OsDetector):
             return platform.release()
         raise OsNotDetected('called in incorrect OS')        
 
+class Centos(Rhel):
+    """
+    Detect CentOS.
+    """
+    def __init__(self, release_file="/etc/redhat-release"):
+        self._release_file = release_file
+
+    def is_os(self):
+        os_list = read_issue(self._release_file)
+        return os_list and os_list[0] == 'CentOS'
+
+    def get_version(self):
+        if self.is_os():
+            os_list = read_issue(self._release_file)
+            idx = os_list.index('release')
+            return os_list[idx+1]
+        raise OsNotDetected('called in incorrect OS')
+
+    def get_codename(self):
+        if self.is_os():
+            os_list = read_issue(self._release_file)
+            idx = os_list.index('release')
+            matches = [x for x in os_list if x[0] == '(']
+            codename = matches[0][1:]
+            if codename[-1] == ')':
+                codename = codename[:-1]
+            return codename.lower()
+        raise OsNotDetected('called in incorrect OS')
+
 class OsDetect:
     """
     This class will iterate over registered classes to lookup the
@@ -420,7 +449,7 @@ class OsDetect:
         :param os_detector: :class:`OsDetector` instance
         """
         OsDetect.default_os_list.insert(0, (os_name, os_detector))
-        
+
     def detect_os(self, env=None):
         """
         Detect operating system.  Return value can be overridden by
@@ -430,6 +459,7 @@ class OsDetect:
         :returns: (os_name, os_version, os_codename), ``(str, str, str)``
         :raises: :exc:`OsNotDetected` if OS could not be detected
         """
+
         if env is None:
             env = os.environ
         if 'ROS_OS_OVERRIDE' in env:
@@ -500,6 +530,7 @@ class OsDetect:
         return self._os_codename
 
 OS_ARCH='arch'
+OS_CENTOS='centos'
 OS_CYGWIN='cygwin'
 OS_DEBIAN='debian'
 OS_FEDORA='fedora'
@@ -516,6 +547,7 @@ OS_WINDOWS='windows'
 
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
+OsDetect.register_default(OS_CENTOS, Centos())
 OsDetect.register_default(OS_DEBIAN, LsbDetect("debian"))
 OsDetect.register_default(OS_FEDORA, Fedora())
 OsDetect.register_default(OS_FREEBSD, FreeBSD())
