@@ -314,7 +314,7 @@ class Centos(OsDetector):
     """
     Detect CentOS.
     """
-    def __init__(self, release_file="/etc/redhat-release"):
+    def __init__(self, release_file='/etc/redhat-release'):
         self._release_file = release_file
 
     def is_os(self):
