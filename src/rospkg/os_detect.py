@@ -535,6 +535,7 @@ OS_DEBIAN='debian'
 OS_FEDORA='fedora'
 OS_FREEBSD='freebsd'
 OS_GENTOO='gentoo'
+OS_LINARO='linaro'
 OS_MINT='mint'
 OS_OPENSUSE='opensuse'
 OS_OPENSUSE13='opensuse'
@@ -551,6 +552,7 @@ OsDetect.register_default(OS_DEBIAN, LsbDetect("debian"))
 OsDetect.register_default(OS_FEDORA, Fedora())
 OsDetect.register_default(OS_FREEBSD, FreeBSD())
 OsDetect.register_default(OS_GENTOO, Gentoo())
+OsDetect.register_default(OS_LINARO, LsbDetect("Linaro"))
 OsDetect.register_default(OS_MINT, LsbDetect("LinuxMint"))
 OsDetect.register_default(OS_OPENSUSE, OpenSuse())
 OsDetect.register_default(OS_OPENSUSE13, OpenSuse(brand_file='/etc/SUSE-brand'))
