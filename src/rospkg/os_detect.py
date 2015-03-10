@@ -104,7 +104,7 @@ class LsbDetect(OsDetector):
     """
     Generic detector for Debian, Ubuntu, and Mint
     """
-    def __init__(self, lsb_name, get_version_fn=None):
+    def __init__(self, lsb_name, get_version_fn=None, use_upstream=False):
         self.lsb_name = lsb_name
         if hasattr(platform,"linux_distribution"):
             self.lsb_info = platform.linux_distribution(full_distribution_name=0)
@@ -112,6 +112,8 @@ class LsbDetect(OsDetector):
             self.lsb_info = platform.dist()
         else:
             self.lsb_info = None
+        if use_upstream:
+            self.lsb_info = self.load_upstream_info()
 
     def is_os(self):
         return self.lsb_info is not None and self.lsb_info[0] == self.lsb_name
@@ -125,6 +127,12 @@ class LsbDetect(OsDetector):
         if self.is_os():
             return self.lsb_info[2]
         raise OsNotDetected('called in incorrect OS')
+
+    def load_upstream_info(self, release_file='/etc/upstream-release/lsb-release'):
+        up_os_list = read_issue(filename=release_file)
+        if up_os_list is None or len(up_os_list) < 3:
+            return None
+        return [line.split('=')[1] for line in up_os_list[:3]]
 
 class OpenSuse(OsDetector):
     """
@@ -543,6 +551,7 @@ OS_OSX='osx'
 OS_QNX='qnx'
 OS_RHEL='rhel'
 OS_UBUNTU='ubuntu'
+OS_UBUNTU_DERIVATIVE='ubuntu'
 OS_WINDOWS='windows'
 
 OsDetect.register_default(OS_ARCH, Arch())
@@ -560,6 +569,7 @@ OsDetect.register_default(OS_OSX, OSX())
 OsDetect.register_default(OS_QNX, QNX())
 OsDetect.register_default(OS_RHEL, Rhel())
 OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
+OsDetect.register_default(OS_UBUNTU_DERIVATIVE, LsbDetect("Ubuntu", use_upstream=True))
 OsDetect.register_default(OS_WINDOWS, Windows())    
     
 
