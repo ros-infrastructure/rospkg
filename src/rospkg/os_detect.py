@@ -370,14 +370,24 @@ class Gentoo(OsDetector):
     def get_version(self):
         if self.is_os():
             os_list = read_issue(self._release_file)
-            if os_list[0] == "Gentoo" and os_list[1] == "Base":
-                return os_list[4]
+            return os_list[4]
         raise OsNotDetected('called in incorrect OS')        
 
     def get_codename(self):
         if self.is_os():
             return ''
         raise OsNotDetected('called in incorrect OS')        
+
+class Funtoo(Gentoo):
+    """
+    Detect Funtoo OS, a Gentoo Variant.
+    """
+    def __init__(self, release_file="/etc/gentoo-release"):
+        Gentoo.__init__(self, release_file)
+
+    def is_os(self):
+        os_list = read_issue(self._release_file)
+        return os_list and os_list[0] == "Funtoo" and os_list[1] == "Linux" 
 
 class FreeBSD(OsDetector):
     """
@@ -534,6 +544,7 @@ OS_CYGWIN='cygwin'
 OS_DEBIAN='debian'
 OS_FEDORA='fedora'
 OS_FREEBSD='freebsd'
+OS_FUNTOO='funtoo'
 OS_GENTOO='gentoo'
 OS_LINARO='linaro'
 OS_MINT='mint'
@@ -551,6 +562,7 @@ OsDetect.register_default(OS_CYGWIN, Cygwin())
 OsDetect.register_default(OS_DEBIAN, LsbDetect("debian"))
 OsDetect.register_default(OS_FEDORA, Fedora())
 OsDetect.register_default(OS_FREEBSD, FreeBSD())
+OsDetect.register_default(OS_FUNTOO, Funtoo())
 OsDetect.register_default(OS_GENTOO, Gentoo())
 OsDetect.register_default(OS_LINARO, LsbDetect("Linaro"))
 OsDetect.register_default(OS_MINT, LsbDetect("LinuxMint"))
@@ -560,11 +572,11 @@ OsDetect.register_default(OS_OSX, OSX())
 OsDetect.register_default(OS_QNX, QNX())
 OsDetect.register_default(OS_RHEL, Rhel())
 OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
-OsDetect.register_default(OS_WINDOWS, Windows())    
-    
+OsDetect.register_default(OS_WINDOWS, Windows())
+
 
 if __name__ == '__main__':
     detect = OsDetect()
     print("OS Name:     %s"%detect.get_name())
-    print("OS Version:  %s"%detect.get_version())    
-    print("OS Codename: %s"%detect.get_codename())    
+    print("OS Version:  %s"%detect.get_version())
+    print("OS Codename: %s"%detect.get_codename())
