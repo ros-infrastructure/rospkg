@@ -304,8 +304,9 @@ class RosPack(ManifestManager):
     NOTE 2: RosPack is not thread-safe. 
 
     Example::
+      from rospkg import RosPack
       rp = RosPack()
-      packages = rp.list_packages()
+      packages = rp.list()
       path = rp.get_path('rospy')
       depends = rp.get_depends('roscpp')
       direct_depends = rp.get_depends('roscpp', implicit=False)

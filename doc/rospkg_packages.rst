@@ -42,8 +42,9 @@ other optimizations for repeated querying.
 
    Example::
 
+        from rospkg import RosPack
         rp = RosPack()
-        packages = rp.list_packages()
+        packages = rp.list()
         path = rp.get_path('rospy')
         depends = rp.get_depends('roscpp')
         depends1 = rp.get_depends('roscpp', implicit=False)
