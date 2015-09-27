@@ -438,7 +438,7 @@ class IntelEdisonYoctoDetect(OsDetector):
     Linux myedison 3.10.17-poky-edison+ #1 SMP PREEMPT Fri Jun 19 12:06:40 CEST 2015 i686 GNU/Linux
     """
     def is_os(self):
-        return platform.system() == "Windows"
+        return platform.release() == "3.10.17-poky-edison+"
 
     def get_version(self):
         if self.is_os():
@@ -577,10 +577,10 @@ OS_QNX='qnx'
 OS_RHEL='rhel'
 OS_UBUNTU='ubuntu'
 OS_WINDOWS='windows'
-OS_YOCTO='yocto'
+OS_YOCTO_EDISON='yocto-edison'
 
 
-OsDetect.register_default(OS_YOCTO, IntelEdisonYoctoDetect())
+OsDetect.register_default(OS_YOCTO_EDISON, IntelEdisonYoctoDetect())
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_CENTOS, Centos())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
