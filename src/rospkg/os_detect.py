@@ -430,6 +430,27 @@ class Windows(OsDetector):
             return platform.release()
         raise OsNotDetected('called in incorrect OS')        
 
+
+class IntelEdisonYoctoDetect(OsDetector):
+    """
+    Detect Intel Edison Yocto Linux.
+    Edison uname -a
+    Linux myedison 3.10.17-poky-edison+ #1 SMP PREEMPT Fri Jun 19 12:06:40 CEST 2015 i686 GNU/Linux
+    """
+    def is_os(self):
+        return platform.system() == "Windows"
+
+    def get_version(self):
+        if self.is_os():
+            return platform.version()
+        raise OsNotDetected('called in incorrect OS')
+
+    def get_codename(self):
+        if self.is_os():
+            return platform.release()
+        raise OsNotDetected('called in incorrect OS')
+
+
 class OsDetect:
     """
     This class will iterate over registered classes to lookup the
@@ -538,6 +559,7 @@ class OsDetect:
             self.detect_os()
         return self._os_codename
 
+
 OS_ARCH='arch'
 OS_CENTOS='centos'
 OS_CYGWIN='cygwin'
@@ -555,7 +577,10 @@ OS_QNX='qnx'
 OS_RHEL='rhel'
 OS_UBUNTU='ubuntu'
 OS_WINDOWS='windows'
+OS_YOCTO='yocto'
 
+
+OsDetect.register_default(OS_YOCTO, IntelEdisonYoctoDetect())
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_CENTOS, Centos())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
