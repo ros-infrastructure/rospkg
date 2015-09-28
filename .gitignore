@@ -10,4 +10,5 @@ nosetests.xml
 src/rospkg.egg-info
 syntax: regexp
 (target|build|dist)/.*
-
+.project
+.pydevproject
