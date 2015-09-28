@@ -434,15 +434,25 @@ class Windows(OsDetector):
 class IntelEdisonYoctoDetect(OsDetector):
     """
     Detect Intel Edison Yocto Linux.
-    Edison uname -a
+    
+    uname -a
     Linux myedison 3.10.17-poky-edison+ #1 SMP PREEMPT Fri Jun 19 12:06:40 CEST 2015 i686 GNU/Linux
+    
+    platform.version()
+    #1 SMP PREEMPT Fri Jun 19 12:06:40 CEST 2015
+    
+    platform.release()
+    3.10.17-poky-edison+
+    
+    platform.system()
+    Linux
     """
     def is_os(self):
-        return platform.release() == "3.10.17-poky-edison+"
+        return "edison" in platform.release()
 
     def get_version(self):
         if self.is_os():
-            return platform.version()
+            return "Yocto"
         raise OsNotDetected('called in incorrect OS')
 
     def get_codename(self):
