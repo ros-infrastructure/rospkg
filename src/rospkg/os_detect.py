@@ -67,6 +67,19 @@ def read_issue(filename="/etc/issue"):
             return f.read().split()
     return None
 
+def read_os_release(filename = "/etc/os-release"):
+    """
+    :returns: Dictonary of key value pairs from /etc/os-release, with quotes stripped from values
+    """
+    release_info = {}
+    if os.path.exists(filename):
+        with codecs.open(filename, 'r', encoding=locale.getpreferredencoding()) as f:
+            for line in f:
+                key, val = line.rstrip('\n').partition('=')[::2]
+                release_info[key] = val.strip('"')
+            return release_info
+    return None
+
 class OsNotDetected(Exception):
     """
     Exception to indicate failure to detect operating system.
@@ -125,6 +138,47 @@ class LsbDetect(OsDetector):
         if self.is_os():
             return self.lsb_info[2]
         raise OsNotDetected('called in incorrect OS')
+
+class FdoDetect(OsDetector):
+    """
+    Generic detector for operating systems implementing /etc/os-release.
+    Requires that the "ID", and "VERSION_ID" keys are set in the os-release file.
+    Codename is parsed from VERSION key if available: either using format
+    "foo, CODENAME" or "foo (CODENAME)."
+    If VERSION is not present, the VERSION_ID is returned.
+    """
+    def __init__(self, fdo_id):
+        release_info = read_os_release()
+        if release_info.has_key("ID") and release_info["ID"] == fdo_id:
+            self.release_info = release_info
+        else:
+            self.release_info = None
+
+    def is_os(self):
+        return self.release_info is not None  and self.release_info.has_key("VERSION_ID")
+
+    def get_version(self):
+        if self.is_os():
+            return self.release_info["VERSION_ID"]
+        raise OsNotDetected("called in incorrect OS")
+
+    def get_codename(self):
+        if self.is_os():
+            if self.release_info.has_key("VERSION"):
+                version = self.release_info["VERSION"]
+                # FDO style: works with Fedora, Debian, Suse.
+                if version.find("(") is not -1:
+                    codename = version[version.find("(")+1 : version.find(")")]
+                # Ubuntu style
+                elif version.find(",") is not -1:
+                    codename = version[version.find(",")+1:].lstrip(' ').split()[0]
+                # Indeterminate style
+                else:
+                    codename = version
+                return codename.lower()
+            else:
+                return self.get_version()
+        raise OsNotDetected("called in incorrect OS")
 
 class OpenSuse(OsDetector):
     """
@@ -560,7 +614,7 @@ OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_CENTOS, Centos())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
 OsDetect.register_default(OS_DEBIAN, LsbDetect("debian"))
-OsDetect.register_default(OS_FEDORA, Fedora())
+OsDetect.register_default(OS_FEDORA, FdoDetect("fedora"))
 OsDetect.register_default(OS_FREEBSD, FreeBSD())
 OsDetect.register_default(OS_FUNTOO, Funtoo())
 OsDetect.register_default(OS_GENTOO, Gentoo())
