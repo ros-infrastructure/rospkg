@@ -67,7 +67,7 @@ def read_issue(filename="/etc/issue"):
             return f.read().split()
     return None
 
-def read_os_release(filename = "/etc/os-release"):
+def read_os_release(filename="/etc/os-release"):
     """
     :returns: Dictonary of key value pairs from /etc/os-release, with quotes stripped from values
     """
