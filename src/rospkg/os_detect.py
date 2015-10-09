@@ -141,11 +141,12 @@ class LsbDetect(OsDetector):
 
 class FdoDetect(OsDetector):
     """
-    Generic detector for operating systems implementing /etc/os-release.
+    Generic detector for operating systems implementing /etc/os-release, as defined by the os-release spec hosted at Freedesktop.org (Fdo):
+    http://www.freedesktop.org/software/systemd/man/os-release.html
     Requires that the "ID", and "VERSION_ID" keys are set in the os-release file.
-    Codename is parsed from VERSION key if available: either using format
-    "foo, CODENAME" or "foo (CODENAME)."
-    If VERSION is not present, the VERSION_ID is returned.
+    
+    Codename is parsed from the VERSION key if available: either using the format "foo, CODENAME" or "foo (CODENAME)."
+    If the VERSION key is not present, the VERSION_ID is value is used as the codename.
     """
     def __init__(self, fdo_id):
         release_info = read_os_release()
