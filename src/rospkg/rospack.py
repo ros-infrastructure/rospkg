@@ -125,6 +125,7 @@ class ManifestManager(object):
         self._depends_cache = {}
         self._rosdeps_cache = {}
         self._location_cache = None
+        self._custom_cache = {}
 
     @classmethod
     def get_instance(cls, ros_paths=None):
@@ -291,6 +292,13 @@ class ManifestManager(object):
                     # robust to bad packages
                     pass
         return depends_on
+
+    def get_custom_cache(self, key, default=None):
+        return self._custom_cache.get(key, default)
+
+    def set_custom_cache(self, key, value):
+        self._custom_cache[key] = value
+
 
 class RosPack(ManifestManager):
     """
