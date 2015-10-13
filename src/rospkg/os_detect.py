@@ -150,7 +150,7 @@ class FdoDetect(OsDetector):
     """
     def __init__(self, fdo_id):
         release_info = read_os_release()
-        if release_info is not None and release_info.has_key("ID") and release_info["ID"] == fdo_id:
+        if release_info is not None and "ID" in release_info and release_info["ID"] == fdo_id:
             self.release_info = release_info
         else:
             self.release_info = None
