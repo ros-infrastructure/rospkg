@@ -86,7 +86,7 @@ class OsNotDetected(Exception):
     """
     pass
 
-class OsDetector:
+class OsDetector(object):
     """
     Generic API for detecting a specific OS.
     """
@@ -138,6 +138,22 @@ class LsbDetect(OsDetector):
         if self.is_os():
             return self.lsb_info[2]
         raise OsNotDetected('called in incorrect OS')
+
+
+class Debian(LsbDetect):
+
+    def __init__(self, get_version_fn=None):
+        super(Debian, self).__init__('debian', get_version_fn)
+
+    def get_codename(self):
+        if self.is_os():
+            v = self.get_version()
+            if v.startswith('7.'):
+                return 'wheezy'
+            if v.startswith('8.'):
+                return 'jessie'
+            return ''
+
 
 class FdoDetect(OsDetector):
     """
@@ -616,7 +632,7 @@ OS_WINDOWS='windows'
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_CENTOS, Centos())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
-OsDetect.register_default(OS_DEBIAN, LsbDetect("debian"))
+OsDetect.register_default(OS_DEBIAN, Debian())
 OsDetect.register_default(OS_ELEMENTARY, LsbDetect('elementary OS'))
 OsDetect.register_default(OS_FEDORA, FdoDetect("fedora"))
 OsDetect.register_default(OS_FREEBSD, FreeBSD())
