@@ -47,9 +47,9 @@ project = u'ROS packages'
 copyright = u'2011, Willow Garage'
 
 intersphinx_mapping = {
-    'vcstools': ('http://ros.org/doc/api/vcstools/html', None),
-    'rosinstall': ('http://ros.org/doc/api/rosinstall/html', None),
-    'rosdep2': ('http://ros.org/doc/api/rosdep2/html', None),
+    'vcstools': ('http://docs.ros.org/independent/api/vcstools/html', None),
+    'rosinstall': ('http://docs.ros.org/independent/api/rosinstall/html', None),
+    'rosdep2': ('http://docs.ros.org/independent/api/rosdep/html', None),
     }
 
 # The version info for the project you're documenting, acts as replacement for
