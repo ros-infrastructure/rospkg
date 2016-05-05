@@ -75,7 +75,7 @@ if len(sys.argv) == 2:
         else:
             distro_name = get_distro_name_from_roscore()
         if not distro_name:
-            print('<unknown>')
+            print('Debian')
         else:
             print(distro_name)
         sys.exit(0)
