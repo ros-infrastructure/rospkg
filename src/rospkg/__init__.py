@@ -38,7 +38,8 @@ from ._version import __version__
 
 from .common import MANIFEST_FILE, STACK_FILE, ResourceNotFound
 from .environment import get_ros_root, get_ros_package_path, get_ros_home, \
-     get_log_dir, get_test_results_dir, on_ros_path, get_ros_paths, get_etc_ros_dir
+     get_log_dir, get_test_results_dir, on_ros_path, get_ros_paths, get_etc_ros_dir, \
+     get_sros_home, get_sros_keystore_path, get_sros_config_dir
 from .manifest import parse_manifest_file, Manifest, InvalidManifest
 from .rospack import RosPack, RosStack, \
      list_by_path, expand_to_packages, get_stack_version_by_dir, \
@@ -52,5 +53,6 @@ __all__ = ['MANIFEST_FILE', 'STACK_FILE', 'ResourceNotFound',
         'RosPack', 'RosStack', 
         'list_by_path', 'expand_to_packages', 'get_stack_version_by_dir',
         'get_package_name',
+        'get_sros_home', 'get_sros_keystore_path', 'get_sros_config_dir'
         ]
 
