@@ -49,7 +49,7 @@ def get_distro_name_from_roscore():
     # there's some chance that the location of this file changes in the future
     try:
         roslaunch_dir = rospack.get_path('roslaunch')
-        roscore_file = os.path.join(roslaunch_dir, 'roscore.xml')
+        roscore_file = os.path.join(roslaunch_dir, 'resources', 'roscore.xml')
         if not os.path.exists(roscore_file):
             return None
     except:
