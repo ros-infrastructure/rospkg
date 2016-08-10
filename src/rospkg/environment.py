@@ -116,7 +116,7 @@ def get_ros_home(env=None):
     Get directory location of '.ros' directory (aka ROS home).
     possible locations for this. The :envvar:`ROS_HOME` environment
     variable has priority. If :envvar:`ROS_HOME` is not set,
-    ``$HOME/.ros/log`` is used.
+    ``$HOME/.ros`` is used.
 
     :param env: override ``os.environ`` dictionary, ``dict``
     :returns: path to use use for log file directory, ``str``
