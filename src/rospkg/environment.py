@@ -42,6 +42,7 @@ import os
 ROS_ROOT         = "ROS_ROOT"
 ROS_PACKAGE_PATH = "ROS_PACKAGE_PATH"
 ROS_HOME         = "ROS_HOME"
+SROS_HOME        = "SROS_HOME"
 
 # override directory path to /etc/ros
 ROS_ETC_DIR      = "ROS_ETC_DIR"
@@ -50,6 +51,10 @@ ROS_ETC_DIR      = "ROS_ETC_DIR"
 ROS_LOG_DIR      ="ROS_LOG_DIR"
 ## directory in which test result files are written
 ROS_TEST_RESULTS_DIR = "ROS_TEST_RESULTS_DIR"
+## path in which sros keystore is located
+SROS_KEYSTORE_PATH = "SROS_KEYSTORE_PATH"
+## directory in which sros config files are kept
+SROS_CONFIG_DIR = "SROS_CONFIG_DIR"
 
 # Utilities
 def _resolve_path(p):
@@ -116,7 +121,7 @@ def get_ros_home(env=None):
     Get directory location of '.ros' directory (aka ROS home).
     possible locations for this. The :envvar:`ROS_HOME` environment
     variable has priority. If :envvar:`ROS_HOME` is not set,
-    ``$HOME/.ros/log`` is used.
+    ``$HOME/.ros`` is used.
 
     :param env: override ``os.environ`` dictionary, ``dict``
     :returns: path to use use for log file directory, ``str``
@@ -128,7 +133,24 @@ def get_ros_home(env=None):
     else:
         #slightly more robust than $HOME
         return os.path.join(os.path.expanduser('~'), '.ros')
-    
+
+def get_sros_home(env=None):
+    """
+    Get directory location of 'sros' directory (aka SROS home).
+    possible locations for this. The :envvar:`SROS_HOME` environment
+    variable has priority. If :envvar:`SROS_HOME` is not set,
+    ``$ROS_HOME/sros`` is used.
+
+    :param env: override ``os.environ`` dictionary, ``dict``
+    :returns: path to use use for log file directory, ``str``
+    """
+    if env is None:
+        env = os.environ
+    if SROS_HOME in env:
+        return env[SROS_HOME]
+    else:
+        return os.path.join(get_ros_home(env), 'sros')
+
 def get_log_dir(env=None):
     """
     Get directory to use for writing log files. There are multiple
@@ -214,4 +236,35 @@ def get_etc_ros_dir(env=None):
         return env[ROS_ETC_DIR]
     else:
         return '/etc/ros'
-    
+
+def get_sros_keystore_path(env=None):
+    """
+    Get path to use for keystore. There are multiple
+    possible locations for this. The SROS_KEYSTORE_PATH environment variable
+    has priority. If that is not set, then SROS_HOME/keystore is used
+
+    :param env: override os.environ dictionary, ``dict``
+    :returns: path to use use for log file directory, ``str``
+    """
+    if env is None:
+        env = os.environ
+    if SROS_KEYSTORE_PATH in env:
+        return env[SROS_KEYSTORE_PATH]
+    else:
+        return os.path.join(get_sros_home(env), 'keystore')
+
+def get_sros_config_dir(env=None):
+    """
+    Get directory to use for sros config log files. There are multiple
+    possible locations for this. The SROS_CONFIG_DIR environment variable
+    has priority. If that is not set, then SROS_HOME/config is used.
+
+    :param env: override os.environ dictionary, ``dict``
+    :returns: path to use use for log file directory, ``str``
+    """
+    if env is None:
+        env = os.environ
+    if SROS_CONFIG_DIR in env:
+        return env[SROS_CONFIG_DIR]
+    else:
+        return os.path.join(get_sros_home(env), 'config')
