@@ -39,10 +39,10 @@ import os
 # Enviroment Variables
 
 # Global, usually set in setup
-ROS_ROOT            = "ROS_ROOT"
-ROS_PACKAGE_PATH    = "ROS_PACKAGE_PATH"
-ROS_HOME            = "ROS_HOME"
-ROS_RPP_NO_DEFAULTS = "ROS_RPP_NO_DEFAULTS"
+ROS_ROOT                     = "ROS_ROOT"
+ROS_PACKAGE_PATH             = "ROS_PACKAGE_PATH"
+ROS_HOME                     = "ROS_HOME"
+ROS_PACKAGE_PATH_NO_DEFAULTS = "ROS_PACKAGE_PATH_NO_DEFAULTS"
 
 # override directory path to /etc/ros
 ROS_ETC_DIR      = "ROS_ETC_DIR"
@@ -111,7 +111,7 @@ def get_ros_package_path(env=None):
     if env is None:
         env = os.environ
 
-    if ROS_RPP_NO_DEFAULTS in env:
+    if ROS_PACKAGE_PATH_NO_DEFAULTS in env:
         return env.get(ROS_PACKAGE_PATH, None)
 
     if ROS_PACKAGE_PATH in env and env.get(ROS_PACKAGE_PATH):

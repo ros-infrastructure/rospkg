@@ -57,7 +57,7 @@ def test_get_ros_package_path():
     assert '/usr/share' == get_ros_package_path(env={})
     env = {'ROS_PACKAGE_PATH': ':'}
     assert '::/usr/share' == get_ros_package_path(env=env)
-    env = {'ROS_PACKAGE_PATH': ':', 'ROS_RPP_NO_DEFAULTS': 'True'}
+    env = {'ROS_PACKAGE_PATH': ':', 'ROS_PACKAGE_PATH_NO_DEFAULTS': 'True'}
     assert ':' == get_ros_package_path(env=env)
 
     # trip-wire tests. Cannot guarantee that ROS_PACKAGE_PATH is set
