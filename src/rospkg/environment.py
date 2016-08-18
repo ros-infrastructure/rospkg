@@ -52,6 +52,9 @@ ROS_LOG_DIR      ="ROS_LOG_DIR"
 ## directory in which test result files are written
 ROS_TEST_RESULTS_DIR = "ROS_TEST_RESULTS_DIR"
 
+# FHS 4.11 package path
+ROS_SYSTEM_PACKAGE_PATH = "/usr/share"
+
 # Utilities
 def _resolve_path(p):
     """
@@ -115,9 +118,9 @@ def get_ros_package_path(env=None):
         return env.get(ROS_PACKAGE_PATH, None)
 
     if ROS_PACKAGE_PATH in env and env.get(ROS_PACKAGE_PATH):
-        return env.get(ROS_PACKAGE_PATH) + ':/usr/share'
+        return env.get(ROS_PACKAGE_PATH) + ':' + ROS_SYSTEM_PACKAGE_PATH
 
-    return '/usr/share'
+    return ROS_SYSTEM_PACKAGE_PATH
 
 def get_ros_home(env=None):
     """
