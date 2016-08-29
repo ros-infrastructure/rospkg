@@ -409,6 +409,35 @@ def test_redhat():
             pass
 
 
+def test_tripwire_slackware():
+    from rospkg.os_detect import OsDetect
+    os_detect = OsDetect()
+    os_detect.get_detector('slackware')
+
+
+def test_slackware():
+    from rospkg.os_detect import Slackware, OsNotDetected
+    test_dir = os.path.join(get_test_dir(), 'slackware')
+    detect = Slackware(os.path.join(test_dir, "slackware-version"))
+    assert detect.is_os()
+    assert detect.get_version() == '14.2'
+    assert detect.get_codename() == ''
+
+    # test freely
+    detect = Slackware()
+    if not detect.is_os():
+        try:
+            detect.get_version()
+            assert False
+        except OsNotDetected:
+            pass
+        try:
+            detect.get_codename()
+            assert False
+        except OsNotDetected:
+            pass
+
+
 def test_tripwire_freebsd():
     from rospkg.os_detect import OsDetect
     os_detect = OsDetect()

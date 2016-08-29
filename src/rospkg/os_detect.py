@@ -485,6 +485,27 @@ class FreeBSD(OsDetector):
             return ''
         raise OsNotDetected('called in incorrect OS')        
 
+class Slackware(OsDetector):
+    """
+    Detect SlackWare Linux.
+    """
+    def __init__(self, release_file='/etc/slackware-version'):
+        self._release_file = release_file
+
+    def is_os(self):
+        return os.path.exists(self._release_file)
+
+    def get_version(self):
+        if self.is_os():
+            os_list = read_issue(self._release_file)
+            return os_list[1]
+        raise OsNotDetected('called in incorrect OS')        
+
+    def get_codename(self):
+        if self.is_os():
+            return ''
+        raise OsNotDetected('called in incorrect OS') 
+
 class Windows(OsDetector):
     """
     Detect Windows OS.
@@ -626,6 +647,7 @@ OS_OPENSUSE13='opensuse'
 OS_OSX='osx'
 OS_QNX='qnx'
 OS_RHEL='rhel'
+OS_SLACKWARE='slackware'
 OS_UBUNTU='ubuntu'
 OS_WINDOWS='windows'
 
@@ -645,6 +667,7 @@ OsDetect.register_default(OS_OPENSUSE13, OpenSuse(brand_file='/etc/SUSE-brand'))
 OsDetect.register_default(OS_OSX, OSX())
 OsDetect.register_default(OS_QNX, QNX())
 OsDetect.register_default(OS_RHEL, Rhel())
+OsDetect.register_default(OS_SLACKWARE, Slackware())
 OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
 OsDetect.register_default(OS_WINDOWS, Windows())
 

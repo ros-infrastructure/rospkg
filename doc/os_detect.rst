@@ -27,6 +27,7 @@ Currently supported OSes:
 - Mint
 - OS X
 - Red Hat Linux
+- Slackware 
 - Ubuntu
 
 
@@ -139,6 +140,10 @@ OS name definitions
 .. data:: OS_RHEL
 
    Name used for Red Hat Enterprise Linux.
+
+.. data:: OS_SLACKWARE
+
+   Name used for Slackware.
 
 .. data:: OS_UBUNTU
 
