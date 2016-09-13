@@ -53,7 +53,7 @@ ROS_LOG_DIR      ="ROS_LOG_DIR"
 ROS_TEST_RESULTS_DIR = "ROS_TEST_RESULTS_DIR"
 
 # FHS 4.11 package path
-ROS_SYSTEM_PACKAGE_PATH = "/usr/share"
+ROS_SYSTEM_PACKAGE_PATH = "/usr/local/share:/usr/share"
 
 # Utilities
 def _resolve_path(p):
