@@ -642,6 +642,7 @@ OS_FUNTOO='funtoo'
 OS_GENTOO='gentoo'
 OS_LINARO='linaro'
 OS_MINT='mint'
+OS_NEON='neon'
 OS_OPENSUSE='opensuse'
 OS_OPENSUSE13='opensuse'
 OS_OSX='osx'
@@ -662,6 +663,7 @@ OsDetect.register_default(OS_FUNTOO, Funtoo())
 OsDetect.register_default(OS_GENTOO, Gentoo())
 OsDetect.register_default(OS_LINARO, LsbDetect("Linaro"))
 OsDetect.register_default(OS_MINT, LsbDetect("LinuxMint"))
+OsDetect.register_default(OS_NEON, LsbDetect("neon"))
 OsDetect.register_default(OS_OPENSUSE, OpenSuse())
 OsDetect.register_default(OS_OPENSUSE13, OpenSuse(brand_file='/etc/SUSE-brand'))
 OsDetect.register_default(OS_OSX, OSX())
