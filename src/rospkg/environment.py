@@ -39,9 +39,10 @@ import os
 # Enviroment Variables
 
 # Global, usually set in setup
-ROS_ROOT         = "ROS_ROOT"
-ROS_PACKAGE_PATH = "ROS_PACKAGE_PATH"
-ROS_HOME         = "ROS_HOME"
+ROS_ROOT                     = "ROS_ROOT"
+ROS_PACKAGE_PATH             = "ROS_PACKAGE_PATH"
+ROS_HOME                     = "ROS_HOME"
+ROS_PACKAGE_PATH_NO_DEFAULTS = "ROS_PACKAGE_PATH_NO_DEFAULTS"
 
 # override directory path to /etc/ros
 ROS_ETC_DIR      = "ROS_ETC_DIR"
@@ -50,6 +51,9 @@ ROS_ETC_DIR      = "ROS_ETC_DIR"
 ROS_LOG_DIR      ="ROS_LOG_DIR"
 ## directory in which test result files are written
 ROS_TEST_RESULTS_DIR = "ROS_TEST_RESULTS_DIR"
+
+# FHS 4.11 package path
+ROS_SYSTEM_PACKAGE_PATH = "/usr/local/share:/usr/share"
 
 # Utilities
 def _resolve_path(p):
@@ -109,7 +113,14 @@ def get_ros_package_path(env=None):
     """
     if env is None:
         env = os.environ
-    return env.get(ROS_PACKAGE_PATH, None)
+
+    if ROS_PACKAGE_PATH_NO_DEFAULTS in env:
+        return env.get(ROS_PACKAGE_PATH, None)
+
+    if ROS_PACKAGE_PATH in env and env.get(ROS_PACKAGE_PATH):
+        return env.get(ROS_PACKAGE_PATH) + ':' + ROS_SYSTEM_PACKAGE_PATH
+
+    return ROS_SYSTEM_PACKAGE_PATH
 
 def get_ros_home(env=None):
     """

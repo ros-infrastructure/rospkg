@@ -54,13 +54,15 @@ def test_get_ros_root():
     
 def test_get_ros_package_path():
     from rospkg import get_ros_package_path
-    assert None == get_ros_package_path(env={})
+    assert '/usr/local/share:/usr/share' == get_ros_package_path(env={})
     env = {'ROS_PACKAGE_PATH': ':'}
+    assert '::/usr/local/share:/usr/share' == get_ros_package_path(env=env)
+    env = {'ROS_PACKAGE_PATH': ':', 'ROS_PACKAGE_PATH_NO_DEFAULTS': 'True'}
     assert ':' == get_ros_package_path(env=env)
 
     # trip-wire tests. Cannot guarantee that ROS_PACKAGE_PATH is set
     # to valid value on test machine, just make sure logic doesn't crash
-    assert os.environ.get('ROS_PACKAGE_PATH', None) == get_ros_package_path()
+    assert os.environ.get('ROS_PACKAGE_PATH', '/usr/local/share:/usr/share') == get_ros_package_path()
 
 def test_get_log_dir():
     from rospkg import get_log_dir, get_ros_root

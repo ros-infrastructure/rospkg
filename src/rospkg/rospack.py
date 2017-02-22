@@ -35,7 +35,7 @@ from threading import Lock
 from xml.etree.cElementTree import ElementTree
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, STACK_FILE, ResourceNotFound
-from .environment import get_ros_paths
+from .environment import get_ros_paths, ROS_SYSTEM_PACKAGE_PATH
 from .manifest import parse_manifest_file, InvalidManifest
 from .stack import parse_stack_file, InvalidStack
 
@@ -89,7 +89,7 @@ def list_by_path(manifest_name, path, cache):
             # optimization for stacks.
             del dirs[:]
             continue #leaf     
-        elif 'rospack_nosubdirs' in files:
+        elif 'rospack_nosubdirs' in files or d.startswith(ROS_SYSTEM_PACKAGE_PATH):
             del dirs[:]
             continue  #leaf
         # remove hidden dirs (esp. .svn/.git)
