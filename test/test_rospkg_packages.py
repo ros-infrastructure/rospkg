@@ -33,13 +33,13 @@
 from __future__ import print_function
 
 import os
-import sys
-import time
 import subprocess
 import tempfile
-  
+
+
 def get_package_test_path():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), 'package_tests'))
+
 
 def test_ManifestManager_constructor():
     from rospkg import RosPack, RosStack, get_ros_paths
@@ -58,7 +58,8 @@ def test_ManifestManager_constructor():
         assert r.ros_paths == [tmp]
         # make sure we can't accidentally mutate the actual data
         r.ros_paths.append('foo')
-        assert r.ros_paths == [tmp]        
+        assert r.ros_paths == [tmp]
+
 
 def test_ManifestManager_get_instance():
     from rospkg import RosPack, RosStack, get_ros_paths
@@ -80,39 +81,54 @@ def test_ManifestManager_get_instance():
         # make sure for different ros_paths we got different instances
         assert r1 is not r3
 
+
 def rospackexec(args):
     rospack_bin = 'rospack'
     val = (subprocess.Popen([rospack_bin] + args, stdout=subprocess.PIPE, stderr=subprocess.PIPE).communicate()[0] or '').strip()
-    if val.startswith('rospack:'): #rospack error message
+    if val.startswith('rospack:'):  # rospack error message
         raise Exception(val)
     return val
+
 
 # for comparing against 'ground truth'
 def rospack_list():
     return [s.strip() for s in rospackexec(['list-names']).split('\n') if s.strip()]
+
+
 def rospack_find(package):
     return rospackexec(['find', package]).strip()
+
+
 def rospack_depends(package):
     return unicode(rospackexec(['depends', package])).split()
+
+
 def rospack_depends1(package):
     return unicode(rospackexec(['depends1', package])).split()
+
+
 def rospack_depends_on(package):
     return unicode(rospackexec(['depends-on', package])).split()
+
+
 def rospack_depends_on1(package):
     return unicode(rospackexec(['depends-on1', package])).split()
+
 
 def delete_cache():
     from rospkg import get_ros_home
     p = os.path.join(get_ros_home(), 'rospack_cache')
     if os.path.exists(p):
         os.remove(p)
-    
+
+
 def rospack_is_available():
     try:
         rospackexec(['-h'])
         return True
     except:
         return False
+
 
 def test_RosPack_list():
     from rospkg import RosPack, get_ros_root
@@ -121,17 +137,18 @@ def test_RosPack_list():
 
         pkgs = rospack_list()
         retval = r.list()
-        assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
+        assert set(pkgs) == set(retval), "%s vs %s" % (pkgs, retval)
 
         # test twice for caching
         retval = r.list()
-        assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
+        assert set(pkgs) == set(retval), "%s vs %s" % (pkgs, retval)
 
         # make sure stress test works with rospack_cache invalidated
         delete_cache()
         r = RosPack()
         retval = r.list()
-        assert set(pkgs) == set(retval), "%s vs %s"%(pkgs, retval)
+        assert set(pkgs) == set(retval), "%s vs %s" % (pkgs, retval)
+
 
 def test_RosPack_no_env():
     # regression test for #3680
@@ -150,8 +167,8 @@ def test_RosPack_no_env():
             pass
     finally:
         os.environ = environ_copy
-    
-    
+
+
 def test_RosPack_get_path():
     from rospkg import RosPack, ResourceNotFound, get_ros_root
 
@@ -160,9 +177,9 @@ def test_RosPack_get_path():
     foo_path_alt = os.path.join(path, 'p2', 'foo')
     bar_path = os.path.join(path, 'p1', 'bar')
     baz_path = os.path.join(path, 'p2', 'baz')
-    
+
     # point ROS_ROOT at top, should spider entire tree
-    print("ROS path: %s"%(path))
+    print("ROS path: %s" % (path))
     r = RosPack(ros_paths=[path])
     # precedence in this case is undefined as there are two 'foo's in the same path
     assert r.get_path('foo') in [foo_path, foo_path_alt]
@@ -173,12 +190,12 @@ def test_RosPack_get_path():
         assert False
     except ResourceNotFound:
         pass
-    
+
     # divide tree in half to test precedence
-    print("ROS_PATH 1: %s"%(os.path.join(path, 'p1')))
-    print("ROS_PATH 2: %s"%(os.path.join(path, 'p2')))
+    print("ROS_PATH 1: %s" % (os.path.join(path, 'p1')))
+    print("ROS_PATH 2: %s" % (os.path.join(path, 'p2')))
     r = RosPack(ros_paths=[os.path.join(path, 'p1'), os.path.join(path, 'p2')])
-    assert foo_path == r.get_path('foo'), "%s vs. %s"%(foo_path, r.get_path('foo'))
+    assert foo_path == r.get_path('foo'), "%s vs. %s" % (foo_path, r.get_path('foo'))
     assert bar_path == r.get_path('bar')
     assert baz_path == r.get_path('baz')
 
@@ -188,7 +205,8 @@ def test_RosPack_get_path():
         for p in rospack_list():
             retval = r.get_path(p)
             rospackval = rospack_find(p)
-            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+            assert retval == rospackval, "[%s]: %s vs. %s" % (p, retval, rospackval)
+
 
 def test_RosPackage_get_depends():
     from rospkg import RosPack, ResourceNotFound, get_ros_root
@@ -216,10 +234,12 @@ def test_RosPackage_get_depends():
         for p in rospack_list():
             retval = set(r.get_depends(p))
             rospackval = set(rospack_depends(p))
-            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
-    
+            assert retval == rospackval, "[%s]: %s vs. %s" % (p, retval, rospackval)
+
+
 def get_stack_test_path():
     return os.path.abspath(os.path.join(os.path.dirname(__file__), 'stack_tests'))
+
 
 def test_stack_of():
     from rospkg import RosPack, ResourceNotFound
@@ -228,7 +248,7 @@ def test_stack_of():
 
     # test with actual stacks
     assert r.stack_of('foo_pkg') == 'foo'
-    assert r.stack_of('foo_pkg_2') == 'foo'    
+    assert r.stack_of('foo_pkg_2') == 'foo'
     assert r.stack_of('bar_pkg') == 'bar'
 
     try:
@@ -236,19 +256,20 @@ def test_stack_of():
         assert False, "should have raised ResourceNotFound"
     except ResourceNotFound:
         pass
-    
+
     path = os.path.join(get_package_test_path(), 'p1')
     r = RosPack(ros_paths=[path])
 
     # test with actual not stacked-packages
-    assert r.stack_of('foo') == None
+    assert r.stack_of('foo') is None
+
 
 def test_RosPackage_get_depends_explicit():
     from rospkg import RosPack, get_ros_root
     path = get_package_test_path()
     r = RosPack(ros_paths=[path])
 
-    implicit=False
+    implicit = False
     assert set(r.get_depends('baz', implicit)) == set(['bar', 'foo'])
     assert r.get_depends('bar', implicit) == ['foo']
     assert r.get_depends('foo', implicit) == []
@@ -259,7 +280,8 @@ def test_RosPackage_get_depends_explicit():
         for p in rospack_list():
             retval = set(r.get_depends(p, implicit))
             rospackval = set(rospack_depends1(p))
-            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+            assert retval == rospackval, "[%s]: %s vs. %s" % (p, retval, rospackval)
+
 
 def test_RosPack_get_rosdeps():
     from rospkg import RosPack
@@ -271,20 +293,20 @@ def test_RosPack_get_rosdeps():
     assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3']) == set(r.get_rosdeps('foo', implicit=True)), r.get_rosdeps('foo', implicit=True)
     assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3']) == set(r.get_rosdeps('foo', implicit=True))
     assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3']) == set(r.get_rosdeps('foo', implicit=False))
-    
+
     assert set(['bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('bar', implicit=False))
     assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('bar', implicit=True))
     assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('bar', implicit=True))
     assert set(['foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('bar'))
 
     assert ['baz_rosdep1'] == r.get_rosdeps('baz', implicit=False)
-    assert set(['baz_rosdep1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))    
+    assert set(['baz_rosdep1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))
     assert set(['baz_rosdep1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))
 
     # create a brand new instance to test with brand new cache
     r = RosPack(ros_paths=[os.path.join(path, 'p1'), os.path.join(path, 'p2')])
     assert set(['baz_rosdep1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))
-    assert set(['baz_rosdep1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))    
+    assert set(['baz_rosdep1', 'foo_rosdep1', 'foo_rosdep2', 'foo_rosdep3', 'bar_rosdep1', 'bar_rosdep2']) == set(r.get_rosdeps('baz'))
 
 
 def test_get_package_name():
@@ -299,8 +321,8 @@ def test_get_package_name():
     assert 'foo' == get_package_name(test_dir_foo)
 
     # test with path outside of our hierarchy
-    assert None == get_package_name(tempfile.tempdir)
-    
+    assert get_package_name(tempfile.tempdir) is None
+
 
 def test_get_depends_on():
     from rospkg import RosPack, get_ros_root
@@ -319,7 +341,7 @@ def test_get_depends_on():
     assert set(['bar', 'baz']) == set(val), val
     val = rp.get_depends_on('bar', implicit=True)
     assert ['baz'] == val, val
-    val = rp.get_depends_on('baz', implicit=True) 
+    val = rp.get_depends_on('baz', implicit=True)
     assert [] == val, val
 
     if get_ros_root() and rospack_is_available():
@@ -328,8 +350,8 @@ def test_get_depends_on():
         for p in rospack_list():
             retval = set(r.get_depends_on(p, False))
             rospackval = set(rospack_depends_on1(p))
-            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+            assert retval == rospackval, "[%s]: %s vs. %s" % (p, retval, rospackval)
         for p in rospack_list():
             retval = set(r.get_depends_on(p, True))
             rospackval = set(rospack_depends_on(p))
-            assert retval == rospackval, "[%s]: %s vs. %s"%(p, retval, rospackval)
+            assert retval == rospackval, "[%s]: %s vs. %s" % (p, retval, rospackval)

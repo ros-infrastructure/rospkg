@@ -39,20 +39,23 @@ import os
 import xml.dom.minidom as dom
 
 # as defined on http://ros.org/doc/fuerte/api/catkin/html/stack_xml.html
-REQUIRED = [ 'name', 'version', 'description', 'author', 'maintainer', 'license', 'copyright' ]
-ALLOWXHTML = [ 'description' ]
-OPTIONAL = [ 'description_brief', 'version_abi', 'url', 'review_notes', 'review_status', 'build_depends', 'depends', 'build_type', 'message_generator', 'review' ]
+REQUIRED = ['name', 'version', 'description', 'author', 'maintainer', 'license', 'copyright']
+ALLOWXHTML = ['description']
+OPTIONAL = ['description_brief', 'version_abi', 'url', 'review_notes', 'review_status', 'build_depends', 'depends', 'build_type', 'message_generator', 'review']
 
-LISTED_ATTRIBUTES = { 'Author': ['name', 'email'], 'Maintainer': ['name', 'email'], 'Depend': ['name', 'version']}
+LISTED_ATTRIBUTES = {'Author': ['name', 'email'], 'Maintainer': ['name', 'email'], 'Depend': ['name', 'version']}
 
 VALID = REQUIRED + OPTIONAL
+
 
 class InvalidStack(Exception):
     pass
 
+
 def _get_nodes_by_name(n, name):
     return [t for t in n.childNodes if t.nodeType == t.ELEMENT_NODE and t.tagName == name]
-    
+
+
 def _check_optional(name, allowXHTML=False):
     """
     Validator for optional elements.
@@ -69,6 +72,7 @@ def _check_optional(name, allowXHTML=False):
             return _get_text(n[0].childNodes).strip()
     return check
 
+
 def _check_required(name, allowXHTML=False):
     """
     Validator for required elements.
@@ -84,6 +88,7 @@ def _check_required(name, allowXHTML=False):
         return _get_text(n[0].childNodes).strip()
     return check
 
+
 def _check_depends(n, key, filename):
     """
     Validator for stack.xml depends.
@@ -91,6 +96,7 @@ def _check_depends(n, key, filename):
     """
     nodes = _get_nodes_by_name(n, key)
     return set([_get_text(n.childNodes).strip() for n in nodes])
+
 
 def _build_listed_attributes(n, key, object_type):
     """
@@ -110,11 +116,13 @@ def _build_listed_attributes(n, key, object_type):
         members.add(object_type(**attribute_dict))
     return members
 
+
 def _attrs(node):
     attrs = {}
-    for k in node.attributes.keys(): 
+    for k in node.attributes.keys():
         attrs[k] = node.attributes.get(k).value
     return attrs
+
 
 def _check(name):
     """
@@ -125,14 +133,16 @@ def _check(name):
     elif name in OPTIONAL:
         return _check_optional(name, name in ALLOWXHTML)
 
+
 class Stack(object):
     """
     Object representation of a ROS ``stack.xml`` file
     """
-    __slots__ = [ 'name', 'version', 'description', 'authors', 'maintainers', 'license', 'copyright',
-                'description_brief', 'version_abi', 'url', 'review_notes', 'review_status', 'build_depends',
-                'depends', 'build_type', 'build_type_file', 'message_generator',
-                'unknown_tags' ]
+    __slots__ = [
+        'name', 'version', 'description', 'authors', 'maintainers', 'license', 'copyright',
+        'description_brief', 'version_abi', 'url', 'review_notes', 'review_status',
+        'build_depends', 'depends', 'build_type', 'build_type_file', 'message_generator',
+        'unknown_tags']
 
     def __init__(self, filename=None):
         """
@@ -140,8 +150,8 @@ class Stack(object):
           converting ``${prefix}`` in ``<export>`` values, ``str``.
         """
         self.description = self.description_brief = self.name = \
-                           self.version = self.version_abi = \
-                           self.license = self.copyright = ''
+            self.version = self.version_abi = \
+            self.license = self.copyright = ''
         self.url = ''
         self.authors = []
         self.maintainers = []
@@ -155,16 +165,18 @@ class Stack(object):
         # store unrecognized tags during parsing
         self.unknown_tags = []
 
+
 def _get_text(nodes):
     """
     DOM utility routine for getting contents of text nodes
     """
     return "".join([n.data for n in nodes if n.nodeType == n.TEXT_NODE])
 
+
 def parse_stack_file(stack_path):
     """
     Parse stack file.
-    
+
     :param stack_path: The path of the stack.xml file
 
     :returns: return :class:`Stack` instance, populated with parsed fields
@@ -172,10 +184,11 @@ def parse_stack_file(stack_path):
     :raises: :exc:`IOError`
     """
     if not os.path.isfile(stack_path):
-        raise IOError("Invalid/non-existent stack.xml file: %s"%(stack_path))
+        raise IOError("Invalid/non-existent stack.xml file: %s" % (stack_path))
 
     with open(stack_path, 'r') as f:
         return parse_stack(f.read(), stack_path)
+
 
 def parse_stack(string, filename):
     """
@@ -193,15 +206,17 @@ def parse_stack(string, filename):
     try:
         d = dom.parseString(string)
     except Exception as e:
-        raise InvalidStack("[%s] invalid XML: %s"%(filename, e))
+        raise InvalidStack("[%s] invalid XML: %s" % (filename, e))
 
     s = Stack()
     p = _get_nodes_by_name(d, 'stack')
     if len(p) != 1:
-        raise InvalidStack("stack.xml [%s] must have a single 'stack' element"%(filename))
+        raise InvalidStack("stack.xml [%s] must have a single 'stack' element" % (filename))
     p = p[0]
-    for attr in [ 'name', 'version', 'description',
-                    'license', 'copyright', 'url', 'build_type', 'message_generator' ]:
+    for attr in [
+        'name', 'version', 'description',
+        'license', 'copyright', 'url', 'build_type', 'message_generator'
+    ]:
         val = _check(attr)(p, filename)
         if val:
             setattr(s, attr, val)
@@ -222,22 +237,22 @@ def parse_stack(string, filename):
         tag = _get_nodes_by_name(p, 'review')[0]
         s.review_status = tag.getAttribute('status') or ''
     except:
-        pass #stack.xml is missing optional 'review status' tag
+        pass  # stack.xml is missing optional 'review status' tag
 
     try:
         tag = _get_nodes_by_name(p, 'review')[0]
         s.review_notes = tag.getAttribute('notes') or ''
     except:
-        pass #stack.xml is missing optional 'review notes' tag
+        pass  # stack.xml is missing optional 'review notes' tag
 
     try:
         tag = _get_nodes_by_name(p, 'build_type')[0]
         s.build_type_file = tag.getAttribute('file') or ''
     except:
-        pass #stack.xml is missing optional 'build_type file' tag
+        pass  # stack.xml is missing optional 'build_type file' tag
 
     # store unrecognized tags
     s.unknown_tags = [e.nodeName for e in p.childNodes if e.nodeType == e.ELEMENT_NODE and e.tagName not in VALID]
     if s.unknown_tags:
-        raise InvalidStack("stack.xml [%s] must be cleaned up from %s"%(filename, str(s.unknown_tags)))
+        raise InvalidStack("stack.xml [%s] must be cleaned up from %s" % (filename, str(s.unknown_tags)))
     return s

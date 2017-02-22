@@ -1,10 +1,10 @@
 #!/usr/bin/env python
 # Copyright (c) 2009, Willow Garage, Inc.
 # All rights reserved.
-# 
+#
 # Redistribution and use in source and binary forms, with or without
 # modification, are permitted provided that the following conditions are met:
-# 
+#
 #     * Redistributions of source code must retain the above copyright
 #       notice, this list of conditions and the following disclaimer.
 #     * Redistributions in binary form must reproduce the above copyright
@@ -13,7 +13,7 @@
 #     * Neither the name of the Willow Garage, Inc. nor the names of its
 #       contributors may be used to endorse or promote products derived from
 #       this software without specific prior written permission.
-# 
+#
 # THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
 # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -30,16 +30,17 @@
 
 """
 Library for detecting the current OS, including detecting specific
-Linux distributions. 
+Linux distributions.
 """
 
 from __future__ import print_function
 
-import os
-import subprocess
-import platform
-import locale
 import codecs
+import locale
+import os
+import platform
+import subprocess
+
 
 def _read_stdout(cmd):
     try:
@@ -51,12 +52,14 @@ def _read_stdout(cmd):
         return std_out.decode(encoding='UTF-8').strip()
     except:
         return None
-    
+
+
 def uname_get_machine():
     """
     Linux: wrapper around uname to determine if OS is 64-bit
     """
     return _read_stdout(['uname', '-m'])
+
 
 def read_issue(filename="/etc/issue"):
     """
@@ -66,6 +69,7 @@ def read_issue(filename="/etc/issue"):
         with codecs.open(filename, 'r', encoding=locale.getpreferredencoding()) as f:
             return f.read().split()
     return None
+
 
 def read_os_release(filename="/etc/os-release"):
     """
@@ -80,11 +84,13 @@ def read_os_release(filename="/etc/os-release"):
             return release_info
     return None
 
+
 class OsNotDetected(Exception):
     """
     Exception to indicate failure to detect operating system.
     """
     pass
+
 
 class OsDetector(object):
     """
@@ -119,9 +125,9 @@ class LsbDetect(OsDetector):
     """
     def __init__(self, lsb_name, get_version_fn=None):
         self.lsb_name = lsb_name
-        if hasattr(platform,"linux_distribution"):
+        if hasattr(platform, "linux_distribution"):
             self.lsb_info = platform.linux_distribution(full_distribution_name=0)
-        elif hasattr(platform,"dist"):
+        elif hasattr(platform, "dist"):
             self.lsb_info = platform.dist()
         else:
             self.lsb_info = None
@@ -133,7 +139,7 @@ class LsbDetect(OsDetector):
         if self.is_os():
             return self.lsb_info[1]
         raise OsNotDetected('called in incorrect OS')
-        
+
     def get_codename(self):
         if self.is_os():
             return self.lsb_info[2]
@@ -160,7 +166,7 @@ class FdoDetect(OsDetector):
     Generic detector for operating systems implementing /etc/os-release, as defined by the os-release spec hosted at Freedesktop.org (Fdo):
     http://www.freedesktop.org/software/systemd/man/os-release.html
     Requires that the "ID", and "VERSION_ID" keys are set in the os-release file.
-    
+
     Codename is parsed from the VERSION key if available: either using the format "foo, CODENAME" or "foo (CODENAME)."
     If the VERSION key is not present, the VERSION_ID is value is used as the codename.
     """
@@ -172,7 +178,7 @@ class FdoDetect(OsDetector):
             self.release_info = None
 
     def is_os(self):
-        return self.release_info is not None  and "VERSION_ID" in self.release_info
+        return self.release_info is not None and "VERSION_ID" in self.release_info
 
     def get_version(self):
         if self.is_os():
@@ -185,10 +191,10 @@ class FdoDetect(OsDetector):
                 version = self.release_info["VERSION"]
                 # FDO style: works with Fedora, Debian, Suse.
                 if version.find("(") is not -1:
-                    codename = version[version.find("(")+1 : version.find(")")]
+                    codename = version[version.find("(") + 1:version.find(")")]
                 # Ubuntu style
                 elif version.find(",") is not -1:
-                    codename = version[version.find(",")+1:].lstrip(' ').split()[0]
+                    codename = version[version.find(",") + 1:].lstrip(' ').split()[0]
                 # Indeterminate style
                 else:
                     codename = version
@@ -197,6 +203,7 @@ class FdoDetect(OsDetector):
                 return self.get_version()
         raise OsNotDetected("called in incorrect OS")
 
+
 class OpenSuse(OsDetector):
     """
     Detect OpenSuse OS.
@@ -204,7 +211,7 @@ class OpenSuse(OsDetector):
     def __init__(self, brand_file="/etc/SuSE-brand", release_file="/etc/SuSE-release"):
         self._brand_file = brand_file
         self._release_file = release_file
-        
+
     def is_os(self):
         os_list = read_issue(self._brand_file)
         return os_list and os_list[0] == "openSUSE"
@@ -224,10 +231,11 @@ class OpenSuse(OsDetector):
             with open(self._release_file, 'r') as fh:
                 os_list = fh.read().strip().split('\n')
                 for line in os_list:
-                   kv = line.split(' = ')
-                   if kv[0] == "CODENAME":
-                     return kv[1]
+                    kv = line.split(' = ')
+                    if kv[0] == "CODENAME":
+                        return kv[1]
         raise OsNotDetected('called in incorrect OS')
+
 
 class Fedora(OsDetector):
     """
@@ -236,17 +244,17 @@ class Fedora(OsDetector):
     def __init__(self, release_file="/etc/redhat-release", issue_file="/etc/issue"):
         self._release_file = release_file
         self._issue_file = issue_file
-        
+
     def is_os(self):
         os_list = read_issue(self._release_file)
-        return os_list and os_list[0] == "Fedora" 
+        return os_list and os_list[0] == "Fedora"
 
     def get_version(self):
         if self.is_os():
             os_list = read_issue(self._issue_file)
             idx = os_list.index('release')
             if idx > 0:
-                return os_list[idx+1]
+                return os_list[idx + 1]
         raise OsNotDetected('cannot get version on this OS')
 
     def get_codename(self):
@@ -259,6 +267,7 @@ class Fedora(OsDetector):
                 codename = codename[:-1]
             return codename.lower()
         raise OsNotDetected('called in incorrect OS')
+
 
 class Rhel(Fedora):
     """
@@ -275,7 +284,7 @@ class Rhel(Fedora):
         if self.is_os():
             os_list = read_issue(self._release_file)
             idx = os_list.index('release')
-            return os_list[idx+1]
+            return os_list[idx + 1]
         raise OsNotDetected('called in incorrect OS')
 
     def get_codename(self):
@@ -289,46 +298,51 @@ class Rhel(Fedora):
                 codename = codename[:-1]
             return codename.lower()
         raise OsNotDetected('called in incorrect OS')
-    
+
+
 # Source: http://en.wikipedia.org/wiki/Mac_OS_X#Versions
-_osx_codename_map = {4: 'tiger',
-                     5: 'leopard',
-                     6: 'snow',
-                     7: 'lion',
-                     8: 'mountain lion',
-                     9: 'mavericks',
-                     10: 'yosemite',
-                     11: 'el capitan',
-                     12: 'sierra'}
+_osx_codename_map = {
+    4: 'tiger',
+    5: 'leopard',
+    6: 'snow',
+    7: 'lion',
+    8: 'mountain lion',
+    9: 'mavericks',
+    10: 'yosemite',
+    11: 'el capitan',
+    12: 'sierra'}
+
+
 def _osx_codename(major, minor):
     if major != 10 or minor not in _osx_codename_map:
-        raise OsNotDetected("unrecognized version: %s.%s"%(major, minor))
+        raise OsNotDetected("unrecognized version: %s.%s" % (major, minor))
     return _osx_codename_map[minor]
-    
+
+
 class OSX(OsDetector):
     """
-    Detect OS X 
+    Detect OS X
     """
     def __init__(self, sw_vers_file="/usr/bin/sw_vers"):
         self._sw_vers_file = sw_vers_file
 
     def is_os(self):
         return os.path.exists(self._sw_vers_file)
-    
+
     def get_codename(self):
         if self.is_os():
             version = self.get_version()
-            import distutils.version # To parse version numbers
+            import distutils.version  # To parse version numbers
             try:
                 ver = distutils.version.StrictVersion(version).version
             except ValueError:
-                raise OsNotDetected("invalid version string: %s"%(version))
+                raise OsNotDetected("invalid version string: %s" % (version))
             return _osx_codename(*ver[0:2])
         raise OsNotDetected('called in incorrect OS')
-        
+
     def get_version(self):
         if self.is_os():
-            return _read_stdout([self._sw_vers_file,'-productVersion'])
+            return _read_stdout([self._sw_vers_file, '-productVersion'])
         raise OsNotDetected('called in incorrect OS')
 
 
@@ -376,12 +390,13 @@ class Arch(OsDetector):
     def get_version(self):
         if self.is_os():
             return ""
-        raise OsNotDetected('called in incorrect OS')        
+        raise OsNotDetected('called in incorrect OS')
 
     def get_codename(self):
         if self.is_os():
             return ""
-        raise OsNotDetected('called in incorrect OS')        
+        raise OsNotDetected('called in incorrect OS')
+
 
 class Centos(OsDetector):
     """
@@ -398,7 +413,7 @@ class Centos(OsDetector):
         if self.is_os():
             os_list = read_issue(self._release_file)
             idx = os_list.index('release')
-            return os_list[idx+1]
+            return os_list[idx + 1]
         raise OsNotDetected('called in incorrect OS')
 
     def get_codename(self):
@@ -410,7 +425,8 @@ class Centos(OsDetector):
             if codename[-1] == ')':
                 codename = codename[:-1]
             return codename.lower()
-        raise OsNotDetected('called in incorrect OS')        
+        raise OsNotDetected('called in incorrect OS')
+
 
 class Cygwin(OsDetector):
     """
@@ -418,16 +434,17 @@ class Cygwin(OsDetector):
     """
     def is_os(self):
         return os.path.exists("/usr/bin/cygwin1.dll")
-    
+
     def get_version(self):
         if self.is_os():
-            return _read_stdout(['uname','-r'])
-        raise OsNotDetected('called in incorrect OS')        
+            return _read_stdout(['uname', '-r'])
+        raise OsNotDetected('called in incorrect OS')
 
     def get_codename(self):
         if self.is_os():
             return ''
-        raise OsNotDetected('called in incorrect OS')        
+        raise OsNotDetected('called in incorrect OS')
+
 
 class Gentoo(OsDetector):
     """
@@ -444,12 +461,13 @@ class Gentoo(OsDetector):
         if self.is_os():
             os_list = read_issue(self._release_file)
             return os_list[4]
-        raise OsNotDetected('called in incorrect OS')        
+        raise OsNotDetected('called in incorrect OS')
 
     def get_codename(self):
         if self.is_os():
             return ''
-        raise OsNotDetected('called in incorrect OS')        
+        raise OsNotDetected('called in incorrect OS')
+
 
 class Funtoo(Gentoo):
     """
@@ -460,7 +478,8 @@ class Funtoo(Gentoo):
 
     def is_os(self):
         os_list = read_issue(self._release_file)
-        return os_list and os_list[0] == "Funtoo" and os_list[1] == "Linux" 
+        return os_list and os_list[0] == "Funtoo" and os_list[1] == "Linux"
+
 
 class FreeBSD(OsDetector):
     """
@@ -479,12 +498,13 @@ class FreeBSD(OsDetector):
     def get_version(self):
         if self.is_os() and os.path.exists(self._uname_file):
             return _read_stdout([self._uname_file, "-r"])
-        raise OsNotDetected('called in incorrect OS')        
+        raise OsNotDetected('called in incorrect OS')
 
     def get_codename(self):
         if self.is_os():
             return ''
-        raise OsNotDetected('called in incorrect OS')        
+        raise OsNotDetected('called in incorrect OS')
+
 
 class Slackware(OsDetector):
     """
@@ -500,12 +520,13 @@ class Slackware(OsDetector):
         if self.is_os():
             os_list = read_issue(self._release_file)
             return os_list[1]
-        raise OsNotDetected('called in incorrect OS')        
+        raise OsNotDetected('called in incorrect OS')
 
     def get_codename(self):
         if self.is_os():
             return ''
-        raise OsNotDetected('called in incorrect OS') 
+        raise OsNotDetected('called in incorrect OS')
+
 
 class Windows(OsDetector):
     """
@@ -513,16 +534,17 @@ class Windows(OsDetector):
     """
     def is_os(self):
         return platform.system() == "Windows"
-    
+
     def get_version(self):
         if self.is_os():
             return platform.version()
-        raise OsNotDetected('called in incorrect OS')        
+        raise OsNotDetected('called in incorrect OS')
 
     def get_codename(self):
         if self.is_os():
             return platform.release()
-        raise OsNotDetected('called in incorrect OS')        
+        raise OsNotDetected('called in incorrect OS')
+
 
 class OsDetect:
     """
@@ -531,8 +553,8 @@ class OsDetect:
     """
 
     default_os_list = []
-    
-    def __init__(self, os_list = None):
+
+    def __init__(self, os_list=None):
         if os_list is None:
             os_list = OsDetect.default_os_list
         self._os_list = os_list
@@ -553,12 +575,12 @@ class OsDetect:
         :param os_detector: :class:`OsDetector` instance
         """
         OsDetect.default_os_list.insert(0, (os_name, os_detector))
-        
+
     def detect_os(self, env=None):
         """
         Detect operating system.  Return value can be overridden by
         the :env:`ROS_OS_OVERRIDE` environment variable.
-        
+
         :param env: override ``os.environ``
         :returns: (os_name, os_version, os_codename), ``(str, str, str)``
         :raises: :exc:`OsNotDetected` if OS could not be detected
@@ -575,7 +597,7 @@ class OsDetect:
                 else:
                     self._os_codename = ''
             else:
-                self._os_version = self._os_codename = ''  
+                self._os_version = self._os_codename = ''
             self._override = True
         else:
             for os_name, os_detector in self._os_list:
@@ -587,14 +609,14 @@ class OsDetect:
 
         if self._os_name:
             return self._os_name, self._os_version, self._os_codename
-        else: # No solution found
+        else:  # No solution found
             attempted = [x[0] for x in self._os_list]
-            raise OsNotDetected("Could not detect OS, tried %s"%attempted)
+            raise OsNotDetected("Could not detect OS, tried %s" % attempted)
 
     def get_detector(self, name=None):
         """
         Get detector used for specified OS name, or the detector for this OS if name is ``None``.
-        
+
         :raises: :exc:`KeyError`
         """
         if name is None:
@@ -606,7 +628,7 @@ class OsDetect:
                 return [d for d_name, d in self._os_list if d_name == name][0]
             except IndexError:
                 raise KeyError(name)
-        
+
     def add_detector(self, name, detector):
         """
         Add detector to list of detectors used by this instance.  *detector* will override any previous
@@ -632,26 +654,27 @@ class OsDetect:
             self.detect_os()
         return self._os_codename
 
-OS_ARCH='arch'
-OS_CENTOS='centos'
-OS_CYGWIN='cygwin'
-OS_DEBIAN='debian'
-OS_ELEMENTARY='elementary'
-OS_FEDORA='fedora'
-OS_FREEBSD='freebsd'
-OS_FUNTOO='funtoo'
-OS_GENTOO='gentoo'
-OS_LINARO='linaro'
-OS_MINT='mint'
-OS_NEON='neon'
-OS_OPENSUSE='opensuse'
-OS_OPENSUSE13='opensuse'
-OS_OSX='osx'
-OS_QNX='qnx'
-OS_RHEL='rhel'
-OS_SLACKWARE='slackware'
-OS_UBUNTU='ubuntu'
-OS_WINDOWS='windows'
+
+OS_ARCH = 'arch'
+OS_CENTOS = 'centos'
+OS_CYGWIN = 'cygwin'
+OS_DEBIAN = 'debian'
+OS_ELEMENTARY = 'elementary'
+OS_FEDORA = 'fedora'
+OS_FREEBSD = 'freebsd'
+OS_FUNTOO = 'funtoo'
+OS_GENTOO = 'gentoo'
+OS_LINARO = 'linaro'
+OS_MINT = 'mint'
+OS_NEON = 'neon'
+OS_OPENSUSE = 'opensuse'
+OS_OPENSUSE13 = 'opensuse'
+OS_OSX = 'osx'
+OS_QNX = 'qnx'
+OS_RHEL = 'rhel'
+OS_SLACKWARE = 'slackware'
+OS_UBUNTU = 'ubuntu'
+OS_WINDOWS = 'windows'
 
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_CENTOS, Centos())
@@ -677,6 +700,6 @@ OsDetect.register_default(OS_WINDOWS, Windows())
 
 if __name__ == '__main__':
     detect = OsDetect()
-    print("OS Name:     %s"%detect.get_name())
-    print("OS Version:  %s"%detect.get_version())
-    print("OS Codename: %s"%detect.get_codename())
+    print("OS Name:     %s" % detect.get_name())
+    print("OS Version:  %s" % detect.get_version())
+    print("OS Codename: %s" % detect.get_codename())

@@ -15,7 +15,8 @@
 #       contributors may be used to endorse or promote products derived from
 #       this software without specific prior written permission.
 #
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" # AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
 # IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
 # ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
 # LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
@@ -28,14 +29,15 @@
 
 from __future__ import print_function
 
-USAGE = "Usage: rosversion <package/stack> or rosversion -d"
-
 import os
 import sys
+import traceback
+
 import rospkg
 from rospkg.common import PACKAGE_FILE
 from rospkg.rospack import ManifestManager
-import traceback
+
+USAGE = "Usage: rosversion <package/stack> or rosversion -d"
 
 
 # for < fuerte, retrieve from roscore file

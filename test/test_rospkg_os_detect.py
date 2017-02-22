@@ -31,9 +31,9 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
-import sys
-import unittest
+
 import mock
+from mock import patch
 
 
 class TrueOs():
@@ -72,7 +72,7 @@ class FalseOs(object):
 def test__read_stdout():
     from rospkg.os_detect import _read_stdout
     assert 'hello' == _read_stdout(['echo', 'hello'])
-    assert None == _read_stdout(['bad-command-input-for-rospkg-os-detect'])
+    assert _read_stdout(['bad-command-input-for-rospkg-os-detect']) is None
 
 
 def test_tripwire_ubuntu():
@@ -152,8 +152,6 @@ def test_tripwire_osx():
     from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
     os_detect.get_detector('osx')
-
-from mock import patch
 
 
 def test_osx():
@@ -336,10 +334,10 @@ def test_fedora():
 
 def test_read_issue():
     from rospkg.os_detect import read_issue
-    assert read_issue('/fake/file') == None
+    assert read_issue('/fake/file') is None
     test_dir = os.path.join(get_test_dir(), 'rhel')
     assert read_issue(os.path.join(test_dir, 'issue')) == \
-    ['Red', 'Hat', 'Enterprise', 'Linux', 'AS', 'release', '3', '(Taroon)']
+        ['Red', 'Hat', 'Enterprise', 'Linux', 'AS', 'release', '3', '(Taroon)']
 
 
 def test_OsDetector():
@@ -446,7 +444,7 @@ def test_tripwire_freebsd():
 
 def test_freebsd():
     from rospkg.os_detect import FreeBSD, OsNotDetected
-    #TODO
+    # TODO
     if 0:
         test_dir = os.path.join(get_test_dir(), 'freebsd')
         release_file, issue_file = [os.path.join(test_dir, x) for
@@ -488,7 +486,7 @@ def test_freebsd():
 
 def test_cygwin():
     from rospkg.os_detect import Cygwin, OsNotDetected
-    #TODO
+    # TODO
     detect = Cygwin()
     if not detect.is_os():
         try:
@@ -635,7 +633,7 @@ def xTrueOsDetect_second_of_many():
 
 
 def xTrueOsDetect_last_of_many():
-    osa = roslib.os_detect.OSDetect([FalseOs(), FalseOs(), FalseOs(), FalseOs(), TrueOs(),])
+    osa = roslib.os_detect.OSDetect([FalseOs(), FalseOs(), FalseOs(), FalseOs(), TrueOs()])
     assert "os_name", osa.get_name()
     assert "os_version", osa.get_version()
     os_class = osa.get_os()

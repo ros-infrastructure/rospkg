@@ -34,23 +34,22 @@
 Base ROS python library for manipulating ROS packages and stacks.
 """
 
-from .common import MANIFEST_FILE, STACK_FILE, ResourceNotFound
-from .environment import get_ros_root, get_ros_package_path, get_ros_home, \
-     get_log_dir, get_test_results_dir, on_ros_path, get_ros_paths, get_etc_ros_dir
-from .manifest import parse_manifest_file, Manifest, InvalidManifest
-from .rospack import RosPack, RosStack, \
-     list_by_path, expand_to_packages, get_stack_version_by_dir, \
-     get_package_name
+from .common import MANIFEST_FILE, ResourceNotFound, STACK_FILE
+from .environment import get_etc_ros_dir, get_log_dir, get_ros_home, \
+    get_ros_package_path, get_ros_paths, get_ros_root, \
+    get_test_results_dir, on_ros_path
+from .manifest import InvalidManifest, Manifest, parse_manifest_file
+from .rospack import expand_to_packages, get_package_name, \
+    get_stack_version_by_dir, list_by_path, RosPack, RosStack
 
 __version__ = '1.0.41'  # same version as in setup.py
 
-__all__ = ['MANIFEST_FILE', 'STACK_FILE', 'ResourceNotFound',
-        'get_ros_root', 'get_ros_package_path', 'get_ros_home',
-        'get_log_dir', 'get_test_results_dir', 'on_ros_path',
-        'get_ros_paths', 'get_etc_ros_dir', 
-        'parse_manifest_file', 'Manifest', 'InvalidManifest',
-        'RosPack', 'RosStack', 
-        'list_by_path', 'expand_to_packages', 'get_stack_version_by_dir',
-        'get_package_name',
-        ]
-
+__all__ = (
+    'MANIFEST_FILE', 'ResourceNotFound', 'STACK_FILE',
+    'get_etc_ros_dir', 'get_log_dir', 'get_ros_home',
+    'get_ros_package_path', 'get_ros_paths', 'get_ros_root',
+    'get_test_results_dir', 'on_ros_path',
+    'InvalidManifest', 'Manifest', 'parse_manifest_file',
+    'get_package_name', 'RosPack', 'RosStack',
+    'list_by_path', 'expand_to_packages', 'get_stack_version_by_dir',
+)
