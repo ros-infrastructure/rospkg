@@ -89,7 +89,7 @@ def list_by_path(manifest_name, path, cache):
             # optimization for stacks.
             del dirs[:]
             continue #leaf     
-        elif 'rospack_nosubdirs' in files:
+        elif 'rospack_nosubdirs' in files or d.startswith('/usr/share/'):
             del dirs[:]
             continue  #leaf
         # remove hidden dirs (esp. .svn/.git)
