@@ -39,17 +39,18 @@ import os
 # Enviroment Variables
 
 # Global, usually set in setup
-ROS_ROOT         = "ROS_ROOT"
+ROS_ROOT = "ROS_ROOT"
 ROS_PACKAGE_PATH = "ROS_PACKAGE_PATH"
-ROS_HOME         = "ROS_HOME"
+ROS_HOME = "ROS_HOME"
 
 # override directory path to /etc/ros
-ROS_ETC_DIR      = "ROS_ETC_DIR"
+ROS_ETC_DIR = "ROS_ETC_DIR"
 
-## directory in which log files are written
-ROS_LOG_DIR      ="ROS_LOG_DIR"
-## directory in which test result files are written
+# directory in which log files are written
+ROS_LOG_DIR = "ROS_LOG_DIR"
+# directory in which test result files are written
 ROS_TEST_RESULTS_DIR = "ROS_TEST_RESULTS_DIR"
+
 
 # Utilities
 def _resolve_path(p):
@@ -64,7 +65,8 @@ def _resolve_path(p):
     if p and p[0] == '~':
         return os.path.expanduser(p)
     return p
-    
+
+
 def _resolve_paths(paths):
     """
     Catch-all utility routine for fixing ROS environment variables
@@ -77,17 +79,19 @@ def _resolve_paths(paths):
     splits = [p for p in paths.split(os.pathsep) if p]
     return os.pathsep.join([_resolve_path(p) for p in splits])
 
+
 def get_ros_paths(env=None):
     """
     Get an ordered list of ROS paths to search for ROS packages,
     stacks, and other resources.  This is generally computed from
     :envvar:`ROS_ROOT` and :envvar:`ROS_PACKAGE_PATH`.
-    
+
     :param env: override environment dictionary
     """
     if env is None:
         env = os.environ
     return _compute_package_paths(get_ros_root(env), get_ros_package_path(env))
+
 
 def get_ros_root(env=None):
     """
@@ -102,6 +106,7 @@ def get_ros_root(env=None):
         ros_root = os.path.normpath(ros_root)
     return ros_root
 
+
 def get_ros_package_path(env=None):
     """
     Get the current ROS_PACKAGE_PATH.
@@ -110,6 +115,7 @@ def get_ros_package_path(env=None):
     if env is None:
         env = os.environ
     return env.get(ROS_PACKAGE_PATH, None)
+
 
 def get_ros_home(env=None):
     """
@@ -126,9 +132,10 @@ def get_ros_home(env=None):
     if ROS_HOME in env:
         return env[ROS_HOME]
     else:
-        #slightly more robust than $HOME
+        # slightly more robust than $HOME
         return os.path.join(os.path.expanduser('~'), '.ros')
-    
+
+
 def get_log_dir(env=None):
     """
     Get directory to use for writing log files. There are multiple
@@ -146,6 +153,7 @@ def get_log_dir(env=None):
     else:
         return os.path.join(get_ros_home(env), 'log')
 
+
 def get_test_results_dir(env=None):
     """
     Get directory to use for writing test result files. There are
@@ -161,11 +169,12 @@ def get_test_results_dir(env=None):
     """
     if env is None:
         env = os.environ
-        
+
     if ROS_TEST_RESULTS_DIR in env:
         return env[ROS_TEST_RESULTS_DIR]
     else:
         return os.path.join(get_ros_home(env), 'test_results')
+
 
 def _compute_package_paths(ros_root, ros_package_path):
     """
@@ -182,6 +191,7 @@ def _compute_package_paths(ros_root, ros_package_path):
         paths.extend([x for x in ros_package_path.split(os.pathsep) if x.strip()])
     return paths
 
+
 def on_ros_path(p, env=None):
     """
     Check to see if filesystem path is on paths specified in ROS
@@ -192,12 +202,13 @@ def on_ros_path(p, env=None):
     """
     if env is None:
         env = os.environ
-        
+
     package = os.path.realpath(_resolve_path(p))
     # filter out non-paths (e.g. if no ROS environment is configured)
     paths = get_ros_paths(env)
     paths = [os.path.realpath(_resolve_path(x)) for x in paths]
     return bool([x for x in paths if package == x or package.startswith(x + os.sep)])
+
 
 def get_etc_ros_dir(env=None):
     """
@@ -214,4 +225,3 @@ def get_etc_ros_dir(env=None):
         return env[ROS_ETC_DIR]
     else:
         return '/etc/ros'
-    

@@ -32,15 +32,16 @@
 
 from __future__ import print_function
 
+
 def test_ResourceNotFound():
     from rospkg import ResourceNotFound
     r = ResourceNotFound('blah')
     assert 'blah' == str(r)
-    assert None == r.ros_paths
+    assert r.ros_paths is None
     s = str(r)
-    assert not 'None' in s
+    assert 'None' not in s
     assert 'blah' in s
-    
+
     r = ResourceNotFound('blah', ['ros_root', 'ros_package_path'])
     assert 'blah' == str(r.args[0])
     assert ['ros_root', 'ros_package_path'] == r.ros_paths

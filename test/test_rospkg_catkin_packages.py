@@ -33,13 +33,10 @@
 from __future__ import print_function
 
 import os
-import sys
-import time
-import subprocess
-import tempfile
 
 import rospkg
-  
+
+
 def test_find_packages():
     search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
 
@@ -53,4 +50,4 @@ def test_find_packages():
     for pkg_name in manager.list():
         assert(pkg_name == 'foo')
         path = manager.get_path(pkg_name)
-        assert(path == os.path.join(search_path,'p1','foo'))
+        assert(path == os.path.join(search_path, 'p1', 'foo'))
