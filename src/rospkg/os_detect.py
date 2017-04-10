@@ -398,6 +398,14 @@ class Arch(OsDetector):
         raise OsNotDetected('called in incorrect OS')
 
 
+class Manjaro(Arch):
+    """
+    Detect Manjaro.
+    """
+    def __init__(self, release_file='/etc/manjaro-release'):
+        super(Manjaro, self).__init__(release_file)
+
+
 class Centos(OsDetector):
     """
     Detect CentOS.
@@ -656,6 +664,7 @@ class OsDetect:
 
 
 OS_ARCH = 'arch'
+OS_MANJARO = 'manjaro'
 OS_CENTOS = 'centos'
 OS_CYGWIN = 'cygwin'
 OS_DEBIAN = 'debian'
@@ -677,6 +686,7 @@ OS_UBUNTU = 'ubuntu'
 OS_WINDOWS = 'windows'
 
 OsDetect.register_default(OS_ARCH, Arch())
+OsDetect.register_default(OS_MANJARO, Manjaro())
 OsDetect.register_default(OS_CENTOS, Centos())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
 OsDetect.register_default(OS_DEBIAN, Debian())

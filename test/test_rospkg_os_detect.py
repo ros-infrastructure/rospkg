@@ -235,6 +235,41 @@ def test_arch():
     test()
 
 
+def test_tripwire_manjaro():
+    from rospkg.os_detect import OsDetect
+    os_detect = OsDetect()
+    os_detect.get_detector('manjaro')
+
+
+def test_manjaro():
+    from rospkg.os_detect import Manjaro, OsNotDetected
+    test_dir = os.path.join(get_test_dir(), 'manjaro')
+    detect = Manjaro(os.path.join(test_dir, "manjaro-release"))
+    assert detect.is_os()
+    assert detect.get_version() == ''
+
+    detect = Manjaro()
+    if not detect.is_os():
+        try:
+            detect.get_version()
+            assert False
+        except OsNotDetected:
+            pass
+        try:
+            detect.get_codename()
+            assert False
+        except OsNotDetected:
+            pass
+
+    @patch.object(Manjaro, 'is_os')
+    def test(mock):
+        mock.is_os.return_value = True
+        detect = Manjaro()
+        assert detect.get_version() == ''
+        assert detect.get_codename() == ''
+    test()
+
+
 def test_tripwire_opensuse():
     from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
