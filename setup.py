@@ -7,7 +7,7 @@ from setuptools import setup
 
 kwargs = {
     'name': 'rospkg',
-    'version': '1.1.0',  # same version as in src/rospkg/__init__.py
+    'version': '1.1.1',  # same version as in src/rospkg/__init__.py
     'packages': ['rospkg'],
     'package_dir': {'': 'src'},
     'scripts': ['scripts/rosversion'],
