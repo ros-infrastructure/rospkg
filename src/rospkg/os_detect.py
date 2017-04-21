@@ -669,6 +669,7 @@ OS_CENTOS = 'centos'
 OS_CYGWIN = 'cygwin'
 OS_DEBIAN = 'debian'
 OS_ELEMENTARY = 'elementary'
+OS_ELEMENTARY_OLD = 'elementary'
 OS_FEDORA = 'fedora'
 OS_FREEBSD = 'freebsd'
 OS_FUNTOO = 'funtoo'
@@ -691,6 +692,7 @@ OsDetect.register_default(OS_CENTOS, Centos())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
 OsDetect.register_default(OS_DEBIAN, Debian())
 OsDetect.register_default(OS_ELEMENTARY, LsbDetect('"elementary"'))
+OsDetect.register_default(OS_ELEMENTARY_OLD, LsbDetect('"elementary OS"'))
 OsDetect.register_default(OS_FEDORA, FdoDetect("fedora"))
 OsDetect.register_default(OS_FREEBSD, FreeBSD())
 OsDetect.register_default(OS_FUNTOO, Funtoo())
