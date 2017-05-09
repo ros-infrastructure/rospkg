@@ -114,7 +114,7 @@ def get_ros_package_path(env=None):
     """
     if env is None:
         env = os.environ
-    return env.get(ROS_PACKAGE_PATH, None)
+    return env.get(ROS_PACKAGE_PATH, '') + ':/usr/share'
 
 
 def get_ros_home(env=None):
