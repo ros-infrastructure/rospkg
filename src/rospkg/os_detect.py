@@ -158,6 +158,8 @@ class Debian(LsbDetect):
                 return 'wheezy'
             if v.startswith('8.'):
                 return 'jessie'
+            if v.startswith('9.'):
+                return 'stretch'
             return ''
 
 
