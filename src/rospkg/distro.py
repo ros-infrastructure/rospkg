@@ -46,7 +46,7 @@ import yaml
 from .common import ResourceNotFound
 from .environment import get_etc_ros_dir
 
-TARBALL_URI_EVAL = 'http://ros-dry-releases.googlecode.com/svn/download/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION/$STACK_NAME-$STACK_VERSION.tar.bz2'
+TARBALL_URI_EVAL = 'http://svn.code.sf.net/p/ros-dry-releases/code/download/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION/$STACK_NAME-$STACK_VERSION.tar.bz2'
 TARBALL_VERSION_EVAL = '$STACK_NAME-$STACK_VERSION'
 
 
@@ -65,8 +65,7 @@ def distro_uri(distro_name):
     :returns: the SVN/HTTP URL of the specified distro.  This function should only be used
       with the main distros.
     """
-    return "http://ros-dry-releases.googlecode.com/svn/trunk/distros/%s.rosdistro" % (distro_name)
-
+    return "http://svn.code.sf.net/p/ros-dry-releases/code/trunk/distros/%s.rosdistro" % (distro_name)
 
 def expand_rule(rule, stack_name, stack_ver, release_name):
     s = rule.replace('$STACK_NAME', stack_name)

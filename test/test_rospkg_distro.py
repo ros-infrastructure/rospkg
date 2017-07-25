@@ -45,7 +45,7 @@ def get_etc_path():
 
 def test_distro_uri():
     from rospkg.distro import distro_uri
-    assert distro_uri('groovy') == "http://ros-dry-releases.googlecode.com/svn/trunk/distros/groovy.rosdistro"
+    assert distro_uri('groovy') == "http://svn.code.sf.net/p/ros-dry-releases/code/trunk/distros/groovy.rosdistro"
 
 
 def test_current_distro_codename():

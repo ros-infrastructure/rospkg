@@ -40,7 +40,7 @@ default_rules['git'] = {'git': {'anon-uri': 'https://github.com/ipa320/$STACK_NA
 rosinstalls['git'] = {}
 rosinstalls['git']['release-tar'] = [{'tar': {'local-name': 'local_name',
                                               'version': '$STACK_NAME-$STACK_VERSIONevaled',
-                                              'uri': 'http://ros-dry-releases.googlecode.com/svn/download/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION/$STACK_NAME-$STACK_VERSION.tar.bz2evaled'}}]
+                                              'uri': 'http://svn.code.sf.net/p/ros-dry-releases/code/download/stacks/$STACK_NAME/$STACK_NAME-$STACK_VERSION/$STACK_NAME-$STACK_VERSION.tar.bz2evaled'}}]
 rosinstalls['git']['devel'] = [{'git': {'local-name': 'local_name',
                                         'version': 'release_electricevaled',
                                         'uri': 'https://github.com/ipa320/$STACK_NAME.gitevaled'}}]
