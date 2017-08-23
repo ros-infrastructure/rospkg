@@ -616,6 +616,7 @@ class OsDetect:
                     self._os_version = os_detector.get_version()
                     self._os_codename = os_detector.get_codename()
                     self._os_detector = os_detector
+                    break
 
         if self._os_name:
             return self._os_name, self._os_version, self._os_codename
@@ -704,6 +705,7 @@ OsDetect.register_default(OS_MINT, LsbDetect("LinuxMint"))
 OsDetect.register_default(OS_NEON, LsbDetect("neon"))
 OsDetect.register_default(OS_OPENSUSE, OpenSuse())
 OsDetect.register_default(OS_OPENSUSE13, OpenSuse(brand_file='/etc/SUSE-brand'))
+OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse"))
 OsDetect.register_default(OS_OSX, OSX())
 OsDetect.register_default(OS_QNX, QNX())
 OsDetect.register_default(OS_RHEL, Rhel())
