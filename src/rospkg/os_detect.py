@@ -312,7 +312,8 @@ _osx_codename_map = {
     9: 'mavericks',
     10: 'yosemite',
     11: 'el capitan',
-    12: 'sierra'}
+    12: 'sierra',
+    13: 'high sierra'}
 
 
 def _osx_codename(major, minor):
