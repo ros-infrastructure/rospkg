@@ -682,6 +682,7 @@ OS_LINARO = 'linaro'
 OS_MINT = 'mint'
 OS_NEON = 'neon'
 OS_OPENSUSE = 'opensuse'
+OS_TIZEN = 'tizen'
 OS_OPENSUSE13 = 'opensuse'
 OS_OSX = 'osx'
 OS_QNX = 'qnx'
@@ -707,6 +708,7 @@ OsDetect.register_default(OS_NEON, LsbDetect("neon"))
 OsDetect.register_default(OS_OPENSUSE, OpenSuse())
 OsDetect.register_default(OS_OPENSUSE13, OpenSuse(brand_file='/etc/SUSE-brand'))
 OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse"))
+OsDetect.register_default(OS_TIZEN, FdoDetect("tizen"))
 OsDetect.register_default(OS_OSX, OSX())
 OsDetect.register_default(OS_QNX, QNX())
 OsDetect.register_default(OS_RHEL, Rhel())
