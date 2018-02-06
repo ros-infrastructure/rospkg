@@ -29,6 +29,7 @@
 
 from __future__ import print_function
 
+import argparse
 import os
 import sys
 import traceback
@@ -37,7 +38,7 @@ import rospkg
 from rospkg.common import PACKAGE_FILE
 from rospkg.rospack import ManifestManager
 
-USAGE = "Usage: rosversion <package/stack> or rosversion -d"
+USAGE = """Returns the version of the given package, or the distribution version of ROS."""
 
 
 # for < fuerte, retrieve from roscore file
@@ -68,47 +69,75 @@ def get_distro_name_from_roscore():
         traceback.print_exc()
 
 
-if len(sys.argv) == 2:
-    stack_name = sys.argv[1]
-
-    if stack_name == '-d' or stack_name == '--distro':
-        if 'ROS_DISTRO' in os.environ:
-            distro_name = os.environ['ROS_DISTRO']
-        else:
-            distro_name = get_distro_name_from_roscore()
-        if not distro_name:
-            print('<unknown>')
-        else:
-            print(distro_name)
-        sys.exit(0)
-
-    rosstack = rospkg.RosStack()
-    try:
-        version = rosstack.get_stack_version(stack_name)
-    except rospkg.ResourceNotFound as e:
-        try:
-            # hack to make it work with wet packages
-            mm = ManifestManager(PACKAGE_FILE)
-            path = mm.get_path(stack_name)
-            package_manifest = os.path.join(path, 'package.xml')
-            if os.path.exists(package_manifest):
-                from xml.etree.ElementTree import ElementTree
-                try:
-                    root = ElementTree(None, package_manifest)
-                    version = root.findtext('version')
-                except Exception:
-                    pass
-        except rospkg.ResourceNotFound as e:
-            print("Cannot locate [%s]" % (stack_name))
-            sys.exit(1)
-
-    if version is None:
-        print('<unversioned>')
+def get_version_printer(skipnewline=False):
+    """
+    @return: A method object to print the version string.
+    """
+    if skipnewline:
+        return sys.stderr.write
     else:
-        print(version)
-else:
-    print(USAGE)
+        return print
+
+parser = argparse.ArgumentParser(description=USAGE)
+if len(sys.argv) < 2:
+    parser.print_usage()
+    sys.exit(1)
+group = parser.add_mutually_exclusive_group()
+group.add_argument(
+    'package',
+    help="Package name. This name must be in ROS format, not OS package format. "
+         "E.g. CORRECT: roscpp, INCORRECT ros-kinetic-roscpp. See ROS naming "
+         "convention http://wiki.ros.org/ROS/Patterns/Conventions#Packages",
+    nargs='?')
+group.add_argument(
+    '-d', '--distro',
+    help="No argument needed. With this, ROS distribution will be returned.",
+    action='store_true')
+parser.add_argument(
+    "-s", "--skipnewline",
+    help="Skip trailing new line",
+    action='store_true')
+
+args = parser.parse_args()
+            
+version_printer = print
+
+if args.skipnewline:
+    version_printer = get_version_printer(skipnewline=True)
+
+if args.distro:
+    if 'ROS_DISTRO' in os.environ:
+        distro_name = os.environ['ROS_DISTRO']
+    else:
+        distro_name = get_distro_name_from_roscore()
+    if not distro_name:
+        version_printer('<unknown>')
+    else:
+        version_printer(distro_name)
+    sys.exit(0)
+
+stack_name = args.package
+rosstack = rospkg.RosStack()
+try:
+    version = rosstack.get_stack_version(stack_name)
+except rospkg.ResourceNotFound as e:
     try:
-        sys.exit(os.EX_USAGE)
-    except AttributeError:
+        # hack to make it work with wet packages
+        mm = ManifestManager(PACKAGE_FILE)
+        path = mm.get_path(stack_name)
+        package_manifest = os.path.join(path, 'package.xml')
+        if os.path.exists(package_manifest):
+            from xml.etree.ElementTree import ElementTree
+            try:
+                root = ElementTree(None, package_manifest)
+                version = root.findtext('version')
+            except Exception:
+                pass
+    except rospkg.ResourceNotFound as e:
+        print("Cannot locate [%s]" % (stack_name))
         sys.exit(1)
+
+if version is None:
+    version_printer('<unversioned>')
+else:
+    version_printer(version)
