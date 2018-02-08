@@ -126,7 +126,6 @@ class ManifestManager(object):
 
         self._manifests = {}
         self._depends_cache = {}
-        self._depends_unavailable = []
         self._rosdeps_cache = {}
         self._location_cache = None
         self._custom_cache = {}
@@ -165,10 +164,7 @@ class ManifestManager(object):
         if name in self._manifests:
             return self._manifests[name]
         else:
-            try:
-                return self._load_manifest(name)
-            except ResourceNotFound as e:
-                raise e
+            return self._load_manifest(name)
 
     def _update_location_cache(self):
         global _cache_lock
@@ -212,11 +208,7 @@ class ManifestManager(object):
         """
         :raises: :exc:`ResourceNotFound`
         """
-        retval = None
-        try:
-            retval = self._manifests[name] = parse_manifest_file(self.get_path(name), self._manifest_name, rospack=self)
-        except ResourceNotFound as e:
-            raise e
+        retval = self._manifests[name] = parse_manifest_file(self.get_path(name), self._manifest_name, rospack=self)
         return retval
 
     def get_depends(self, name, implicit=True):
@@ -241,14 +233,15 @@ class ManifestManager(object):
             # assign key before recursive call to prevent infinite case
             self._depends_cache[name] = s = set()
 
+            depends_unavailable = set()
+
             # take the union of all dependencies
             names = None
             try:
                 names = [p.name for p in self.get_manifest(name).depends]
             except ResourceNotFound as e:
                 del self._depends_cache[name]
-                self._depends_unavailable.append(name)
-                e.list_deps_sofar = self._depends_unavailable
+                e.deps_unavailable.add(name)
                 raise e
 
             for p in names:
@@ -256,21 +249,24 @@ class ManifestManager(object):
                 try:
                     deps = self.get_depends(p, implicit)
                 except ResourceNotFound as e:
-                    deps = e.list_deps_sofar
-                s.update(deps)
+                    deps = e.get_depends()
+                    depends_unavailable.update(e.deps_unavailable)
+                if deps:
+                    s.update(deps)
             # add in our own deps
             s.update(names)
             # cache the return value as a list
             s = list(s)
             self._depends_cache[name] = s
-            if 0 < len(self._depends_unavailable) or 0 == len(s):
+            if 0 < len(depends_unavailable) or 0 == len(s):
                 raise ResourceNotFound(
-                    "Pkg(s) {} not available on your environment.\n"
+                    "Pkg(s) {0} not available on your environment.\n"
                     "Defined dependency can be obtained in "
-                    "ResourceNotFound.list_deps_sofar: {}".format(
-                        self._depends_unavailable, s),
+                    "ResourceNotFound.get_depends: {1}".format(
+                        list(depends_unavailable), s),
                     ros_paths=self._ros_paths,
-                    list_deps_sofar=s)
+                    deps_sofar=s,
+                    deps_unavailable=depends_unavailable)
             return s
 
     def get_depends_on(self, name, implicit=True):
