@@ -246,6 +246,7 @@ class ManifestManager(object):
             try:
                 names = [p.name for p in self.get_manifest(name).depends]
             except ResourceNotFound as e:
+                del self._depends_cache[name]
                 self._depends_unavailable.append(name)
                 e.list_deps_sofar = self._depends_unavailable
                 raise e
