@@ -45,9 +45,15 @@ class ResourceNotFound(Exception):
     A ROS filesystem resource was not found.
     """
 
-    def __init__(self, msg, ros_paths=None):
+    def __init__(self, msg, ros_paths=None, list_deps_sofar=None):
+        """
+        :type list_deps_sofar: [str]
+        :param list_deps_sofar: List of depended packages at the time the command
+                                               stopped due to this exception.
+        """
         super(ResourceNotFound, self).__init__(msg)
         self.ros_paths = ros_paths
+        self.list_deps_sofar = list_deps_sofar
 
     def __str__(self):
         s = self.args[0]  # python 2.6
