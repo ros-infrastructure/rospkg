@@ -246,6 +246,7 @@ class ManifestManager(object):
             try:
                 names = [p.name for p in self.get_manifest(name).depends]
             except ResourceNotFound as e:
+                del self._depends_cache[name]
                 self._depends_unavailable.append(name)
                 e.list_deps_sofar = self._depends_unavailable
                 raise e
@@ -382,6 +383,8 @@ class RosPack(ManifestManager):
         :param package: package name, ``str``
         :returns: list of rosdeps, ``[str]``
         """
+        depends_unavailable = set()
+
         if package in self._rosdeps_cache:
             return self._rosdeps_cache[package]
 
@@ -389,9 +392,12 @@ class RosPack(ManifestManager):
         self._rosdeps_cache[package] = s = set()
 
         # take the union of all dependencies
-        packages = self.get_depends(package, implicit=True)
-        for p in packages:
-            s.update(self.get_rosdeps(p, implicit=False))
+        try:
+            packages = self.get_depends(package, implicit=True)
+            for p in packages:
+                s.update(self.get_rosdeps(p, implicit=False))
+        except ResourceNotFound as e:
+            print("Despite exception, continue: {}".format(str(e)))
         # add in our own deps
         m = self.get_manifest(package)
         s.update([d.name for d in m.rosdeps])
