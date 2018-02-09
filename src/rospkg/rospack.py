@@ -130,6 +130,9 @@ class ManifestManager(object):
         self._location_cache = None
         self._custom_cache = {}
 
+        # Status of the scope for getting dependencies.
+        self._typeof_dependency = 0  # Any type of depend
+
     @classmethod
     def get_instance(cls, ros_paths=None):
         """
@@ -157,14 +160,18 @@ class ManifestManager(object):
         return self._ros_paths[:]
     ros_paths = property(get_ros_paths, doc="Get ROS paths of this instance")
 
-    def get_manifest(self, name):
+    def get_manifest(self, name, typeof_depend=0):
         """
+        :param typeof_depend:
+                0: all kinds of depend.
+                1: only runtime_depend, such as run_depend in package.xml format 1 and 2.
+                2: only build_depend.
         :raises: :exc:`InvalidManifest`
         """
         if name in self._manifests:
             return self._manifests[name]
         else:
-            return self._load_manifest(name)
+            return self._load_manifest(name, typeof_depend)
 
     def _update_location_cache(self):
         global _cache_lock
@@ -204,40 +211,53 @@ class ManifestManager(object):
         else:
             return self._location_cache[name]
 
-    def _load_manifest(self, name):
+    def _load_manifest(self, name, typeof_depend=0):
         """
         :raises: :exc:`ResourceNotFound`
         """
-        retval = self._manifests[name] = parse_manifest_file(self.get_path(name), self._manifest_name, rospack=self)
+        retval = self._manifests[name] = parse_manifest_file(self.get_path(name), self._manifest_name, rospack=self, typeof_depend=typeof_depend)
         return retval
 
-    def get_depends(self, name, implicit=True):
+    def get_depends(self, name, implicit=True, typeof_depend=0):
         """
         Get dependencies of a resource.  If implicit is ``True``, this
         includes implicit (recursive) dependencies.
 
         :param name: resource name, ``str``
         :param implicit: include implicit (recursive) dependencies, ``bool``
-
+        :param typeof_depend:
+                0: all kinds of depend.
+                1: only runtime_depend, such as run_depend in package.xml format 1 and 2.
+                2: only build_depend.
+        :type typeof_depend: int
         :returns: list of names of dependencies, ``[str]``
         :raises: :exc:`InvalidManifest` If resource or any of its
           dependencies have an invalid manifest.
         """
+        # When typeof_depend flag is different from the one previously used,
+        # flag, re-compute the dependency.
+        if not self._typeof_dependency == typeof_depend:
+            self._typeof_dependency = typeof_depend
+            # Resetting cache. This may not be necessary when the duplicate invocation
+            # issue is addressed https://github.com/ros-infrastructure/rospkg/pull/129#issuecomment-364572565
+            self._depends_cache = {}
+            self._manifests = {}
+
         if not implicit:
-            m = self.get_manifest(name)
+            m = self.get_manifest(name, typeof_depend)
             return [d.name for d in m.depends]
         else:
             if name in self._depends_cache:
                 return self._depends_cache[name]
 
             # take the union of all dependencies
-            names = [p.name for p in self.get_manifest(name).depends]
+            names = [p.name for p in self.get_manifest(name, typeof_depend).depends]
 
             # assign key before recursive call to prevent infinite case
             self._depends_cache[name] = s = set()
 
             for p in names:
-                s.update(self.get_depends(p, implicit))
+                s.update(self.get_depends(p, implicit, typeof_depend))
             # add in our own deps
             s.update(names)
             # cache the return value as a list
