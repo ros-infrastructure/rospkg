@@ -386,9 +386,18 @@ class RosPack(ManifestManager):
         self._rosdeps_cache[package] = s = set()
 
         # take the union of all dependencies
-        packages = self.get_depends(package, implicit=True)
-        for p in packages:
-            s.update(self.get_rosdeps(p, implicit=False))
+        packages = []
+        try:
+            packages = self.get_depends(package, implicit=True)
+        except ResourceNotFound as e:
+            del self._rosdeps_cache[package]
+            packages = e.get_depends()
+        if packages:
+            for p in packages:
+                try:
+                    s.update(self.get_rosdeps(p, implicit=False))
+                except ResourceNotFound as e:
+                    print("Not available in your environment: {}".format(str(e)))
         # add in our own deps
         m = self.get_manifest(package)
         s.update([d.name for d in m.rosdeps])
