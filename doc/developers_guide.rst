@@ -12,8 +12,7 @@ better understand the motivation and goals of the rospkg library.
 Bug reports and feature requests
 --------------------------------
 
-- `Submit a bug report <https://code.ros.org/trac/ros/newticket?component=rospkg&type=defect&&rospkg>`_
-- `Submit a feature request <https://code.ros.org/trac/ros/newticket?component=rospkg&type=enhancement&rospkg>`_
+- `Submit a bug report / a feature request <https://github.com/ros-infrastructure/rospkg/issues>`_
 
 Getting the code
 ----------------
