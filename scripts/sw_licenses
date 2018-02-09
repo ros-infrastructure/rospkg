@@ -1,0 +1,61 @@
+#!/usr/bin/env python
+
+# Copyright 2018 PlusOne Robotics Inc. All rights reserved.
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+#     * Redistributions of source code must retain the above copyright
+#       notice, this list of conditions and the following disclaimer.
+#     * Redistributions in binary form must reproduce the above copyright
+#       notice, this list of conditions and the following disclaimer in the
+#       documentation and/or other materials provided with the distribution.
+#     * Neither the name of the PlusOne Robotics Inc. nor the names of its
+#       contributors may be used to endorse or promote products derived from
+#       this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+# ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+# LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+# CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+# SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+# INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+# CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+# ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+# POSSIBILITY OF SUCH DAMAGE.
+
+
+import argparse
+import logging
+import sys
+
+from rospkg.sw_license import  LicenseUtil
+
+PATH_PREFIX_OUTPUT = "/tmp/licenses"
+
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO)
+    parser = argparse.ArgumentParser(description=
+                                     'List the OSS licenses of all ROS dependency for the given package.')
+    parser.add_argument(
+        'pkg_name', help='Package that starts tracking from to get the all licenses of.')
+    parser.add_argument(
+        '--path_licenses_prev',
+        help="Path of a file to be compared from. Run comparison if this is passed.")
+    parser.add_argument(
+        '--prefix_outfile', help='Prefix of the output file in an absolute path.'
+        ' By default it is {}'.format(PATH_PREFIX_OUTPUT),
+        default="{}".format(PATH_PREFIX_OUTPUT))
+    args = parser.parse_args()
+    license_util = LicenseUtil()
+    dict_licenses = license_util.software_license(args.pkg_name)
+    licenses, path_licenses = license_util.save_licenses(
+        dict_licenses, args.pkg_name, prefix_outfile=args.prefix_outfile)
+    print("Path of the output file: {}".format(path_licenses))
+    if args.path_licenses_prev:
+        ret = license_util.compare_license(args.path_licenses_prev, path_licenses)
+        if not ret:
+            logging.error("New license found. Exiting with 1.")
+            sys.exit(1)

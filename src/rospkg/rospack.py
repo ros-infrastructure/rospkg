@@ -30,9 +30,11 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from collections import defaultdict
 import os
 from threading import Lock
 from xml.etree.cElementTree import ElementTree
+import yaml
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, ResourceNotFound, STACK_FILE
 from .environment import get_ros_paths
@@ -386,6 +388,51 @@ class RosPack(ManifestManager):
                 return os.path.basename(d)
             else:
                 d = os.path.dirname(d)
+
+    def get_licenses(self, name, implicit=True, sortbylicense=True):
+        """
+        @summary: Return a list of licenses the packages the given package declares
+                             dependency on.
+        @return Dictionary. By default dict of license name and package name(s).
+                       Note: For the packages that declare multiple licenses, those licenses
+                       are returned in a single string with each license separated by comma.
+                       E.g. if your package declares BSD and LGPL in separate tags in
+                       package.xml, the returned key will look like "BSD, LGPL".
+        @rtype { k, [d] }
+        @raise ResourceNotFound
+        """
+        license_dict = defaultdict(list)
+        license_list = []
+
+        # Unlike get_depends, the licenses of the given package itself needs added.
+        manifest_self = self.get_manifest(name)
+        license_list.append((name, manifest_self.license))
+
+        # Get licenses from depended packages
+        try:
+            pkgnames_dep = self.get_depends(name, implicit)
+        except ResourceNotFound as e:
+            raise e
+        for pkgname_dep in pkgnames_dep:
+            manifest = self.get_manifest(pkgname_dep)
+            license_list.append((pkgname_dep, manifest.license))
+
+        # Traverse for Non-ROS, system packages
+        try:
+            pkgnames_rosdep = self.get_rosdeps(name, implicit)
+        except ResourceNotFound as e:
+            raise e
+        for pkgname_rosdep in pkgnames_rosdep:
+            license_list.append((
+                pkgname_rosdep, "(System package. License not automatically detected)"))
+
+        for pkgname, license_name in license_list:
+            if not sortbylicense:
+                license_dict[pkgname].append(license_name)
+            else:
+                license_dict[license_name].append(pkgname)
+        licenses = license_dict.items()
+        return dict(licenses)
 
 
 class RosStack(ManifestManager):
