@@ -51,3 +51,10 @@ def test_find_packages():
         assert(pkg_name == 'foo')
         path = manager.get_path(pkg_name)
         assert(path == os.path.join(search_path, 'p1', 'foo'))
+
+
+def test_get_manifest():
+    search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
+    manager = rospkg.rospack.ManifestManager(rospkg.common.MANIFEST_FILE, ros_paths=[search_path])
+    manif = manager.get_manifest("foo")
+    assert(manif.type == "package")
