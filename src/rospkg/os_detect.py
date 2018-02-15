@@ -160,6 +160,8 @@ class Debian(LsbDetect):
                 return 'jessie'
             if v.startswith('9.'):
                 return 'stretch'
+            if v.startswith('10.'):
+                return 'buster'
             return ''
 
 
