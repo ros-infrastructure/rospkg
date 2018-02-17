@@ -69,14 +69,12 @@ def get_distro_name_from_roscore():
         traceback.print_exc()
 
 
-def get_version_printer(skipnewline=False):
+def print_nonewline(argtext):
     """
-    @return: A method object to print the version string.
+    @summary print with no new line.
     """
-    if skipnewline:
-        return sys.stderr.write
-    else:
-        return print
+    print(argtext, end="")
+
 
 parser = argparse.ArgumentParser(description=USAGE)
 if len(sys.argv) < 2:
@@ -103,7 +101,7 @@ args = parser.parse_args()
 version_printer = print
 
 if args.skipnewline:
-    version_printer = get_version_printer(skipnewline=True)
+    version_printer = print_nonewline
 
 if args.distro:
     if 'ROS_DISTRO' in os.environ:
