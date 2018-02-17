@@ -60,6 +60,28 @@ Common API
 Installation
 ------------
 
+Recommended automated installation
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+``rospkg`` is already dependend by many core packages of ROS, so it should get automatically installed when you follow standard installation steps.
+
+Automated installation is realized by adding a dependency like this:
+
+In ``package.xml`` `format 1 <http://www.ros.org/reps/rep-0127.html>`_:
+
+::
+
+    <run_depend>python-rospkg</run_depend>
+
+In ``package.xml`` `format 2 <http://www.ros.org/reps/rep-0140.html>`_, `format 3 <http://www.ros.org/reps/rep-0149.html#exec-depend-multiple>`_:
+
+::
+
+    <exec_depend>python-rospkg</exec_depend>
+
+Manual installation
+~~~~~~~~~~~~~~~~~~~
+
 rospkg is available on pypi and can be installed via ``pip``
 ::
 
