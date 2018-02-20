@@ -67,40 +67,27 @@ def get_distro_name_from_roscore():
         traceback.print_exc()
 
 
-def print_nonewline(argtext):
-    """
-    @summary print with no new line.
-    """
-    print(argtext, end="")
+def print_without_newline(argtext):
+    """Print with no new line."""
+    print(argtext, end='')
 
 
 parser = argparse.ArgumentParser(
     description='Output the version of the given package, or the ROS distribution name.)
-if len(sys.argv) < 2:
-    parser.print_usage()
-    sys.exit(1)
-group = parser.add_mutually_exclusive_group()
-group.add_argument(
-    'package',
-    help="Package name. This name must be in ROS format, not OS package format. "
-         "E.g. CORRECT: roscpp, INCORRECT ros-kinetic-roscpp. See ROS naming "
-         "convention http://wiki.ros.org/ROS/Patterns/Conventions#Packages",
-    nargs='?')
-group.add_argument(
-    '-d', '--distro',
-    help="No argument needed. With this, ROS distribution will be returned.",
-    action='store_true')
 parser.add_argument(
-    "-s", "--skipnewline",
-    help="Skip trailing new line",
-    action='store_true')
+    '-s', '--skip-newline', action='store_true',
+    help='Skip trailing newline')
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument(
+    'package', nargs='?',
+    help="The ROS package name (e.g. 'rclcpp')")
+group.add_argument(
+    '-d', '--distro', action='store_true',
+    help='Output the ROS distribution name')
 
 args = parser.parse_args()
             
-version_printer = print
-
-if args.skipnewline:
-    version_printer = print_nonewline
+printer = print_without_newline if args.skip_newline else print
 
 if args.distro:
     if 'ROS_DISTRO' in os.environ:
@@ -108,20 +95,18 @@ if args.distro:
     else:
         distro_name = get_distro_name_from_roscore()
     if not distro_name:
-        version_printer('<unknown>')
-    else:
-        version_printer(distro_name)
+        distro_name = '<unknown>'
+    printer(distro_name)
     sys.exit(0)
 
-stack_name = args.package
 rosstack = rospkg.RosStack()
 try:
-    version = rosstack.get_stack_version(stack_name)
+    version = rosstack.get_stack_version(args.package)
 except rospkg.ResourceNotFound as e:
     try:
         # hack to make it work with wet packages
         mm = ManifestManager(PACKAGE_FILE)
-        path = mm.get_path(stack_name)
+        path = mm.get_path(args.package)
         package_manifest = os.path.join(path, 'package.xml')
         if os.path.exists(package_manifest):
             from xml.etree.ElementTree import ElementTree
@@ -131,10 +116,9 @@ except rospkg.ResourceNotFound as e:
             except Exception:
                 pass
     except rospkg.ResourceNotFound as e:
-        print("Cannot locate [%s]" % (stack_name))
+        print('Cannot locate [%s]' % args.package)
         sys.exit(1)
 
 if version is None:
-    version_printer('<unversioned>')
-else:
-    version_printer(version)
+    version = '<unversioned>'
+printer(version)
