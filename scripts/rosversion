@@ -80,7 +80,7 @@ parser.add_argument(
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument(
     'package', nargs='?',
-    help="The ROS package name (e.g. 'rclcpp')")
+    help="The ROS package name (e.g. 'roscpp')")
 group.add_argument(
     '-d', '--distro', action='store_true',
     help='Output the ROS distribution name')
