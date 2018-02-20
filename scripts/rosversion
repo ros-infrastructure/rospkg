@@ -73,7 +73,7 @@ def print_without_newline(argtext):
 
 
 parser = argparse.ArgumentParser(
-    description='Output the version of the given package, or the ROS distribution name.)
+    description='Output the version of the given package, or the ROS distribution name.')
 parser.add_argument(
     '-s', '--skip-newline', action='store_true',
     help='Skip trailing newline')
