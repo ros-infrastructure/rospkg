@@ -38,8 +38,6 @@ import rospkg
 from rospkg.common import PACKAGE_FILE
 from rospkg.rospack import ManifestManager
 
-USAGE = """Returns the version of the given package, or the distribution version of ROS."""
-
 
 # for < fuerte, retrieve from roscore file
 def get_distro_name_from_roscore():
@@ -76,7 +74,8 @@ def print_nonewline(argtext):
     print(argtext, end="")
 
 
-parser = argparse.ArgumentParser(description=USAGE)
+parser = argparse.ArgumentParser(
+    description='Output the version of the given package, or the ROS distribution name.)
 if len(sys.argv) < 2:
     parser.print_usage()
     sys.exit(1)
