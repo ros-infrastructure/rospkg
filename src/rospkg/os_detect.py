@@ -668,7 +668,7 @@ class OsDetect:
             self.detect_os()
         return self._os_codename
 
-
+OS_ALPINE = 'alpine'
 OS_ARCH = 'arch'
 OS_MANJARO = 'manjaro'
 OS_CENTOS = 'centos'
@@ -693,6 +693,7 @@ OS_SLACKWARE = 'slackware'
 OS_UBUNTU = 'ubuntu'
 OS_WINDOWS = 'windows'
 
+OsDetect.register_default(OS_ALPINE, FdoDetect("Alpine Linux"))
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_MANJARO, Manjaro())
 OsDetect.register_default(OS_CENTOS, Centos())
