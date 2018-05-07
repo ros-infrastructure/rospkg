@@ -15,7 +15,6 @@ kwargs = {
     'author': 'Ken Conley',
     'author_email': 'kwc@willowgarage.com',
     'url': 'http://wiki.ros.org/rospkg',
-    'download_url': 'http://download.ros.org/downloads/rospkg/',
     'keywords': ['ROS'],
     'classifiers': [
         'Programming Language :: Python',
