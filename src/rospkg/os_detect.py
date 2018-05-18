@@ -668,6 +668,7 @@ class OsDetect:
             self.detect_os()
         return self._os_codename
 
+
 OS_ALPINE = 'alpine'
 OS_ARCH = 'arch'
 OS_MANJARO = 'manjaro'
