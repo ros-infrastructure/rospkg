@@ -45,9 +45,21 @@ class ResourceNotFound(Exception):
     A ROS filesystem resource was not found.
     """
 
-    def __init__(self, msg, ros_paths=None):
+    def __init__(self, msg, ros_paths=None, deps_sofar=None, deps_unavailable=None):
+        """
+        :type deps_sofar: [str]
+        :param deps_sofar: List of depended packages at the time the command
+                           stopped due to this exception.
+        :type deps_unavailable: [str]
+        :param deps_unavailable: List of packages defined in the dependency but are not
+                                 available on the platform.
+        """
         super(ResourceNotFound, self).__init__(msg)
         self.ros_paths = ros_paths
+        self.deps_sofar = deps_sofar
+        self.deps_unavailable = set()
+        if deps_unavailable:
+            self.deps_unavailable.update(deps_unavailable)
 
     def __str__(self):
         s = self.args[0]  # python 2.6
@@ -55,3 +67,6 @@ class ResourceNotFound(Exception):
             for i, p in enumerate(self.ros_paths):
                 s = s + '\nROS path [%s]=%s' % (i, p)
         return s
+
+    def get_depends(self):
+        return self.deps_sofar

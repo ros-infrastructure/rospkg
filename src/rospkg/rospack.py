@@ -230,19 +230,43 @@ class ManifestManager(object):
             if name in self._depends_cache:
                 return self._depends_cache[name]
 
-            # take the union of all dependencies
-            names = [p.name for p in self.get_manifest(name).depends]
-
             # assign key before recursive call to prevent infinite case
             self._depends_cache[name] = s = set()
 
+            depends_unavailable = set()
+
+            # take the union of all dependencies
+            names = None
+            try:
+                names = [p.name for p in self.get_manifest(name).depends]
+            except ResourceNotFound as e:
+                del self._depends_cache[name]
+                e.deps_unavailable.add(name)
+                raise e
+
             for p in names:
-                s.update(self.get_depends(p, implicit))
+                deps = None
+                try:
+                    deps = self.get_depends(p, implicit)
+                except ResourceNotFound as e:
+                    deps = e.get_depends()
+                    depends_unavailable.update(e.deps_unavailable)
+                if deps:
+                    s.update(deps)
             # add in our own deps
             s.update(names)
             # cache the return value as a list
             s = list(s)
             self._depends_cache[name] = s
+            if 0 < len(depends_unavailable) or 0 == len(s):
+                raise ResourceNotFound(
+                    "Pkg(s) {0} not available on your environment.\n"
+                    "Defined dependency can be obtained in "
+                    "ResourceNotFound.get_depends: {1}".format(
+                        list(depends_unavailable), s),
+                    ros_paths=self._ros_paths,
+                    deps_sofar=s,
+                    deps_unavailable=depends_unavailable)
             return s
 
     def get_depends_on(self, name, implicit=True):
@@ -362,9 +386,18 @@ class RosPack(ManifestManager):
         self._rosdeps_cache[package] = s = set()
 
         # take the union of all dependencies
-        packages = self.get_depends(package, implicit=True)
-        for p in packages:
-            s.update(self.get_rosdeps(p, implicit=False))
+        packages = []
+        try:
+            packages = self.get_depends(package, implicit=True)
+        except ResourceNotFound as e:
+            del self._rosdeps_cache[package]
+            packages = e.get_depends()
+        if packages:
+            for p in packages:
+                try:
+                    s.update(self.get_rosdeps(p, implicit=False))
+                except ResourceNotFound as e:
+                    print("Not available in your environment: {}".format(str(e)))
         # add in our own deps
         m = self.get_manifest(package)
         s.update([d.name for d in m.rosdeps])
