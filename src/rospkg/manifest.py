@@ -42,7 +42,7 @@ import xml.dom.minidom as dom
 from .common import MANIFEST_FILE, PACKAGE_FILE, STACK_FILE
 
 # stack.xml and manifest.xml have the same internal tags right now
-REQUIRED = ['license']
+REQUIRED = ['license', "name"]
 ALLOWXHTML = ['description']
 OPTIONAL = ['author', 'logo', 'url', 'brief', 'description', 'status',
             'notes', 'depend', 'rosdep', 'export', 'review',
@@ -318,7 +318,7 @@ class Manifest(object):
         'author', 'license', 'licenses', 'license_url', 'url',
         'depends', 'rosdeps', 'platforms',
         'exports', 'version',
-        'status', 'notes',
+        'status', 'name', 'notes',
         'unknown_tags', 'type', 'filename',
         'is_catkin']
 
@@ -396,6 +396,7 @@ def parse_manifest_file(dirpath, manifest_name, rospack=None):
         p = parse_package(package_filename)
         # put these into manifest
         manifest.description = p.description
+        manifest.name = p.name
         manifest.author = ', '.join([('Maintainer: %s' % str(m)) for m in p.maintainers] + [str(a) for a in p.authors])
         manifest.license = ', '.join(p.licenses)
         manifest.licenses = p.licenses
@@ -499,6 +500,7 @@ def parse_manifest(manifest_name, string, filename='string'):
         pass  # manifest is missing optional 'review notes' tag
 
     m.author = _check('author', True)(p, filename)
+    m.name = _check("name")(p, filename)
     m.url = _check('url')(p, filename)
     m.version = _check('version')(p, filename)
 
