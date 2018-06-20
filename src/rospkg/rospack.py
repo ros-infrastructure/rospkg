@@ -401,21 +401,18 @@ class RosPack(ManifestManager):
         @rtype { k, [d] }
         @raise ResourceNotFound
         """
+        MSG_LICENSE_NOTFOUND_SYSPKG = "(License not automatically detected)"
         license_dict = defaultdict(list)
-        license_list = []
 
-        # Unlike get_depends, the licenses of the given package itself needs added.
-        manifest_self = self.get_manifest(name)
-        license_list.append((name, manifest_self.license))
+        self.get_depends(name, implicit)
 
-        # Get licenses from depended packages
-        try:
-            pkgnames_dep = self.get_depends(name, implicit)
-        except ResourceNotFound as e:
-            raise e
-        for pkgname_dep in pkgnames_dep:
-            manifest = self.get_manifest(pkgname_dep)
-            license_list.append((pkgname_dep, manifest.license))
+        manifests = self._manifests
+
+        for pkg_name, manifest in manifests.items():
+            if not sortbylicense:
+                license_dict[pkg_name].append(manifest.license)
+            else:
+                license_dict[manifest.license].append(pkg_name)
 
         # Traverse for Non-ROS, system packages
         try:
@@ -423,14 +420,11 @@ class RosPack(ManifestManager):
         except ResourceNotFound as e:
             raise e
         for pkgname_rosdep in pkgnames_rosdep:
-            license_list.append((
-                pkgname_rosdep, "(System package. License not automatically detected)"))
-
-        for pkgname, license_name in license_list:
             if not sortbylicense:
-                license_dict[pkgname].append(license_name)
+                license_dict[pkgname_rosdep].append(MSG_LICENSE_NOTFOUND_SYSPKG)
             else:
-                license_dict[license_name].append(pkgname)
+                license_dict[MSG_LICENSE_NOTFOUND_SYSPKG].append(pkgname_rosdep)
+
         licenses = license_dict.items()
         return dict(licenses)
 
