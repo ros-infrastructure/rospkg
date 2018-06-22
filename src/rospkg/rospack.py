@@ -32,13 +32,16 @@
 
 from collections import defaultdict, OrderedDict
 import os
+import platform
+import shutil
+import subprocess
 from threading import Lock
 from xml.etree.cElementTree import ElementTree
 import yaml
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, ResourceNotFound, STACK_FILE
 from .environment import get_ros_paths
-from .manifest import InvalidManifest, parse_manifest_file
+from .manifest import InvalidManifest, Manifest, parse_manifest_file
 from .stack import InvalidStack, parse_stack_file
 
 _cache_lock = Lock()
@@ -419,11 +422,18 @@ class RosPack(ManifestManager):
             pkgnames_rosdep = self.get_rosdeps(name, implicit)
         except ResourceNotFound as e:
             raise e
-        for pkgname_rosdep in pkgnames_rosdep:
-            if not sortbylicense:
-                license_dict[pkgname_rosdep].append(MSG_LICENSE_NOTFOUND_SYSPKG)
-            else:
-                license_dict[MSG_LICENSE_NOTFOUND_SYSPKG].append(pkgname_rosdep)
+        if platform.linux_distribution()[0] == "Ubuntu":
+            manifests_systempkg = self.get_manifests_ubuntu(pkgnames_rosdep)
+            for pkgname_rosdep in pkgnames_rosdep:
+                syspkg_dict = filter(lambda syspkg: syspkg["name"] == pkgname_rosdep, manifests_systempkg)
+                if syspkg_dict:
+                    license_syspkg = syspkg_dict[0]["manifest"].license
+                else:
+                    license_syspkg = MSG_LICENSE_NOTFOUND_SYSPKG
+                if not sortbylicense:
+                    license_dict[pkgname_rosdep].append(license_syspkg)
+                else:
+                    license_dict[license_syspkg].append(pkgname_rosdep)
 
         # Sort pkg names in each license
         for list_key in license_dict.values():
@@ -438,6 +448,54 @@ class RosPack(ManifestManager):
         #   - - python_orocos_kdl
         #     - orocos_kdl
         return dict(licenses)
+
+    def get_manifests_ubuntu(self, pkg_names=None):
+        """
+        @summary: Temporarily proof of concept method to get a list of system packages
+                             on Ubuntu.
+        @type pkg_names: [str]
+        @rtype: [{str: rospkg.manifest.Manifest}]
+        """
+        #URL_DPKGLICENSE = "https://github.com/daald/dpkg-licenses.git"
+        DELIMITER_DPKG_LINE = ";"
+        URL_DPKGLICENSE = "https://github.com/130s/dpkg-licenses.git"
+        manifests_syspkg = []
+
+        # Get dpkg-licenses from github.com.
+        os.chdir("/tmp")
+        REPO_DIR_NAME = "dpkg-licenses"
+        if not os.path.exists(REPO_DIR_NAME):
+            subprocess.call(["git", "clone", URL_DPKGLICENSE, "-b", "hack_output"])
+        os.chdir("dpkg-licenses")
+
+        ## Save the stdout of licenses script to the memory.
+        ## Better saving stdout directly to memory than generating a file.
+        #
+        ## https://stackoverflow.com/questions/4514751/pipe-subprocess-standard-output-to-a-variable
+        dpkg_out_lines = []
+        proc = subprocess.Popen("./dpkg-licenses", stdout=subprocess.PIPE)
+        while True:
+            line = proc.stdout.readline()
+            if line:
+                dpkg_out_lines.append(line.rstrip())
+            else:
+                break
+
+        # Parse the dpkg output to return a list of manifest for the sys pkgs.
+        for line in dpkg_out_lines:
+            syspkg_name = line.split(DELIMITER_DPKG_LINE)[1].strip()
+            if (pkg_names and syspkg_name not in pkg_names):
+                continue
+            mani = Manifest()
+            mani.is_catkin = False
+            mani.name = syspkg_name
+            mani.version = line.split(DELIMITER_DPKG_LINE)[2].strip()
+            mani.description = line.split(DELIMITER_DPKG_LINE)[4].strip()
+            mani.license = line.split(DELIMITER_DPKG_LINE)[5].strip()
+
+            manifests_syspkg.append({"name": syspkg_name, "manifest": mani})
+
+        return manifests_syspkg
 
 
 class RosStack(ManifestManager):
