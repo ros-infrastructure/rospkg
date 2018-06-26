@@ -1,6 +1,6 @@
 # Software License Agreement (BSD License)
 #
-# Copyright (c) 2011, Willow Garage, Inc.
+# Copyright 2018 PlusOne Robotics Inc.
 # All rights reserved.
 #
 # Redistribution and use in source and binary forms, with or without
@@ -13,7 +13,7 @@
 #    copyright notice, this list of conditions and the following
 #    disclaimer in the documentation and/or other materials provided
 #    with the distribution.
-#  * Neither the name of Willow Garage, Inc. nor the names of its
+#  * Neither the name of Plus One Robotics, Inc. nor the names of its
 #    contributors may be used to endorse or promote products derived
 #    from this software without specific prior written permission.
 #
@@ -37,34 +37,12 @@ import os
 import rospkg
 
 
-def test_find_packages():
+def test_compare_license():
+    from rospkg import sw_license
     search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
-    pkgnames_test = ["baa", "foo"]
-
-    manager = rospkg.rospack.ManifestManager(rospkg.common.MANIFEST_FILE, ros_paths=[search_path])
-    # for backward compatibility a wet package which is not a metapackage is found when searching for MANIFEST_FILE
-    assert(len(manager.list()) == 2)
-    manager = rospkg.rospack.ManifestManager(rospkg.common.STACK_FILE, ros_paths=[search_path])
-    assert(len(manager.list()) == 0)
-    manager = rospkg.rospack.ManifestManager(rospkg.common.PACKAGE_FILE, ros_paths=[search_path])
-
-    for pkg_name in manager.list():
-        assert(pkg_name in pkgnames_test)
-        path = manager.get_path(pkg_name)
-        assert(path == os.path.join(search_path, 'p1', pkg_name))
-
-
-def test_get_manifest():
-    search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
-    manager = rospkg.rospack.ManifestManager(rospkg.common.MANIFEST_FILE, ros_paths=[search_path])
-    manif = manager.get_manifest("foo")
-    assert(manif.type == "package")
-
-
-def test_get_licenses():
-    search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
-    manager = rospkg.rospack.RosPack(ros_paths=[search_path])
-    licenses = manager.get_licenses("foo", implicit=False)
-    # package foo declares these 2 licenses in separate tags, which the dict
-    # get_licenses returns contains as a single string.
-    assert("BSD, LGPL" in licenses)
+    manager = sw_license.LicenseUtil(ros_paths=[search_path])
+    dict_result = [("baa", "licenses_baa-0.1.2.yml")]
+    for res in dict_result:
+        licenses = manager.software_license(res[0])
+        path_outputfile = manager.save_licenses(licenses, res[0])
+        assert(manager.compare_license(path_outputfile, "{}/p1/{}/{}".format(search_path, res[0], res[1])))

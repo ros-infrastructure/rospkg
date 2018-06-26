@@ -40,38 +40,61 @@ from rospkg.environment import get_ros_root
 from rospkg.os_detect import OsDetect
 
 
+class SwLicenseException(Exception):
+    """Software license detection problem occurred."""
+
+    def __init__(self, msg=""):
+        super(SwLicenseException, self).__init__(msg)
+
+
 class LicenseUtil(object):
     _URL_ISSUE_RELEVANT = "https://github.com/ros-infrastructure/rospkg/pull/129#issue-168007083"
 
-    def __init__(self):
-        self.rp = RosPack()
+    def __init__(self, ros_paths=None):
+        """
+        :param ros_paths: Ordered list of paths to search for
+                                      resources. If `None` (default), use environment ROS path.
+        """
+        self.rp = RosPack(ros_paths=ros_paths)
         self._os_detect = OsDetect()
 
-    def compare_license(self, path_a="", path_b=""):
+    def compare_license(self, path_licensefile_new, path_licensefile_prev):
         """
         @summary Compare 2 files of license output and returns any new license entries.
         """
+        if not (path_licensefile_new and path_licensefile_prev):
+            raise ValueError(
+                "Check if both 2 paths are passed and correct. What you passed are:\n"
+                "- path_licensefile_new: {}\n"
+                "- path_licensefile_prev: {}".format(path_licensefile_new, path_licensefile_prev))
         ret = True
-        stream_a = open(path_a, "r")
-        yaml_a = yaml.load_all(stream_a)
+        stream_a = open(path_licensefile_new, "r")
+        yaml_new = yaml.load_all(stream_a)
 
-        stream_b = open(path_b, "r")
-        yaml_b = yaml.load_all(stream_b)
+        stream_b = open(path_licensefile_prev, "r")
+        yaml_prev = yaml.load_all(stream_b)
 
         # PyYaml doesn't preserve order of input yaml, so this is needed.
         # https://github.com/yaml/pyyaml/issues/110
-        ordered_a = OrderedDict(sorted(list(yaml_a)[0].items()))
-        ordered_b = OrderedDict(sorted(list(yaml_b)[0].items()))
-        logging.debug("yaml_a: {}\nyaml_b: {}".format(ordered_a, ordered_b))
+        set_new = set(sorted(list(yaml_new)[0]))
+        set_prev = set(sorted(list(yaml_prev)[0]))
+        logging.debug("yaml_new: {}\n\tyaml_prev: {}".format(set_new, set_prev))
         # What to check?
         # - Key addition
         # - Values
-        for key in ordered_a:
-            if key not in ordered_b:
-                logging.error("License '{}' was NOT present in the input file.".format(key))
-                ret = False
-            else:
-                logging.info("License '{}' was present.".format(key))
+        set_new_found = set_new - set_prev
+        set_removed_found = set_prev - set_new
+        ERRMSG_NEWLICENSE_FOUND = "New license(s) '{}' found.".format(set_new_found)
+        ERRMSG_LICENSES_REMOVED = "License(s) '{}' removed.".format(set_removed_found)
+        if (set_new_found and not set_removed_found):
+            raise SwLicenseException(ERRMSG_NEWLICENSE_FOUND)
+        elif (not set_new_found and set_removed_found):
+            raise SwLicenseException(ERRMSG_LICENSES_REMOVED)
+        elif (set_new_found and set_removed_found):
+            raise SwLicenseException("{}\n{}".format(
+                ERRMSG_NEWLICENSE_FOUND, ERRMSG_LICENSES_REMOVED))
+
+        logging.info("No new or removed license found.")
         return ret
 
     def software_license(self, pkgnames):
@@ -186,4 +209,4 @@ class LicenseUtil(object):
             outfile.write("{}\n".format(output_header))
             yaml.dump(licenses, outfile, default_flow_style=False, allow_unicode=True)
             logging.debug("Result saved at {}".format(path_outputfile))
-        return licenses, path_outputfile
+        return path_outputfile

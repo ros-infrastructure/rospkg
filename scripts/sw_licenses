@@ -31,7 +31,7 @@ import argparse
 import logging
 import sys
 
-from rospkg.sw_license import  LicenseUtil
+from rospkg.sw_license import LicenseUtil, SwLicenseException
 
 PATH_PREFIX_OUTPUT = "/tmp/licenses"
 
@@ -51,11 +51,12 @@ if __name__ == "__main__":
     args = parser.parse_args()
     license_util = LicenseUtil()
     dict_licenses = license_util.software_license(args.pkg_names)
-    licenses, path_licenses = license_util.save_licenses(
+    path_licenses = license_util.save_licenses(
         dict_licenses, args.pkg_names, prefix_outfile=args.prefix_outfile)
     print("Path of the output file: {}".format(path_licenses))
     if args.path_licenses_prev:
-        ret = license_util.compare_license(args.path_licenses_prev, path_licenses)
-        if not ret:
-            logging.error("New license found. Exiting with 1.")
+        try:
+            license_util.compare_license(args.path_licenses_prev, path_licenses)
+        except SwLicenseException as e:
+            logging.error(str(e))
             sys.exit(1)
