@@ -93,6 +93,11 @@ or ``easy_install``:
 
     easy_install -U rospkg
 
+For debian-based OSes it's available via apt.
+::
+
+    apt-get install python-rospkg
+
 Using rospkg
 ------------
 
