@@ -63,7 +63,7 @@ Installation
 Recommended automated installation
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-``rospkg`` is already dependend by many core packages of ROS, so it should get automatically installed when you follow standard installation steps.
+``rospkg`` is already a dependency of many core packages of ROS, so it should get automatically installed when you follow standard installation steps.
 
 Automated installation is realized by adding a dependency like this:
 
