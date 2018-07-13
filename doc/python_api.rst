@@ -34,6 +34,7 @@ tools.
    rospkg_environment
    os_detect
    rospkg_distro
+   sw_license_introspection
    
 Example::
 
