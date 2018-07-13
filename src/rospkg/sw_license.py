@@ -88,7 +88,8 @@ class LicenseUtil(object):
         return dict_license
 
     def save_licenses(
-            self, licenses, pkgname, implicit=True, sortbylicense=True, prefix_outfile="/tmp/licenses",):
+            self, licenses, pkgname, implicit=True, sortbylicense=True,
+            prefix_outfile="/tmp/licenses", description_output=None):
         """
         @summary:  If True save the result of get_licenses to a text file.
         @param licenses: TBD
@@ -97,17 +98,22 @@ class LicenseUtil(object):
         @param prefix_outfile: Prefix of the output file in an absolute full path style.
                                               E.g. by default output of pkgA version 1.0.0 will be saved at:
                                                    /tmp/licenses_pkgA-1.0.0.log
+        @param description_output: Description printed at the top of the output file.
         @return 1) License object, 2) Path of the resulted file (either absolute/relative
                        depending on the prefix_outfile)
         @raise ResourceNotFound
         """
         pkg_version = "pkgversion"
+        if not description_output:
+            description_output = "# Output of software license introspection started from {}.".format(pkgname)
+
         try:
             pkg_version = self.rp.get_manifest(pkgname).version
         except Exception as e:
             print(str(e))
         path_outputfile = '{}_{}-{}.yml'.format(prefix_outfile, pkgname, pkg_version)
         with open(path_outputfile, 'w') as outfile:
-            yaml.dump(licenses, outfile, default_flow_style=False)
+            outfile.write("{}\n".format(description_output))
+            yaml.dump(licenses, outfile, default_flow_style=False, allow_unicode=True)
             logging.debug("Result saved at {}".format(path_outputfile))
         return licenses, path_outputfile
