@@ -40,7 +40,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=
                                      'List the OSS licenses of all ROS dependency for the given package.')
     parser.add_argument(
-        'pkg_name', help='Package that starts tracking from to get the all licenses of.')
+        'pkg_names', help="Packages that start from to get the all licenses of. Delimit by comma and enclose the entire list by double quote when multiple packages passed. Result will be consolidated into one file.")
     parser.add_argument(
         '--path_licenses_prev',
         help="Path of a file to be compared from. Run comparison if this is passed.")
@@ -50,9 +50,9 @@ if __name__ == "__main__":
         default="{}".format(PATH_PREFIX_OUTPUT))
     args = parser.parse_args()
     license_util = LicenseUtil()
-    dict_licenses = license_util.software_license(args.pkg_name)
+    dict_licenses = license_util.software_license(args.pkg_names)
     licenses, path_licenses = license_util.save_licenses(
-        dict_licenses, args.pkg_name, prefix_outfile=args.prefix_outfile)
+        dict_licenses, args.pkg_names, prefix_outfile=args.prefix_outfile)
     print("Path of the output file: {}".format(path_licenses))
     if args.path_licenses_prev:
         ret = license_util.compare_license(args.path_licenses_prev, path_licenses)
