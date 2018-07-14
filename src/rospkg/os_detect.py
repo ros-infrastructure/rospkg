@@ -696,7 +696,7 @@ OS_SLACKWARE = 'slackware'
 OS_UBUNTU = 'ubuntu'
 OS_WINDOWS = 'windows'
 
-OsDetect.register_default(OS_ALPINE, FdoDetect("Alpine Linux"))
+OsDetect.register_default(OS_ALPINE, FdoDetect("alpine"))
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_MANJARO, Manjaro())
 OsDetect.register_default(OS_CENTOS, Centos())
