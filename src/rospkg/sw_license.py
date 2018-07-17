@@ -36,6 +36,8 @@ import logging
 import yaml
 
 from rospkg import ResourceNotFound, RosPack
+from rospkg.environment import get_ros_root
+from rospkg.os_detect import OsDetect
 
 
 class LicenseUtil(object):
@@ -43,6 +45,7 @@ class LicenseUtil(object):
 
     def __init__(self):
         self.rp = RosPack()
+        self._os_detect = OsDetect()
 
     def compare_license(self, path_a="", path_b=""):
         """
@@ -164,6 +167,9 @@ class LicenseUtil(object):
         if not description_output:
             description_output = """# Output of software license introspection started from {}""".format(pkgnames)
 
+        output_header = "{}\n# Environment this file was generated on:\n# - OS: {}\n# - ROS root: {}".format(
+            description_output, self._os_detect.detect_os(), get_ros_root())
+
         pkgnames_versions = []
         for pkgname in pkgnames:
             try:
@@ -177,7 +183,7 @@ class LicenseUtil(object):
 
         path_outputfile = '{}-{}.yml'.format(prefix_outfile, pkgnames_versions_str)
         with open(path_outputfile, 'w') as outfile:
-            outfile.write("{}\n".format(description_output))
+            outfile.write("{}\n".format(output_header))
             yaml.dump(licenses, outfile, default_flow_style=False, allow_unicode=True)
             logging.debug("Result saved at {}".format(path_outputfile))
         return licenses, path_outputfile
