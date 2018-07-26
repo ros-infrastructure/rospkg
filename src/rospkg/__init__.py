@@ -42,7 +42,10 @@ from .manifest import InvalidManifest, Manifest, parse_manifest_file
 from .rospack import expand_to_packages, get_package_name, \
     get_stack_version_by_dir, list_by_path, RosPack, RosStack
 
-__version__ = '1.1.4'  # same version as in setup.py
+# same version as in:
+# - setup.py
+# - stdeb.cfg
+__version__ = '1.1.4'
 
 __all__ = (
     'MANIFEST_FILE', 'ResourceNotFound', 'STACK_FILE',
