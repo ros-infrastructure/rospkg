@@ -13,7 +13,9 @@ kwargs = {
     'version': '1.1.4',
     'packages': ['rospkg'],
     'package_dir': {'': 'src'},
-    'scripts': ['scripts/rosversion'],
+    'entry_points': {
+        'console_scripts': ['rosversion=rospkg.rosversion:main'],
+    },
     'install_requires': ['catkin_pkg', 'PyYAML'],
     'author': 'Ken Conley',
     'author_email': 'kwc@willowgarage.com',
