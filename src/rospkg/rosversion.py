@@ -88,7 +88,7 @@ def main():
         help='Output the ROS distribution name')
 
     args = parser.parse_args()
-                
+
     printer = print_without_newline if args.skip_newline else print
 
     if args.distro:
