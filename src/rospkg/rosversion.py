@@ -70,6 +70,7 @@ def print_without_newline(argtext):
     """Print with no new line."""
     print(argtext, end='')
 
+
 def main():
     parser = argparse.ArgumentParser(
         description='rosversion -d: Output the version of the given package\n'
