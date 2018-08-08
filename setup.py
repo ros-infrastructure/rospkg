@@ -40,5 +40,6 @@ if 'SKIP_PYTHON_MODULES' in os.environ:
 if 'SKIP_PYTHON_SCRIPTS' in os.environ:
     kwargs['name'] += '_modules'
     kwargs['scripts'] = []
+    kwargs['entry_points']['console_scripts'] = []
 
 setup(**kwargs)
