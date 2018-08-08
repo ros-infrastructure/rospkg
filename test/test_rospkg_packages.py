@@ -166,7 +166,8 @@ def test_RosPack_no_env():
         except ResourceNotFound:
             pass
     finally:
-        os.environ = environ_copy
+        os.environ.clear()
+        os.environ.update(environ_copy)
 
 
 def test_RosPack_get_path():
