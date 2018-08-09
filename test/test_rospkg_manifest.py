@@ -214,12 +214,12 @@ def test_parse_bad_file():
             assert p in str(e), "file name [%s] should be in error message [%s]" % (p, str(e))
 
 
-EXAMPLE1 = """<package>
+EXAMPLE1 = u"""<package>
   <description brief="a brief description">Line 1
 Line 2
   </description>
-  <author>The authors
-go here</author>
+  <author>The authors go here.
+utf-8 test: ÄÖÜ</author>
   <license>Public Domain
 with other stuff</license>
   <url>http://pr.willowgarage.com/package/</url>
