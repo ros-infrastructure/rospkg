@@ -431,7 +431,10 @@ def parse_manifest_file(dirpath, manifest_name, rospack=None):
         return manifest
 
     with open(filename, 'rb') as f:
-        return parse_manifest(manifest_name, f.read().decode('utf-8'), filename)
+        data = f.read()
+    if sys.version_info[0] >= 3:
+        data = data.decode('utf-8')
+    return parse_manifest(manifest_name, data, filename)
 
 
 def parse_manifest(manifest_name, string, filename='string'):
