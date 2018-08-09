@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Software License Agreement (BSD License)
 #
 # Copyright (c) 2011, Willow Garage, Inc.
@@ -103,7 +104,7 @@ def _subtest_parse_example1(m):
     assert 'package' == m.type
     assert "a brief description" == m.brief
     assert "Line 1\nLine 2" == m.description.strip()
-    assert "The authors\ngo here" == m.author.strip()
+    assert u"The authors go here.\nutf-8 test: ÄÖÜ" == m.author.strip()
     assert "Public Domain\nwith other stuff" == m.license.strip()
     assert "http://pr.willowgarage.com/package/" == m.url
     for d in m.depends:
