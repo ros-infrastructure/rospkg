@@ -71,11 +71,16 @@ def read_issue(filename="/etc/issue"):
     return None
 
 
-def read_os_release(filename="/etc/os-release"):
+def read_os_release(filename=""):
     """
-    :returns: Dictonary of key value pairs from /etc/os-release, with quotes stripped from values
+    :returns: Dictonary of key value pairs from /etc/os-release or fallback to /usr/lib/os-release, with quotes stripped from values
     """
     release_info = {}
+    if not filename:
+        filename = "/etc/os-release"
+        if not os.path.exists(filename):
+            filename = "/usr/lib/os-release"
+
     if os.path.exists(filename):
         with codecs.open(filename, 'r', encoding=locale.getpreferredencoding()) as f:
             for line in f:
