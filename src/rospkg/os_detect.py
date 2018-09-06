@@ -700,6 +700,7 @@ OS_RHEL = 'rhel'
 OS_SLACKWARE = 'slackware'
 OS_UBUNTU = 'ubuntu'
 OS_WINDOWS = 'windows'
+OS_CLEARLINUX = 'clearlinux'
 
 OsDetect.register_default(OS_ALPINE, FdoDetect("alpine"))
 OsDetect.register_default(OS_ARCH, Arch())
@@ -725,6 +726,7 @@ OsDetect.register_default(OS_QNX, QNX())
 OsDetect.register_default(OS_RHEL, Rhel())
 OsDetect.register_default(OS_SLACKWARE, Slackware())
 OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
+OsDetect.register_default(OS_CLEARLINUX, FdoDetect("clear-linux-os"))
 OsDetect.register_default(OS_WINDOWS, Windows())
 
 
