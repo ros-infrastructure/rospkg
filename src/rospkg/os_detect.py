@@ -71,23 +71,25 @@ def read_issue(filename="/etc/issue"):
     return None
 
 
-def read_os_release(filename=""):
+def read_os_release(filename=None):
     """
-    :returns: Dictonary of key value pairs from /etc/os-release or fallback to /usr/lib/os-release, with quotes stripped from values
+    :returns: Dictionary of key value pairs from /etc/os-release or fallback to 
+      /usr/lib/os-release, with quotes stripped from values
     """
-    release_info = {}
-    if not filename:
-        filename = "/etc/os-release"
+    if filename is None:
+        filename = '/etc/os-release'
         if not os.path.exists(filename):
-            filename = "/usr/lib/os-release"
+            filename = '/usr/lib/os-release'
 
-    if os.path.exists(filename):
-        with codecs.open(filename, 'r', encoding=locale.getpreferredencoding()) as f:
-            for line in f:
-                key, val = line.rstrip('\n').partition('=')[::2]
-                release_info[key] = val.strip('"')
-            return release_info
-    return None
+    if not os.path.exists(filename):
+        return None
+
+    release_info = {}
+    with codecs.open(filename, 'r', encoding=locale.getpreferredencoding()) as f:
+        for line in f:
+            key, val = line.rstrip('\n').partition('=')[::2]
+            release_info[key] = val.strip('"')
+    return release_info
 
 
 class OsNotDetected(Exception):
