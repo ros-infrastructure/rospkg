@@ -1,5 +1,3 @@
-#!/usr/bin/env python
-
 # Copyright (c) 2008, Willow Garage, Inc.
 # All rights reserved.
 #
