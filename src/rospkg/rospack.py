@@ -30,6 +30,7 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from collections import defaultdict, OrderedDict
 import os
 from threading import Lock
 
@@ -390,6 +391,56 @@ class RosPack(ManifestManager):
                 return os.path.basename(d)
             else:
                 d = os.path.dirname(d)
+
+    def get_licenses(self, name, implicit=True, sort_by_license=True):
+        """
+        @summary: Return a list of licenses the packages the given package declares
+                             dependency on.
+        @return Dictionary. By default dict of license name and package name(s).
+                       Note: For the packages that declare multiple licenses, those licenses
+                       are returned in a single string with each license separated by comma.
+                       E.g. if your package declares BSD and LGPL in separate tags in
+                       package.xml, the returned key will look like "BSD, LGPL".
+        @rtype { k, [d] }
+        @raise ResourceNotFound
+        """
+        MSG_LICENSE_NOTFOUND_SYSPKG = "(License not automatically detected)"
+        license_dict = defaultdict(list)
+
+        self.get_depends(name, implicit)
+
+        manifests = self._manifests
+
+        for pkg_name, manifest in manifests.items():
+            if not sort_by_license:
+                license_dict[pkg_name].append(manifest.license)
+            else:
+                license_dict[manifest.license].append(pkg_name)
+
+        # Traverse for Non-ROS, system packages
+        try:
+            pkgnames_rosdep = self.get_rosdeps(name, implicit)
+        except ResourceNotFound as e:
+            raise e
+        for pkgname_rosdep in pkgnames_rosdep:
+            if not sort_by_license:
+                license_dict[pkgname_rosdep].append(MSG_LICENSE_NOTFOUND_SYSPKG)
+            else:
+                license_dict[MSG_LICENSE_NOTFOUND_SYSPKG].append(pkgname_rosdep)
+
+        # Sort pkg names in each license
+        for list_key in license_dict.values():
+            list_key.sort()
+        # Sort by license name.
+        licenses = OrderedDict(sorted(license_dict.items()))
+
+        # List of tuples converted into yaml can look like the following, which isn't 
+        # that useful. So here converting to a dict.
+        # - !!python/tuple
+        #  - LGPL
+        #   - - python_orocos_kdl
+        #     - orocos_kdl
+        return dict(licenses)
 
 
 class RosStack(ManifestManager):
