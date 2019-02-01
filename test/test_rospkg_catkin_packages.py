@@ -59,6 +59,7 @@ def test_get_manifest():
     assert(manif.type == "package")
 
 
+
 def test_licenses():
     rospack = rospkg.rospack.RosPack(ros_paths=[search_path])
     licenses_list = ["BSD", "LGPL"]
@@ -67,3 +68,12 @@ def test_licenses():
     assert(len(manif.licenses) == 2)
     for l in manif.licenses:
         assert(l in licenses_list)
+
+
+def test_get_licenses():
+    search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
+    manager = rospkg.rospack.RosPack(ros_paths=[search_path])
+    licenses = manager.get_licenses("foo", implicit=False)
+    # package foo declares these 2 licenses in separate tags, which the dict
+    # get_licenses returns contains as a single string.
+    assert("BSD, LGPL" in licenses)
