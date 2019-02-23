@@ -389,7 +389,7 @@ class RosPack(ManifestManager):
             else:
                 d = os.path.dirname(d)
 
-    def get_licenses(self, name, implicit=True, sortbylicense=True):
+    def get_licenses(self, name, implicit=True, sort_by_license=True):
         """
         @summary: Return a list of licenses the packages the given package declares
                              dependency on.
@@ -409,7 +409,7 @@ class RosPack(ManifestManager):
         manifests = self._manifests
 
         for pkg_name, manifest in manifests.items():
-            if not sortbylicense:
+            if not sort_by_license:
                 license_dict[pkg_name].append(manifest.license)
             else:
                 license_dict[manifest.license].append(pkg_name)
@@ -420,7 +420,7 @@ class RosPack(ManifestManager):
         except ResourceNotFound as e:
             raise e
         for pkgname_rosdep in pkgnames_rosdep:
-            if not sortbylicense:
+            if not sort_by_license:
                 license_dict[pkgname_rosdep].append(MSG_LICENSE_NOTFOUND_SYSPKG)
             else:
                 license_dict[MSG_LICENSE_NOTFOUND_SYSPKG].append(pkgname_rosdep)
