@@ -393,11 +393,8 @@ class RosPack(ManifestManager):
         """
         @summary: Return a list of licenses the packages the given package declares
                              dependency on.
-        @return Dictionary. By default dict of license name and package name(s).
-                       Note: For the packages that declare multiple licenses, those licenses
-                       are returned in a single string with each license separated by comma.
-                       E.g. if your package declares BSD and LGPL in separate tags in
-                       package.xml, the returned key will look like "BSD, LGPL".
+        @return Dictionary. By default dict of license name and a list of packages.
+            When sort_by_license=False, dict of package name and a list of licenses.
         @rtype { k, [d] }
         @raise ResourceNotFound
         """
@@ -410,9 +407,10 @@ class RosPack(ManifestManager):
 
         for pkg_name, manifest in manifests.items():
             if not sort_by_license:
-                license_dict[pkg_name].append(manifest.license)
+                license_dict[pkg_name].append(manifest.licenses)
             else:
-                license_dict[manifest.license].append(pkg_name)
+                for license in manifest.licenses:
+                    license_dict[license].append(pkg_name)
 
         # Traverse for Non-ROS, system packages
         try:
