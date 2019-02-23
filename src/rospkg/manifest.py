@@ -334,6 +334,7 @@ class Manifest(object):
             self.version = self.notes = ''
         self.licenses = []
         self.depends = []
+        self.licenses = []
         self.rosdeps = []
         self.exports = []
         self.platforms = []
