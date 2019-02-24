@@ -42,7 +42,7 @@ import xml.dom.minidom as dom
 from .common import MANIFEST_FILE, PACKAGE_FILE, STACK_FILE
 
 # stack.xml and manifest.xml have the same internal tags right now
-REQUIRED = ['license', "name"]
+REQUIRED = ['license', 'name']
 ALLOWXHTML = ['description']
 OPTIONAL = ['author', 'logo', 'url', 'brief', 'description', 'status',
             'notes', 'depend', 'rosdep', 'export', 'review',
@@ -501,7 +501,7 @@ def parse_manifest(manifest_name, string, filename='string'):
         pass  # manifest is missing optional 'review notes' tag
 
     m.author = _check('author', True)(p, filename)
-    m.name = _check("name")(p, filename)
+    m.name = _check('name')(p, filename)
     m.url = _check('url')(p, filename)
     m.version = _check('version')(p, filename)
 

@@ -392,40 +392,28 @@ class RosPack(ManifestManager):
             else:
                 d = os.path.dirname(d)
 
-    def get_licenses(self, name, implicit=True, sort_by_license=True):
+    def get_licenses(self, pkg_name, implicit=True):
         """
         @summary: Return a list of licenses and the packages in the dependency tree
-            for the given package. Format of the returned object can vary depending on
-            the argument.
-        @return Dictionary. By default dict of license name and a list of packages.
-            When sort_by_license=False, dict of package name and a list of licenses.
+            for the given package.
+        @param pkg_name: Name of the package the dependency tree begins from.
+        @return Dictionary of license name and a list of packages.
         @rtype { k, [d] }
         @raise ResourceNotFound
         """
         MSG_LICENSE_NOTFOUND_SYSPKG = "(License not automatically detected)"
         license_dict = defaultdict(list)
 
-        self.get_depends(name, implicit)
+        self.get_depends(name=pkg_name, implicit=implicit)
 
-        manifests = self._manifests
-
-        for pkg_name, manifest in manifests.items():
-            if not sort_by_license:
-                license_dict[pkg_name].append(manifest.licenses)
-            else:
-                for license in manifest.licenses:
-                    license_dict[license].append(pkg_name)
+        for p_name, manifest in self._manifests.items():
+            for license in manifest.licenses:
+                license_dict[license].append(p_name)
 
         # Traverse for Non-ROS, system packages
-        try:
-            pkgnames_rosdep = self.get_rosdeps(name, implicit)
-        except ResourceNotFound as e:
-            raise e
+        pkgnames_rosdep = self.get_rosdeps(name=pkg_name, implicit=implicit)
         for pkgname_rosdep in pkgnames_rosdep:
-            if not sort_by_license:
-                license_dict[pkgname_rosdep].append(MSG_LICENSE_NOTFOUND_SYSPKG)
-            else:
-                license_dict[MSG_LICENSE_NOTFOUND_SYSPKG].append(pkgname_rosdep)
+            license_dict[MSG_LICENSE_NOTFOUND_SYSPKG].append(pkgname_rosdep)
 
         # Sort pkg names in each license
         for list_key in license_dict.values():

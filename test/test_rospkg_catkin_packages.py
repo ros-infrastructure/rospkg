@@ -59,7 +59,6 @@ def test_get_manifest():
     assert(manif.type == "package")
 
 
-
 def test_licenses():
     rospack = rospkg.rospack.RosPack(ros_paths=[search_path])
     licenses_list = ["BSD", "LGPL"]
