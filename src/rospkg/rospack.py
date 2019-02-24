@@ -411,22 +411,16 @@ class RosPack(ManifestManager):
                 license_dict[license].append(p_name)
 
         # Traverse for Non-ROS, system packages
-        pkgnames_rosdep = self.get_rosdeps(name=pkg_name, implicit=implicit)
+        pkgnames_rosdep = self.get_rosdeps(package=pkg_name, implicit=implicit)
         for pkgname_rosdep in pkgnames_rosdep:
             license_dict[MSG_LICENSE_NOTFOUND_SYSPKG].append(pkgname_rosdep)
 
         # Sort pkg names in each license
         for list_key in license_dict.values():
             list_key.sort()
-        # Sort by license name.
+        # Sort license names
         licenses = OrderedDict(sorted(license_dict.items()))
-
-        # List of tuples converted into yaml can look like the following, which isn't 
-        # that useful. So here converting to a dict.
-        # - !!python/tuple
-        #  - LGPL
-        #   - - python_orocos_kdl
-        #     - orocos_kdl
+        # Convert to dict for user friendlier output.
         return dict(licenses)
 
 
