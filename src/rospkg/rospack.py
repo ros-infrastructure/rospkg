@@ -391,8 +391,9 @@ class RosPack(ManifestManager):
 
     def get_licenses(self, name, implicit=True, sort_by_license=True):
         """
-        @summary: Return a list of licenses the packages the given package declares
-                             dependency on.
+        @summary: Return a list of licenses and the packages in the dependency tree
+            for the given package. Format of the returned object can vary depending on
+            the argument.
         @return Dictionary. By default dict of license name and a list of packages.
             When sort_by_license=False, dict of package name and a list of licenses.
         @rtype { k, [d] }
