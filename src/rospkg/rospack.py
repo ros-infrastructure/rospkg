@@ -34,7 +34,6 @@ from collections import defaultdict, OrderedDict
 import os
 from threading import Lock
 from xml.etree.cElementTree import ElementTree
-import yaml
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, ResourceNotFound, STACK_FILE
 from .environment import get_ros_paths
@@ -403,17 +402,12 @@ class RosPack(ManifestManager):
 
         self.get_depends(name=pkg_name, implicit=implicit)
 
-        manifests = self._manifests
-
-        for p_name, manifest in manifests.items():
+        for p_name, manifest in self._manifests.items():
             for license in manifest.licenses:
                 license_dict[license].append(p_name)
 
         # Traverse for Non-ROS, system packages
-        try:
-            pkgnames_rosdep = self.get_rosdeps(name=pkg_name, implicit=implicit)
-        except ResourceNotFound as e:
-            raise e
+        pkgnames_rosdep = self.get_rosdeps(name=pkg_name, implicit=implicit)
         for pkgname_rosdep in pkgnames_rosdep:
             license_dict[MSG_LICENSE_NOTFOUND_SYSPKG].append(pkgname_rosdep)
 
