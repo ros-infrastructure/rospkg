@@ -389,10 +389,11 @@ class RosPack(ManifestManager):
             else:
                 d = os.path.dirname(d)
 
-    def get_licenses(self, name, implicit=True):
+    def get_licenses(self, pkg_name, implicit=True):
         """
         @summary: Return a list of licenses and the packages in the dependency tree
             for the given package.
+        @param pkg_name: Name of the package the dependency tree begins from.
         @return Dictionary of license name and a list of packages.
         @rtype { k, [d] }
         @raise ResourceNotFound
@@ -400,17 +401,17 @@ class RosPack(ManifestManager):
         MSG_LICENSE_NOTFOUND_SYSPKG = "(License not automatically detected)"
         license_dict = defaultdict(list)
 
-        self.get_depends(name, implicit)
+        self.get_depends(name=pkg_name, implicit=implicit)
 
         manifests = self._manifests
 
-        for pkg_name, manifest in manifests.items():
+        for p_name, manifest in manifests.items():
             for license in manifest.licenses:
-                license_dict[license].append(pkg_name)
+                license_dict[license].append(p_name)
 
         # Traverse for Non-ROS, system packages
         try:
-            pkgnames_rosdep = self.get_rosdeps(name, implicit)
+            pkgnames_rosdep = self.get_rosdeps(name=pkg_name, implicit=implicit)
         except ResourceNotFound as e:
             raise e
         for pkgname_rosdep in pkgnames_rosdep:
