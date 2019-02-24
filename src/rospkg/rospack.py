@@ -391,13 +391,14 @@ class RosPack(ManifestManager):
     def get_licenses(self, pkg_name, implicit=True):
         """
         @summary: Return a list of licenses and the packages in the dependency tree
-            for the given package.
+            for the given package. Special value 'ERR' is used as the license for the
+            packages that license was not detected for.
         @param pkg_name: Name of the package the dependency tree begins from.
         @return Dictionary of license name and a list of packages.
         @rtype { k, [d] }
         @raise ResourceNotFound
         """
-        MSG_LICENSE_NOTFOUND_SYSPKG = "(License not automatically detected)"
+        MSG_LICENSE_NOTFOUND_SYSPKG = "ERR"
         license_dict = defaultdict(list)
 
         self.get_depends(name=pkg_name, implicit=implicit)
