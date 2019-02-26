@@ -315,8 +315,8 @@ class Manifest(object):
     """
     __slots__ = [
         'description', 'brief',
-        'author', 'license', 'licenses', 'license_url',
-        'url', 'depends', 'rosdeps', 'platforms',
+        'author', 'license', 'licenses', 'license_url', 'url',
+        'depends', 'rosdeps', 'platforms',
         'exports', 'version',
         'status', 'notes',
         'unknown_tags', 'type', 'filename',
@@ -332,8 +332,8 @@ class Manifest(object):
             self.license = self.license_url = \
             self.url = self.status = \
             self.version = self.notes = ''
-        self.depends = []
         self.licenses = []
+        self.depends = []
         self.rosdeps = []
         self.exports = []
         self.platforms = []
