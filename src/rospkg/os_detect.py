@@ -113,14 +113,14 @@ class OsDetector(object):
 
     def get_version(self):
         """
-        :returns: standardized version for this OS. (ala Ubuntu Hardy Heron = "8.04")
+        :returns: standardized version for this OS. (aka Ubuntu Hardy Heron = "8.04")
         :raises: :exc:`OsNotDetected` if called on incorrect OS.
         """
         raise NotImplementedError("get_version unimplemented")
 
     def get_codename(self):
         """
-        :returns: codename for this OS. (ala Ubuntu Hardy Heron = "hardy").  If codenames are not available for this OS, return empty string.
+        :returns: codename for this OS. (aka Ubuntu Hardy Heron = "hardy").  If codenames are not available for this OS, return empty string.
         :raises: :exc:`OsNotDetected` if called on incorrect OS.
         """
         raise NotImplementedError("get_codename unimplemented")
