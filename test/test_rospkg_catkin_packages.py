@@ -36,10 +36,10 @@ import os
 
 import rospkg
 
+search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
+
 
 def test_find_packages():
-    search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
-
     manager = rospkg.rospack.ManifestManager(rospkg.common.MANIFEST_FILE, ros_paths=[search_path])
     # for backward compatibility a wet package which is not a metapackage is found when searching for MANIFEST_FILE
     assert(len(manager.list()) == 1)
@@ -54,14 +54,12 @@ def test_find_packages():
 
 
 def test_get_manifest():
-    search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
     manager = rospkg.rospack.ManifestManager(rospkg.common.MANIFEST_FILE, ros_paths=[search_path])
     manif = manager.get_manifest("foo")
     assert(manif.type == "package")
 
 
 def test_licenses():
-    search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
     manager = rospkg.rospack.RosPack(ros_paths=[search_path])
     manif = manager.get_manifest("foo")
     assert(manif.license == "BSD, LGPL")
