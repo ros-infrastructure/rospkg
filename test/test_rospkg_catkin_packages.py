@@ -60,7 +60,11 @@ def test_get_manifest():
 
 
 def test_licenses():
-    manager = rospkg.rospack.RosPack(ros_paths=[search_path])
-    manif = manager.get_manifest("foo")
-    assert(manif.license == "BSD, LGPL")
-    assert(len(manif.licenses) == 2)  # package.xml in 'foo' defines BSD and LGPL
+    rospack = rospkg.rospack.RosPack(ros_paths=[search_path]) 
+    licenses_list = ["BSD", "LGPL"]
+    licenses_str = ", ".join(licenses_list)
+    manif = rospack.get_manifest("foo")
+    print("DEBUG: manif.licenses={}".format(manif.licenses))
+    assert(manif.license == licenses_str)
+    for license in manif.licenses:
+        assert(license in licenses_list)
