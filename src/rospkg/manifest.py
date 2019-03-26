@@ -315,7 +315,7 @@ class Manifest(object):
     """
     __slots__ = [
         'description', 'brief',
-        'author', 'license', 'license_url', 'url',
+        'author', 'license', 'licenses', 'license_url', 'url',
         'depends', 'rosdeps', 'platforms',
         'exports', 'version',
         'status', 'notes',
@@ -332,6 +332,7 @@ class Manifest(object):
             self.license = self.license_url = \
             self.url = self.status = \
             self.version = self.notes = ''
+        self.licenses = []
         self.depends = []
         self.rosdeps = []
         self.exports = []
@@ -397,6 +398,7 @@ def parse_manifest_file(dirpath, manifest_name, rospack=None):
         manifest.description = p.description
         manifest.author = ', '.join([('Maintainer: %s' % str(m)) for m in p.maintainers] + [str(a) for a in p.authors])
         manifest.license = ', '.join(p.licenses)
+        manifest.licenses = p.licenses
         if p.urls:
             manifest.url = str(p.urls[0])
         manifest.version = p.version
