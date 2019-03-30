@@ -40,17 +40,18 @@ search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_pa
 
 
 def test_find_packages():
+    PKGS_EXIST = ['foo', 'bar']
     manager = rospkg.rospack.ManifestManager(rospkg.common.MANIFEST_FILE, ros_paths=[search_path])
     # for backward compatibility a wet package which is not a metapackage is found when searching for MANIFEST_FILE
-    assert(len(manager.list()) == 1)
+    assert(len(manager.list()) == 2)
     manager = rospkg.rospack.ManifestManager(rospkg.common.STACK_FILE, ros_paths=[search_path])
     assert(len(manager.list()) == 0)
     manager = rospkg.rospack.ManifestManager(rospkg.common.PACKAGE_FILE, ros_paths=[search_path])
 
     for pkg_name in manager.list():
-        assert(pkg_name == 'foo')
+        assert(pkg_name in PKGS_EXIST)
         path = manager.get_path(pkg_name)
-        assert(path == os.path.join(search_path, 'p1', 'foo'))
+        assert(path == os.path.join(search_path, 'p1', PKGS_EXIST[PKGS_EXIST.index(pkg_name)]))
 
 
 def test_get_manifest():
@@ -70,10 +71,9 @@ def test_licenses():
 
 
 def test_get_licenses():
-    search_path = os.path.abspath(os.path.join(os.path.dirname(__file__), 'catkin_package_tests'))
-    manager = rospkg.rospack.RosPack(ros_paths=[search_path])
-    licenses = manager.get_licenses("foo", implicit=False)
-    # package foo declares these 2 licenses.
-    assert not "BSD, LGPL" in licenses
+    """Check licenses from all packages in the dependency chain"""
+    rospack = rospkg.rospack.RosPack(ros_paths=[search_path])
+    licenses = rospack.get_licenses("bar", implicit=True)
+    assert("MIT" in licenses)
     assert("BSD" in licenses)
     assert("LGPL" in licenses)
