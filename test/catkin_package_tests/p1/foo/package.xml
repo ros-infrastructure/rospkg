@@ -14,9 +14,6 @@
   <author>John Doe</author>
   <author email="jane.doe@example.com">Jane Doe</author>
 
-  <build_depend>catkin</build_depend>
-  <build_depend version_gte="1.1" version_lt="2.0">genmsg</build_depend>
-
   <build_depend>libboost-thread-dev</build_depend>
   <run_depend>libboost-thread</run_depend>
 
