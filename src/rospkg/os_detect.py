@@ -214,6 +214,24 @@ class FdoDetect(OsDetector):
         raise OsNotDetected("called in incorrect OS")
 
 
+class OpenEmbedded(OsDetector):
+    """
+    Detect OpenEmbedded.
+    """
+    def is_os(self):
+        return "ROS_OS_OVERRIDE" in os.environ and os.environ["ROS_OS_OVERRIDE"] == "openembedded"
+
+    def get_version(self):
+        if self.is_os():
+            return ""
+        raise OsNotDetected('called in incorrect OS')
+
+    def get_codename(self):
+        if self.is_os():
+            return ""
+        raise OsNotDetected('called in incorrect OS')
+
+
 class OpenSuse(OsDetector):
     """
     Detect OpenSuse OS.
@@ -693,6 +711,7 @@ OS_LINARO = 'linaro'
 OS_MINT = 'mint'
 OS_MX = 'mx'
 OS_NEON = 'neon'
+OS_OPENEMBEDDED = 'openembedded'
 OS_OPENSUSE = 'opensuse'
 OS_TIZEN = 'tizen'
 OS_OPENSUSE13 = 'opensuse'
@@ -720,6 +739,7 @@ OsDetect.register_default(OS_LINARO, LsbDetect("Linaro"))
 OsDetect.register_default(OS_MINT, LsbDetect("LinuxMint"))
 OsDetect.register_default(OS_MX, LsbDetect("MX"))
 OsDetect.register_default(OS_NEON, LsbDetect("neon"))
+OsDetect.register_default(OS_OPENEMBEDDED, OpenEmbedded())
 OsDetect.register_default(OS_OPENSUSE, OpenSuse())
 OsDetect.register_default(OS_OPENSUSE13, OpenSuse(brand_file='/etc/SUSE-brand'))
 OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse"))
