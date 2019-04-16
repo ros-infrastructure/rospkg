@@ -39,6 +39,7 @@ if 'SKIP_PYTHON_MODULES' in os.environ:
     kwargs['package_dir'] = {}
 if 'SKIP_PYTHON_SCRIPTS' in os.environ:
     kwargs['name'] += '_modules'
+    kwargs['install_requires'].remove('catkin_pkg')
     kwargs['scripts'] = []
     kwargs['entry_points']['console_scripts'] = []
 
