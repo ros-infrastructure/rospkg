@@ -328,7 +328,7 @@ class Rhel(Fedora):
         raise OsNotDetected('called in incorrect OS')
 
 
-# Source: http://en.wikipedia.org/wiki/Mac_OS_X#Versions
+# Source: https://en.wikipedia.org/wiki/MacOS#Versions
 _osx_codename_map = {
     4: 'tiger',
     5: 'leopard',
@@ -341,6 +341,7 @@ _osx_codename_map = {
     12: 'sierra',
     13: 'high sierra',
     14: 'mojave',
+    15: 'catalina',
 }
 
 
