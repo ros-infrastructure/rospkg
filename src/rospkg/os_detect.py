@@ -714,15 +714,16 @@ OS_MX = 'mx'
 OS_NEON = 'neon'
 OS_OPENEMBEDDED = 'openembedded'
 OS_OPENSUSE = 'opensuse'
-OS_TIZEN = 'tizen'
 OS_OPENSUSE13 = 'opensuse'
+OS_TIZEN = 'tizen'
 OS_OSX = 'osx'
 OS_QNX = 'qnx'
 OS_RHEL = 'rhel'
 OS_SLACKWARE = 'slackware'
 OS_UBUNTU = 'ubuntu'
-OS_WINDOWS = 'windows'
 OS_CLEARLINUX = 'clearlinux'
+OS_NIXOS = 'nixos'
+OS_WINDOWS = 'windows'
 
 OsDetect.register_default(OS_ALPINE, FdoDetect("alpine"))
 OsDetect.register_default(OS_ARCH, Arch())
@@ -751,6 +752,7 @@ OsDetect.register_default(OS_RHEL, Rhel())
 OsDetect.register_default(OS_SLACKWARE, Slackware())
 OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
 OsDetect.register_default(OS_CLEARLINUX, FdoDetect("clear-linux-os"))
+OsDetect.register_default(OS_NIXOS, FdoDetect("nixos"))
 OsDetect.register_default(OS_WINDOWS, Windows())
 
 
