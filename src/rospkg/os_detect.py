@@ -724,6 +724,7 @@ OS_UBUNTU = 'ubuntu'
 OS_CLEARLINUX = 'clearlinux'
 OS_NIXOS = 'nixos'
 OS_WINDOWS = 'windows'
+OS_ZORIN =  'zorin'
 
 OsDetect.register_default(OS_ALPINE, FdoDetect("alpine"))
 OsDetect.register_default(OS_ARCH, Arch())
@@ -754,6 +755,7 @@ OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
 OsDetect.register_default(OS_CLEARLINUX, FdoDetect("clear-linux-os"))
 OsDetect.register_default(OS_NIXOS, FdoDetect("nixos"))
 OsDetect.register_default(OS_WINDOWS, Windows())
+OsDetect.register_default(OS_ZORIN, LsbDetect("Zorin"))
 
 
 if __name__ == '__main__':
