@@ -214,6 +214,19 @@ class FdoDetect(OsDetector):
         raise OsNotDetected("called in incorrect OS")
 
 
+class Alpine(FdoDetect):
+    """
+    Detect Alpine Linux
+    """
+    def __init__(self):
+        super(Alpine, self).__init__('alpine')
+
+    def get_codename(self):
+        if self.is_os():
+            return ".".join(self.get_version().split('.')[:2])
+        raise OsNotDetected('called in incorrect OS')
+
+
 class OpenEmbedded(OsDetector):
     """
     Detect OpenEmbedded.
@@ -725,7 +738,7 @@ OS_CLEARLINUX = 'clearlinux'
 OS_NIXOS = 'nixos'
 OS_WINDOWS = 'windows'
 
-OsDetect.register_default(OS_ALPINE, FdoDetect("alpine"))
+OsDetect.register_default(OS_ALPINE, Alpine())
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_MANJARO, Manjaro())
 OsDetect.register_default(OS_CENTOS, Centos())
