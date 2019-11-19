@@ -255,6 +255,9 @@ class OpenSuse(OsDetector):
         raise OsNotDetected('cannot get version on this OS')
 
     def get_codename(self):
+        # /etc/SuSE-release is deprecated since 13.1
+        if self._release_file is None:
+            return ""
         if self.is_os() and os.path.exists(self._release_file):
             with open(self._release_file, 'r') as fh:
                 os_list = fh.read().strip().split('\n')
@@ -744,7 +747,8 @@ OsDetect.register_default(OS_MX, LsbDetect("MX"))
 OsDetect.register_default(OS_NEON, LsbDetect("neon"))
 OsDetect.register_default(OS_OPENEMBEDDED, OpenEmbedded())
 OsDetect.register_default(OS_OPENSUSE, OpenSuse())
-OsDetect.register_default(OS_OPENSUSE13, OpenSuse(brand_file='/etc/SUSE-brand'))
+OsDetect.register_default(OS_OPENSUSE13, OpenSuse(brand_file='/etc/SUSE-brand', release_file=None))
+OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse-tumbleweed"))
 OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse"))
 OsDetect.register_default(OS_TIZEN, FdoDetect("tizen"))
 OsDetect.register_default(OS_OSX, OSX())
