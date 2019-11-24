@@ -35,6 +35,7 @@ Linux distributions.
 from __future__ import print_function
 
 import codecs
+import distro
 import locale
 import os
 import platform
@@ -131,10 +132,10 @@ class LsbDetect(OsDetector):
     """
     def __init__(self, lsb_name, get_version_fn=None):
         self.lsb_name = lsb_name
-        if hasattr(platform, "linux_distribution"):
-            self.lsb_info = platform.linux_distribution(full_distribution_name=0)
-        elif hasattr(platform, "dist"):
-            self.lsb_info = platform.dist()
+        if hasattr(distro, "linux_distribution"):
+            self.lsb_info = distro.linux_distribution(full_distribution_name=0)
+        elif hasattr(distro, "dist"):
+            self.lsb_info = distro.dist()
         else:
             self.lsb_info = None
 
