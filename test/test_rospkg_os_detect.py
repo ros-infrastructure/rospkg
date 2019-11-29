@@ -101,9 +101,9 @@ def test_LsbDetect():
     # test match
     # to be removed after Ubuntu Xenial is out of support
     try:
-        import distro
-    except ModuleNotFoundError:
         import platform as distro
+    except ModuleNotFoundError:
+        import distro
 
     distro.linux_distribution = mock.Mock()
     distro.linux_distribution.return_value = ('Ubuntu', '10.04', 'lucid')
