@@ -35,7 +35,11 @@ Linux distributions.
 from __future__ import print_function
 
 import codecs
-import distro
+# to be removed after Ubuntu Xenial is out of support
+try:
+    import distro
+except ModuleNotFoundError:
+    import platform as distro
 import locale
 import os
 import platform
