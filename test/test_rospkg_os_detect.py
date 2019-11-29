@@ -99,11 +99,11 @@ def test_LsbDetect():
         pass
 
     # test match
-    import platform
-    platform.linux_distribution = mock.Mock()
-    platform.linux_distribution.return_value = ('Ubuntu', '10.04', 'lucid')
-    platform.dist = mock.Mock()
-    platform.dist.return_value = ('Ubuntu', '10.04', 'lucid')
+    import distro
+    distro.linux_distribution = mock.Mock()
+    distro.linux_distribution.return_value = ('Ubuntu', '10.04', 'lucid')
+    distro.dist = mock.Mock()
+    distro.dist.return_value = ('Ubuntu', '10.04', 'lucid')
 
     detect = LsbDetect('Ubuntu')
     assert detect.is_os(), "should be Ubuntu"
