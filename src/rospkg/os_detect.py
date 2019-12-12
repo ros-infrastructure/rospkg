@@ -200,10 +200,10 @@ class FdoDetect(OsDetector):
             if "VERSION" in self.release_info:
                 version = self.release_info["VERSION"]
                 # FDO style: works with Fedora, Debian, Suse.
-                if version.find("(") is not -1:
+                if '(' in version:
                     codename = version[version.find("(") + 1:version.find(")")]
                 # Ubuntu style
-                elif version.find(",") is not -1:
+                elif '"' in version:
                     codename = version[version.find(",") + 1:].lstrip(' ').split()[0]
                 # Indeterminate style
                 else:
