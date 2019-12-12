@@ -104,7 +104,7 @@ def test_LsbDetect():
     # to be removed after Ubuntu Xenial is out of support
     try:
         import platform as distro
-    except ModuleNotFoundError:
+    except ImportError:
         import distro
 
     distro.linux_distribution = mock.Mock()

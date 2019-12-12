@@ -39,7 +39,7 @@ import codecs
 # to be removed after Ubuntu Xenial is out of support
 try:
     import platform as distro
-except ModuleNotFoundError:
+except ImportError:
     import distro
 import locale
 import os
