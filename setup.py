@@ -5,6 +5,14 @@ import sys
 
 from setuptools import setup
 
+install_requires = ['catkin_pkg', 'PyYAML']
+
+if (
+    'SKIP_PYTHON_MODULES' not in os.environ and
+    'SKIP_PYTHON_SCRIPTS' not in os.environ
+):
+    install_requires.append('distro')
+
 kwargs = {
     'name': 'rospkg',
     # same version as in:
@@ -16,7 +24,7 @@ kwargs = {
     'entry_points': {
         'console_scripts': ['rosversion=rospkg.rosversion:main'],
     },
-    'install_requires': ['catkin_pkg', 'distro', 'PyYAML'],
+    'install_requires': install_requires,
     'author': 'Ken Conley',
     'author_email': 'kwc@willowgarage.com',
     'url': 'http://wiki.ros.org/rospkg',
