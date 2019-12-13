@@ -30,6 +30,8 @@
 # ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 # POSSIBILITY OF SUCH DAMAGE.
 
+from __future__ import absolute_import
+
 import os
 
 import mock
@@ -99,11 +101,16 @@ def test_LsbDetect():
         pass
 
     # test match
-    import platform
-    platform.linux_distribution = mock.Mock()
-    platform.linux_distribution.return_value = ('Ubuntu', '10.04', 'lucid')
-    platform.dist = mock.Mock()
-    platform.dist.return_value = ('Ubuntu', '10.04', 'lucid')
+    # to be removed after Ubuntu Xenial is out of support
+    try:
+        import platform as distro
+    except ImportError:
+        import distro
+
+    distro.linux_distribution = mock.Mock()
+    distro.linux_distribution.return_value = ('Ubuntu', '10.04', 'lucid')
+    distro.dist = mock.Mock()
+    distro.dist.return_value = ('Ubuntu', '10.04', 'lucid')
 
     detect = LsbDetect('Ubuntu')
     assert detect.is_os(), "should be Ubuntu"

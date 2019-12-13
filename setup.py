@@ -16,7 +16,7 @@ kwargs = {
     'entry_points': {
         'console_scripts': ['rosversion=rospkg.rosversion:main'],
     },
-    'install_requires': ['catkin_pkg', 'PyYAML'],
+    'install_requires': ['catkin_pkg', 'distro', 'PyYAML'],
     'author': 'Ken Conley',
     'author_email': 'kwc@willowgarage.com',
     'url': 'http://wiki.ros.org/rospkg',
