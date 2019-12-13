@@ -8,8 +8,8 @@ from setuptools import setup
 install_requires = ['catkin_pkg', 'PyYAML']
 
 if (
-    sys.version_info[0] > 3 or
-    sys.version_info[0] == 3 and sys.version_info[1] >= 8
+    'SKIP_PYTHON_MODULES' not in os.environ and
+    'SKIP_PYTHON_SCRIPTS' not in os.environ
 ):
     install_requires.append('distro')
 
