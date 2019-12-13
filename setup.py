@@ -10,7 +10,7 @@ kwargs = {
     # same version as in:
     # - src/rospkg/__init__.py
     # - stdeb.cfg
-    'version': '1.2.0',
+    'version': '1.2.1',
     'packages': ['rospkg'],
     'package_dir': {'': 'src'},
     'entry_points': {
