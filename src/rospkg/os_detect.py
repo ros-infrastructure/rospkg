@@ -37,10 +37,11 @@ from __future__ import print_function
 
 import codecs
 # to be removed after Ubuntu Xenial is out of support
-try:
-    import platform as distro
-except ImportError:
+import sys
+if sys.version_info >= (3, 8):
     import distro
+else:
+    import platform as distro
 import locale
 import os
 import platform
