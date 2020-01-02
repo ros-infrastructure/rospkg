@@ -163,6 +163,10 @@ def test_tripwire_osx():
 
 
 def test_osx():
+    if 'posix' != os.name:
+        from unittest.case import SkipTest
+        raise SkipTest('Test requires POSIX platform, not "{}"'.format(os.name))
+
     from rospkg.os_detect import OSX, _osx_codename, OsNotDetected
     test_dir = os.path.join(get_test_dir(), 'osx')
     detect = OSX(os.path.join(test_dir, "sw_vers"))
