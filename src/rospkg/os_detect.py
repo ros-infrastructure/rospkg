@@ -146,7 +146,10 @@ class LsbDetect(OsDetector):
             self.lsb_info = None
 
     def is_os(self):
-        return self.lsb_info is not None and self.lsb_info[0] == self.lsb_name
+        if self.lsb_info is None:
+            return False
+        # Work around platform returning 'Ubuntu' and distro returning 'ubuntu'
+        return self.lsb_info[0].lower() == self.lsb_name.lower()
 
     def get_version(self):
         if self.is_os():
