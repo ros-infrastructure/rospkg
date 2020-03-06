@@ -418,7 +418,7 @@ def parse_manifest_file(dirpath, manifest_name, rospack=None):
             if _static_rosdep_view:
                 depends = set([])
                 rosdeps = set([])
-                for d in (p.buildtool_depends + p.build_depends + p.run_depends + p.test_depends):
+                for d in (p.buildtool_depends + p.buildtool_export_depends + p.build_depends + p.run_depends + p.test_depends):
                     if (rospack and d.name in rospack.list()) or is_ros_package(_static_rosdep_view, d.name):
                         depends.add(d.name)
                     if is_system_dependency(_static_rosdep_view, d.name):
