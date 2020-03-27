@@ -31,8 +31,13 @@
 # POSSIBILITY OF SUCH DAMAGE.
 
 import os
+import sys
 from threading import Lock
-from xml.etree.cElementTree import ElementTree
+
+if sys.version_info >= (3, 3):
+    from xml.etree.ElementTree import ElementTree
+else:
+    from xml.etree.cElementTree import ElementTree
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, ResourceNotFound, STACK_FILE
 from .environment import get_ros_paths
