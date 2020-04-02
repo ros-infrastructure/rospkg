@@ -32,7 +32,11 @@
 
 import os
 from threading import Lock
-from xml.etree.cElementTree import ElementTree
+
+try:
+    from xml.etree.cElementTree import ElementTree
+except ImportError:
+    from xml.etree.ElementTree import ElementTree
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, ResourceNotFound, STACK_FILE
 from .environment import get_ros_paths
