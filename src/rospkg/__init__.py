@@ -45,7 +45,7 @@ from .rospack import expand_to_packages, get_package_name, \
 # same version as in:
 # - setup.py
 # - stdeb.cfg
-__version__ = '1.2.3'
+__version__ = '1.2.4'
 
 __all__ = (
     'MANIFEST_FILE', 'ResourceNotFound', 'STACK_FILE',
