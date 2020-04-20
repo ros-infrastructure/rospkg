@@ -37,7 +37,8 @@ if sys.version_info[0] == 2 and sys.version_info[1] < 7:
 if (
     sys.version_info[0] < 3 or
     (sys.version_info[0] == 3 and sys.version_info[1] < 8) or
-    'SKIP_PYTHON_MODULES' in os.environ
+    'SKIP_PYTHON_MODULES' in os.environ or
+    'SKIP_PYTHON_SCRIPTS' in os.environ
 ):
     kwargs['install_requires'].remove('distro')
 
