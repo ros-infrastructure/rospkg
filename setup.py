@@ -5,14 +5,6 @@ import sys
 
 from setuptools import setup
 
-install_requires = ['catkin_pkg', 'PyYAML']
-
-if (
-    'SKIP_PYTHON_MODULES' not in os.environ and
-    'SKIP_PYTHON_SCRIPTS' not in os.environ
-):
-    install_requires.append('distro')
-
 kwargs = {
     'name': 'rospkg',
     # same version as in:
@@ -24,7 +16,7 @@ kwargs = {
     'entry_points': {
         'console_scripts': ['rosversion=rospkg.rosversion:main'],
     },
-    'install_requires': install_requires,
+    'install_requires': ['catkin_pkg', 'distro', 'PyYAML'],
     'author': 'Ken Conley',
     'author_email': 'kwc@willowgarage.com',
     'url': 'http://wiki.ros.org/rospkg',
@@ -42,13 +34,21 @@ kwargs = {
 if sys.version_info[0] == 2 and sys.version_info[1] < 7:
     kwargs['install_requires'].append('argparse')
 
+if sys.version_info[0] < 3 or (sys.version_info[0] == 3 and
+        sys.version_info[1] < 8):
+    kwargs['install_requires'].remove('distro')
+
 if 'SKIP_PYTHON_MODULES' in os.environ:
     kwargs['packages'] = []
     kwargs['package_dir'] = {}
-    kwargs['install_requires'].remove('catkin_pkg')
+    kwargs['install_requires'] = [
+        p for p in kwargs['install_requires']
+        if p not in {'catkin_pkg', 'distro'}]
 if 'SKIP_PYTHON_SCRIPTS' in os.environ:
     kwargs['name'] += '_modules'
-    kwargs['install_requires'].remove('catkin_pkg')
+    kwargs['install_requires'] = [
+        p for p in kwargs['install_requires']
+        if p not in {'catkin_pkg', 'distro'}]
     kwargs['scripts'] = []
     kwargs['entry_points']['console_scripts'] = []
 
