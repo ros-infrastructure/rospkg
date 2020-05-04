@@ -26,6 +26,7 @@ Currently supported OSes:
 - Gentoo
 - Mint
 - OS X
+- Pop! OS
 - Red Hat Linux
 - Slackware 
 - Ubuntu
@@ -136,6 +137,10 @@ OS name definitions
 .. data:: OS_OSX
 
    Name used for OS X.
+
+.. data:: OS_POP
+
+   Name used for Pop! OS.
 
 .. data:: OS_RHEL
 
