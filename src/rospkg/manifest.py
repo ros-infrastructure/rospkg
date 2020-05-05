@@ -314,11 +314,11 @@ class Manifest(object):
     Object representation of a ROS manifest file (``manifest.xml`` and ``stack.xml``)
     """
     __slots__ = [
-        'description', 'brief',
+        'name', 'description', 'brief',
         'author', 'license', 'licenses', 'license_url', 'url',
         'depends', 'rosdeps', 'platforms',
         'exports', 'version',
-        'status', 'name', 'notes',
+        'status', 'notes',
         'unknown_tags', 'type', 'filename',
         'is_catkin']
 
