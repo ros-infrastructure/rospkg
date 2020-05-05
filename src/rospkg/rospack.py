@@ -398,7 +398,7 @@ class RosPack(ManifestManager):
             for the given package. Special value 'ERR' is used as the license for the
             packages that license was not detected for.
         @param pkg_name: Name of the package the dependency tree begins from.
-        @return Dictionary of license name and a list of packages.
+        @return OrderedDict of license name and a list of packages.
         @rtype { k, [d] }
         @raise ResourceNotFound
         """
@@ -421,8 +421,7 @@ class RosPack(ManifestManager):
             list_key.sort()
         # Sort license names
         licenses = OrderedDict(sorted(license_dict.items()))
-        # Convert to dict for user friendlier output.
-        return dict(licenses)
+        return licenses
 
 
 class RosStack(ManifestManager):
