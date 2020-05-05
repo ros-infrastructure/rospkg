@@ -73,7 +73,9 @@ def test_licenses():
 def test_get_licenses():
     """Check licenses from all packages in the dependency chain"""
     rospack = rospkg.rospack.RosPack(ros_paths=[search_path])
-    licenses_list = [None, "MIT", "BSD", "LGPL"]  # Licenses of 'bar and 'foo'. License for some deps are undetermined so 'None'.
+    # Union on the licenses of 'bar and 'foo'.
+    # License for some deps are undetermined so LICENSE_NOT_FOUND.
+    licenses_list = [rospack.LICENSE_NOT_FOUND, "MIT", "BSD", "LGPL"]
     licenses = rospack.get_licenses("bar", implicit=True)
     assert("MIT" in licenses)
     assert("BSD" in licenses)

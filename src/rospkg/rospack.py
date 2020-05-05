@@ -328,6 +328,8 @@ class RosPack(ManifestManager):
       direct_depends = rp.get_depends('roscpp', implicit=False)
     """
 
+    LICENSE_NOT_FOUND= "license_not_found"
+
     def __init__(self, ros_paths=None):
         """
         :param ros_paths: Ordered list of paths to search for
@@ -395,14 +397,13 @@ class RosPack(ManifestManager):
     def get_licenses(self, pkg_name, implicit=True):
         """
         @summary: Return a list of licenses and the packages in the dependency tree
-            for the given package. Special value 'ERR' is used as the license for the
+            for the given package. Special value 'license_not_found' is used as the license for the
             packages that license was not detected for.
         @param pkg_name: Name of the package the dependency tree begins from.
         @return OrderedDict of license name and a list of packages.
         @rtype { k, [d] }
         @raise ResourceNotFound
         """
-        MSG_LICENSE_NOTFOUND_SYSPKG = "ERR"
         license_dict = defaultdict(list)
 
         self.get_depends(name=pkg_name, implicit=implicit)
@@ -414,12 +415,12 @@ class RosPack(ManifestManager):
         # Traverse for Non-ROS, system packages
         pkgnames_rosdep = self.get_rosdeps(package=pkg_name, implicit=implicit)
         for pkgname_rosdep in pkgnames_rosdep:
-            license_dict[MSG_LICENSE_NOTFOUND_SYSPKG].append(pkgname_rosdep)
+            license_dict[self.LICENSE_NOT_FOUND].append(pkgname_rosdep)
 
-        # Sort pkg names in each license
+        # Sort pkg names within the set of pkgs with  each license
         for list_key in license_dict.values():
             list_key.sort()
-        # Sort license names
+        # Sort licenspe names
         licenses = OrderedDict(sorted(license_dict.items()))
         return licenses
 
