@@ -134,7 +134,7 @@ class OsDetector(object):
 
 class LsbDetect(OsDetector):
     """
-    Generic detector for Debian, Ubuntu, and Mint
+    Generic detector for Debian, Ubuntu, Mint, and Pop! OS
     """
     def __init__(self, lsb_name, get_version_fn=None):
         self.lsb_name = lsb_name
@@ -731,6 +731,7 @@ OS_OPENSUSE13 = 'opensuse'
 OS_TIZEN = 'tizen'
 OS_SAILFISHOS = 'sailfishos'
 OS_OSX = 'osx'
+OS_POP = 'pop'
 OS_QNX = 'qnx'
 OS_RHEL = 'rhel'
 OS_SLACKWARE = 'slackware'
@@ -764,6 +765,7 @@ OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse"))
 OsDetect.register_default(OS_TIZEN, FdoDetect("tizen"))
 OsDetect.register_default(OS_SAILFISHOS, FdoDetect("sailfishos"))
 OsDetect.register_default(OS_OSX, OSX())
+OsDetect.register_default(OS_POP, LsbDetect("Pop"))
 OsDetect.register_default(OS_QNX, QNX())
 OsDetect.register_default(OS_RHEL, Rhel())
 OsDetect.register_default(OS_SLACKWARE, Slackware())
