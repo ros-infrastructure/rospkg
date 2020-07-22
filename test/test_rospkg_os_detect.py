@@ -410,7 +410,7 @@ def test_OsDetector():
 def test_tripwire_uname_get_machine():
     from rospkg.os_detect import uname_get_machine
     retval = uname_get_machine()
-    assert retval in [None, 'aarch64', 'armv7l', 'i386', 'i686', 'ppc', 'ppc64', 'ppc64le', 's390', 's390x', 'x86_64']
+    assert retval in [None, 'aarch64', 'armv7l', 'armv8l', 'i386', 'i686', 'ppc', 'ppc64', 'ppc64le', 's390', 's390x', 'x86_64']
 
 
 def test_tripwire_rhel():
