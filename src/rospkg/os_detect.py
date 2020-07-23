@@ -481,6 +481,18 @@ class Centos(OsDetector):
         raise OsNotDetected('called in incorrect OS')
 
 
+class Euleros(Centos):
+    """
+    Detect Euleros.
+    """
+    def __init__(self, release_file='/etc/euleros-release'):
+        super(Euleros, self).__init__(release_file)
+
+    def is_os(self):
+        os_list = read_issue(self._release_file)
+        return os_list and os_list[0] == 'EulerOS'
+
+
 class Cygwin(OsDetector):
     """
     Detect Cygwin presence on Windows OS.
@@ -714,6 +726,7 @@ OS_ARCH = 'arch'
 OS_BUILDROOT = 'buildroot'
 OS_MANJARO = 'manjaro'
 OS_CENTOS = 'centos'
+OS_EULEROS = 'euleros'
 OS_CYGWIN = 'cygwin'
 OS_DEBIAN = 'debian'
 OS_ELEMENTARY = 'elementary'
@@ -747,6 +760,7 @@ OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_BUILDROOT, FdoDetect("buildroot"))
 OsDetect.register_default(OS_MANJARO, Manjaro())
 OsDetect.register_default(OS_CENTOS, Centos())
+OsDetect.register_default(OS_EULEROS, Euleros())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
 OsDetect.register_default(OS_DEBIAN, Debian())
 OsDetect.register_default(OS_ELEMENTARY, LsbDetect("elementary"))
