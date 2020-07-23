@@ -711,6 +711,7 @@ class OsDetect:
 
 OS_ALPINE = 'alpine'
 OS_ARCH = 'arch'
+OS_BUILDROOT = 'buildroot'
 OS_MANJARO = 'manjaro'
 OS_CENTOS = 'centos'
 OS_CYGWIN = 'cygwin'
@@ -743,6 +744,7 @@ OS_ZORIN =  'zorin'
 
 OsDetect.register_default(OS_ALPINE, FdoDetect("alpine"))
 OsDetect.register_default(OS_ARCH, Arch())
+OsDetect.register_default(OS_BUILDROOT, FdoDetect("buildroot"))
 OsDetect.register_default(OS_MANJARO, Manjaro())
 OsDetect.register_default(OS_CENTOS, Centos())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
