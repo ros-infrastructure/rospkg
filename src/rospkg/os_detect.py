@@ -390,6 +390,8 @@ class MacOS(OsDetector):
             return _read_stdout([self._sw_vers_file, '-productVersion'])
         raise OsNotDetected('called in incorrect OS')
 
+OSX = MacOS
+
         
 class QNX(OsDetector):
     '''
