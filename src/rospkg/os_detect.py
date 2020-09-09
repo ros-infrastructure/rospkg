@@ -341,7 +341,7 @@ class Rhel(Fedora):
         raise OsNotDetected('called in incorrect OS')
 
 
-class MacOS(OSDetector):
+class MacOS(OsDetector):
     """
     Detect OS X or macOS
     """
