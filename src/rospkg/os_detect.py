@@ -341,38 +341,38 @@ class Rhel(Fedora):
         raise OsNotDetected('called in incorrect OS')
 
 
-# Source: https://en.wikipedia.org/wiki/MacOS#Versions
-_osx_codename_map = {
-    4: 'tiger',
-    5: 'leopard',
-    6: 'snow',
-    7: 'lion',
-    8: 'mountain lion',
-    9: 'mavericks',
-    10: 'yosemite',
-    11: 'el capitan',
-    12: 'sierra',
-    13: 'high sierra',
-    14: 'mojave',
-    15: 'catalina',
-}
-
-
-def _osx_codename(major, minor):
-    if major != 10 or minor not in _osx_codename_map:
-        raise OsNotDetected("unrecognized version: %s.%s" % (major, minor))
-    return _osx_codename_map[minor]
-
-
-class OSX(OsDetector):
+class MacOS(OSDetector)
     """
-    Detect OS X
+    Detect OS X or macOS
     """
     def __init__(self, sw_vers_file="/usr/bin/sw_vers"):
         self._sw_vers_file = sw_vers_file
 
     def is_os(self):
         return os.path.exists(self._sw_vers_file)
+
+    # Source: https://en.wikipedia.org/wiki/MacOS#Versions
+    _osx_codename_map = {
+        4: 'tiger',
+        5: 'leopard',
+        6: 'snow',
+        7: 'lion',
+        8: 'mountain lion',
+        9: 'mavericks',
+        10: 'yosemite',
+        11: 'el capitan',
+        12: 'sierra',
+        13: 'high sierra',
+        14: 'mojave',
+        15: 'catalina',
+    }
+
+    def _osx_codename(major, minor):
+        if major == 11:
+            return 'big sur'
+        if major != 10 or minor not in self._osx_codename_map:
+            raise OsNotDetected("unrecognized version: %s.%s" % (major, minor))
+        return self._osx_codename_map[minor]
 
     def get_codename(self):
         if self.is_os():
@@ -382,7 +382,7 @@ class OSX(OsDetector):
                 ver = distutils.version.StrictVersion(version).version
             except ValueError:
                 raise OsNotDetected("invalid version string: %s" % (version))
-            return _osx_codename(*ver[0:2])
+            return self._osx_codename(*ver[0:2])
         raise OsNotDetected('called in incorrect OS')
 
     def get_version(self):
@@ -390,7 +390,7 @@ class OSX(OsDetector):
             return _read_stdout([self._sw_vers_file, '-productVersion'])
         raise OsNotDetected('called in incorrect OS')
 
-
+        
 class QNX(OsDetector):
     '''
     Detect QNX realtime OS.
