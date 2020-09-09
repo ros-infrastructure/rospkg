@@ -744,6 +744,7 @@ OS_OPENSUSE = 'opensuse'
 OS_OPENSUSE13 = 'opensuse'
 OS_TIZEN = 'tizen'
 OS_SAILFISHOS = 'sailfishos'
+OS_MACOS = 'macos'
 OS_OSX = 'osx'
 OS_POP = 'pop'
 OS_QNX = 'qnx'
@@ -780,7 +781,8 @@ OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse-tumbleweed"))
 OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse"))
 OsDetect.register_default(OS_TIZEN, FdoDetect("tizen"))
 OsDetect.register_default(OS_SAILFISHOS, FdoDetect("sailfishos"))
-OsDetect.register_default(OS_OSX, OSX())
+OsDetect.register_default(OS_OSX, MacOS())
+OsDetect.register_default(OS_MACOS, MacOS())
 OsDetect.register_default(OS_POP, LsbDetect("Pop"))
 OsDetect.register_default(OS_QNX, QNX())
 OsDetect.register_default(OS_RHEL, Rhel())
