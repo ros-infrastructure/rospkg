@@ -167,7 +167,7 @@ def test_osx():
         from unittest.case import SkipTest
         raise SkipTest('Test requires POSIX platform, not "{}"'.format(os.name))
 
-    from rospkg.os_detect import OSX, _osx_codename, OsNotDetected
+    from rospkg.os_detect import OSX, OsNotDetected
     test_dir = os.path.join(get_test_dir(), 'osx')
     detect = OSX(os.path.join(test_dir, "sw_vers"))
     assert detect.is_os()
@@ -179,14 +179,6 @@ def test_osx():
     assert detect.is_os()
     try:
         detect.get_codename()
-        assert False
-    except OsNotDetected:
-        pass
-
-    # regression test codename mapping
-    assert 'lion' == _osx_codename(10, 7)
-    try:
-        _osx_codename(9, 7)
         assert False
     except OsNotDetected:
         pass
