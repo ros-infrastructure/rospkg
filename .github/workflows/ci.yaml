@@ -44,6 +44,9 @@ jobs:
           python-version: ${{matrix.python}}
       - name: Install dependencies
         run: |
+          if test ${{matrix.python}} = 2.7; then
+            python -m pip install pyparsing==2.4.7
+          fi
           python -m pip install --upgrade pip setuptools
           python -m pip install nose coverage mock
           python setup.py build develop
