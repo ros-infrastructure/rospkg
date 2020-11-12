@@ -45,7 +45,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip setuptools
-          python -m pip install nose coverage
+          python -m pip install nose coverage mock
           python setup.py build develop
       - name: Run tests
         run: |
