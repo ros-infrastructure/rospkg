@@ -57,5 +57,3 @@ jobs:
       - name: Run tests
         run: |
           python -m nose --with-coverage --cover-package=rospkg --with-xunit test
-
-
