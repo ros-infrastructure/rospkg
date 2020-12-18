@@ -474,9 +474,12 @@ class Centos(OsDetector):
             os_list = read_issue(self._release_file)
             idx = os_list.index('release')
             matches = [x for x in os_list if x[0] == '(']
-            codename = matches[0][1:]
-            if codename[-1] == ')':
-                codename = codename[:-1]
+            if matches:
+                codename = matches[0][1:]
+                if codename[-1] == ')':
+                    codename = codename[:-1]
+            else:
+                codename = os_list[-1]
             return codename.lower()
         raise OsNotDetected('called in incorrect OS')
 

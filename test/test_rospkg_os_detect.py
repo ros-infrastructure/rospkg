@@ -439,6 +439,11 @@ def test_redhat():
     assert detect.get_version() == '4'
     assert detect.get_codename() == 'nahant'
 
+    detect = Rhel(os.path.join(test_dir, "redhat-release-ootpa"))
+    assert detect.is_os()
+    assert detect.get_version() == '8.3'
+    assert detect.get_codename() == 'ootpa'
+
     # test freely
     detect = Rhel()
     if not detect.is_os():
@@ -554,6 +559,42 @@ def test_cygwin():
         detect = Cygwin()
         assert detect.get_codename() == ''
     test()
+
+
+def test_tripwire_centos():
+    from rospkg.os_detect import OsDetect
+    os_detect = OsDetect()
+    os_detect.get_detector('centos')
+
+
+def test_centos():
+    from rospkg.os_detect import Centos, OsNotDetected
+    test_dir = os.path.join(get_test_dir(), 'centos')
+
+    # go through several test files
+    detect = Centos(os.path.join(test_dir, "redhat-release-8.2"))
+    assert detect.is_os()
+    assert detect.get_version() == '8.2.2004'
+    assert detect.get_codename() == 'core'
+
+    detect = Centos(os.path.join(test_dir, "redhat-release-8.3"))
+    assert detect.is_os()
+    assert detect.get_version() == '8.3.2011'
+    assert detect.get_codename() == '8.3.2011'
+
+    # test freely
+    detect = Centos()
+    if not detect.is_os():
+        try:
+            detect.get_version()
+            assert False
+        except OsNotDetected:
+            pass
+        try:
+            detect.get_codename()
+            assert False
+        except OsNotDetected:
+            pass
 
 
 def test_OsDetect():
