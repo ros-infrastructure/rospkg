@@ -1,3 +1,8 @@
+1.2.10 (2021-02-04)
+-------------------
+- Fix CentOS 8.3 detection
+  - https://github.com/ros-infrastructure/rospkg/pull/215
+
 1.2.9 (2020-11-12)
 ------------------
 - Add armv8l to tripwire_uname test.
