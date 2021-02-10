@@ -343,25 +343,31 @@ class Rhel(Fedora):
 
 # Source: https://en.wikipedia.org/wiki/MacOS#Versions
 _osx_codename_map = {
-    4: 'tiger',
-    5: 'leopard',
-    6: 'snow',
-    7: 'lion',
-    8: 'mountain lion',
-    9: 'mavericks',
-    10: 'yosemite',
-    11: 'el capitan',
-    12: 'sierra',
-    13: 'high sierra',
-    14: 'mojave',
-    15: 'catalina',
+    10:{
+        4: 'tiger',
+        5: 'leopard',
+        6: 'snow',
+        7: 'lion',
+        8: 'mountain lion',
+        9: 'mavericks',
+        10: 'yosemite',
+        11: 'el capitan',
+        12: 'sierra',
+        13: 'high sierra',
+        14: 'mojave',
+        15: 'catalina',
+    },
+    11:{
+        0: 'big sur',
+    }
 }
 
 
 def _osx_codename(major, minor):
-    if major != 10 or minor not in _osx_codename_map:
+    
+    if ((major not in _osx_codename_map) or (minor not in _osx_codename_map[major])):
         raise OsNotDetected("unrecognized version: %s.%s" % (major, minor))
-    return _osx_codename_map[minor]
+    return _osx_codename_map[major][minor]
 
 
 class OSX(OsDetector):
