@@ -278,69 +278,6 @@ class OpenSuse(OsDetector):
         raise OsNotDetected('called in incorrect OS')
 
 
-class Fedora(OsDetector):
-    """
-    Detect Fedora OS.
-    """
-    def __init__(self, release_file="/etc/redhat-release", issue_file="/etc/issue"):
-        self._release_file = release_file
-        self._issue_file = issue_file
-
-    def is_os(self):
-        os_list = read_issue(self._release_file)
-        return os_list and os_list[0] == "Fedora"
-
-    def get_version(self):
-        if self.is_os():
-            os_list = read_issue(self._issue_file)
-            idx = os_list.index('release')
-            if idx > 0:
-                return os_list[idx + 1]
-        raise OsNotDetected('cannot get version on this OS')
-
-    def get_codename(self):
-        if self.is_os():
-            os_list = read_issue(self._release_file)
-            idx = os_list.index('release')
-            matches = [x for x in os_list if x[0] == '(']
-            codename = matches[0][1:]
-            if codename[-1] == ')':
-                codename = codename[:-1]
-            return codename.lower()
-        raise OsNotDetected('called in incorrect OS')
-
-
-class Rhel(Fedora):
-    """
-    Detect Redhat OS.
-    """
-    def __init__(self, release_file="/etc/redhat-release"):
-        self._release_file = release_file
-
-    def is_os(self):
-        os_list = read_issue(self._release_file)
-        return os_list and os_list[:3] == ['Red', 'Hat', 'Enterprise']
-
-    def get_version(self):
-        if self.is_os():
-            os_list = read_issue(self._release_file)
-            idx = os_list.index('release')
-            return os_list[idx + 1]
-        raise OsNotDetected('called in incorrect OS')
-
-    def get_codename(self):
-        # taroon, nahant, tikanga, santiago, pensacola
-        if self.is_os():
-            os_list = read_issue(self._release_file)
-            idx = os_list.index('release')
-            matches = [x for x in os_list if x[0] == '(']
-            codename = matches[0][1:]
-            if codename[-1] == ')':
-                codename = codename[:-1]
-            return codename.lower()
-        raise OsNotDetected('called in incorrect OS')
-
-
 # Source: https://en.wikipedia.org/wiki/MacOS#Versions
 _osx_codename_map = {
     4: 'tiger',
@@ -449,51 +386,6 @@ class Manjaro(Arch):
     """
     def __init__(self, release_file='/etc/manjaro-release'):
         super(Manjaro, self).__init__(release_file)
-
-
-class Centos(OsDetector):
-    """
-    Detect CentOS.
-    """
-    def __init__(self, release_file='/etc/redhat-release'):
-        self._release_file = release_file
-
-    def is_os(self):
-        os_list = read_issue(self._release_file)
-        return os_list and os_list[0] == 'CentOS'
-
-    def get_version(self):
-        if self.is_os():
-            os_list = read_issue(self._release_file)
-            idx = os_list.index('release')
-            return os_list[idx + 1]
-        raise OsNotDetected('called in incorrect OS')
-
-    def get_codename(self):
-        if self.is_os():
-            os_list = read_issue(self._release_file)
-            idx = os_list.index('release')
-            matches = [x for x in os_list if x[0] == '(']
-            if matches:
-                codename = matches[0][1:]
-                if codename[-1] == ')':
-                    codename = codename[:-1]
-            else:
-                codename = os_list[-1]
-            return codename.lower()
-        raise OsNotDetected('called in incorrect OS')
-
-
-class Euleros(Centos):
-    """
-    Detect Euleros.
-    """
-    def __init__(self, release_file='/etc/euleros-release'):
-        super(Euleros, self).__init__(release_file)
-
-    def is_os(self):
-        os_list = read_issue(self._release_file)
-        return os_list and os_list[0] == 'EulerOS'
 
 
 class Cygwin(OsDetector):
@@ -724,7 +616,9 @@ class OsDetect:
         return self._os_codename
 
 
+OS_ALMALINUX = 'almalinux'
 OS_ALPINE = 'alpine'
+OS_AMAZON = 'amazon'
 OS_ARCH = 'arch'
 OS_BUILDROOT = 'buildroot'
 OS_MANJARO = 'manjaro'
@@ -745,12 +639,14 @@ OS_NEON = 'neon'
 OS_OPENEMBEDDED = 'openembedded'
 OS_OPENSUSE = 'opensuse'
 OS_OPENSUSE13 = 'opensuse'
+OS_ORACLE = 'oracle'
 OS_TIZEN = 'tizen'
 OS_SAILFISHOS = 'sailfishos'
 OS_OSX = 'osx'
 OS_POP = 'pop'
 OS_QNX = 'qnx'
 OS_RHEL = 'rhel'
+OS_ROCKY = 'rocky'
 OS_SLACKWARE = 'slackware'
 OS_UBUNTU = 'ubuntu'
 OS_CLEARLINUX = 'clearlinux'
@@ -758,12 +654,14 @@ OS_NIXOS = 'nixos'
 OS_WINDOWS = 'windows'
 OS_ZORIN =  'zorin'
 
+OsDetect.register_default(OS_ALMALINUX, FdoDetect("almalinux"))
 OsDetect.register_default(OS_ALPINE, FdoDetect("alpine"))
+OsDetect.register_default(OS_AMAZON, FdoDetect("amzn"))
 OsDetect.register_default(OS_ARCH, Arch())
 OsDetect.register_default(OS_BUILDROOT, FdoDetect("buildroot"))
 OsDetect.register_default(OS_MANJARO, Manjaro())
-OsDetect.register_default(OS_CENTOS, Centos())
-OsDetect.register_default(OS_EULEROS, Euleros())
+OsDetect.register_default(OS_CENTOS, FdoDetect("centos"))
+OsDetect.register_default(OS_EULEROS, FdoDetect("euleros"))
 OsDetect.register_default(OS_CYGWIN, Cygwin())
 OsDetect.register_default(OS_DEBIAN, Debian())
 OsDetect.register_default(OS_ELEMENTARY, LsbDetect("elementary"))
@@ -781,12 +679,14 @@ OsDetect.register_default(OS_OPENSUSE, OpenSuse())
 OsDetect.register_default(OS_OPENSUSE13, OpenSuse(brand_file='/etc/SUSE-brand', release_file=None))
 OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse-tumbleweed"))
 OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse"))
+OsDetect.register_default(OS_ORACLE, FdoDetect("ol"))
 OsDetect.register_default(OS_TIZEN, FdoDetect("tizen"))
 OsDetect.register_default(OS_SAILFISHOS, FdoDetect("sailfishos"))
 OsDetect.register_default(OS_OSX, OSX())
 OsDetect.register_default(OS_POP, LsbDetect("Pop"))
 OsDetect.register_default(OS_QNX, QNX())
-OsDetect.register_default(OS_RHEL, Rhel())
+OsDetect.register_default(OS_RHEL, FdoDetect("rhel"))
+OsDetect.register_default(OS_ROCKY, FdoDetect("rocky"))
 OsDetect.register_default(OS_SLACKWARE, Slackware())
 OsDetect.register_default(OS_UBUNTU, LsbDetect("Ubuntu"))
 OsDetect.register_default(OS_CLEARLINUX, FdoDetect("clear-linux-os"))
