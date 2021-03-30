@@ -360,25 +360,6 @@ def get_test_dir():
                                         'os_detect'))
 
 
-def test_fedora():
-    from rospkg.os_detect import Fedora, OsNotDetected
-    test_dir = os.path.join(get_test_dir(), 'fedora')
-    release_file, issue_file = [os.path.join(test_dir, x) for
-                                x in ["redhat-release", "issue"]]
-    detect = Fedora(release_file, issue_file)
-    assert detect.is_os()
-    assert detect.get_version() == '1'
-    assert detect.get_codename() == 'bordeaux', detect.get_codename()
-
-    detect = Fedora()
-    if not detect.is_os():
-        try:
-            detect.get_version()
-            assert False
-        except OsNotDetected:
-            pass
-
-
 def test_read_issue():
     from rospkg.os_detect import read_issue
     assert read_issue('/fake/file') is None
@@ -417,46 +398,6 @@ def test_tripwire_rhel():
     from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
     os_detect.get_detector('rhel')
-
-
-def test_redhat():
-    from rospkg.os_detect import Rhel, OsNotDetected
-    test_dir = os.path.join(get_test_dir(), 'rhel')
-
-    # go through several test files
-    detect = Rhel(os.path.join(test_dir, "redhat-release"))
-    assert detect.is_os()
-    assert detect.get_version() == '3'
-    assert detect.get_codename() == 'taroon'
-
-    detect = Rhel(os.path.join(test_dir, "redhat-release-tikanga"))
-    assert detect.is_os()
-    assert detect.get_version() == '5'
-    assert detect.get_codename() == 'tikanga'
-
-    detect = Rhel(os.path.join(test_dir, "redhat-release-nahant"))
-    assert detect.is_os()
-    assert detect.get_version() == '4'
-    assert detect.get_codename() == 'nahant'
-
-    detect = Rhel(os.path.join(test_dir, "redhat-release-ootpa"))
-    assert detect.is_os()
-    assert detect.get_version() == '8.3'
-    assert detect.get_codename() == 'ootpa'
-
-    # test freely
-    detect = Rhel()
-    if not detect.is_os():
-        try:
-            detect.get_version()
-            assert False
-        except OsNotDetected:
-            pass
-        try:
-            detect.get_codename()
-            assert False
-        except OsNotDetected:
-            pass
 
 
 def test_tripwire_slackware():
@@ -565,36 +506,6 @@ def test_tripwire_centos():
     from rospkg.os_detect import OsDetect
     os_detect = OsDetect()
     os_detect.get_detector('centos')
-
-
-def test_centos():
-    from rospkg.os_detect import Centos, OsNotDetected
-    test_dir = os.path.join(get_test_dir(), 'centos')
-
-    # go through several test files
-    detect = Centos(os.path.join(test_dir, "redhat-release-8.2"))
-    assert detect.is_os()
-    assert detect.get_version() == '8.2.2004'
-    assert detect.get_codename() == 'core'
-
-    detect = Centos(os.path.join(test_dir, "redhat-release-8.3"))
-    assert detect.is_os()
-    assert detect.get_version() == '8.3.2011'
-    assert detect.get_codename() == '8.3.2011'
-
-    # test freely
-    detect = Centos()
-    if not detect.is_os():
-        try:
-            detect.get_version()
-            assert False
-        except OsNotDetected:
-            pass
-        try:
-            detect.get_codename()
-            assert False
-        except OsNotDetected:
-            pass
 
 
 def test_OsDetect():
