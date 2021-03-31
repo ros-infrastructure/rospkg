@@ -1,3 +1,12 @@
+1.3.0 (2021-03-31)
+-------------------
+- Fix for detecting big sur (and newer) versions of macOS
+  - https://github.com/ros-infrastructure/rospkg/pull/216
+- Add "opensuse-leap" support to os_detect.py
+  - https://github.com/ros-infrastructure/rospkg/pull/218
+- Switch RedHat-likes to FdoDetect, add some RHEL clones
+  - https://github.com/ros-infrastructure/rospkg/pull/219
+
 1.2.10 (2021-02-04)
 -------------------
 - Fix CentOS 8.3 detection
