@@ -247,7 +247,7 @@ class RoboStack(OsDetector):
     Detect RoboStack.
     """
     def is_os(self):
-        return "ROS_OS_OVERRIDE" in os.environ and os.environ["ROS_OS_OVERRIDE"] == "robostack"
+        return "ROS_OS_OVERRIDE" in os.environ and os.environ["ROS_OS_OVERRIDE"].startswith("robostack")
 
     def get_version(self):
         if self.is_os():
