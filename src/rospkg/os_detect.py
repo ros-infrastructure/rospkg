@@ -242,12 +242,14 @@ class OpenEmbedded(OsDetector):
         raise OsNotDetected('called in incorrect OS')
 
 
-class RoboStack(OsDetector):
+class Conda(OsDetector):
     """
-    Detect RoboStack.
+    Detect Conda.
     """
     def is_os(self):
-        return "ROS_OS_OVERRIDE" in os.environ and os.environ["ROS_OS_OVERRIDE"].startswith("robostack")
+        return "ROS_OS_OVERRIDE" in os.environ and
+            (os.environ["ROS_OS_OVERRIDE"].lower().startswith("robostack") or
+             os.environ["ROS_OS_OVERRIDE"].lower().startswith("conda"))
 
     def get_version(self):
         if self.is_os():
@@ -663,7 +665,7 @@ OS_OPENEMBEDDED = 'openembedded'
 OS_OPENSUSE = 'opensuse'
 OS_OPENSUSE13 = 'opensuse'
 OS_ORACLE = 'oracle'
-OS_ROBOSTACK = 'robostack'
+OS_CONDA = 'conda'
 OS_TIZEN = 'tizen'
 OS_SAILFISHOS = 'sailfishos'
 OS_OSX = 'osx'
@@ -705,7 +707,7 @@ OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse-tumbleweed"))
 OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse-leap"))
 OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse"))
 OsDetect.register_default(OS_ORACLE, FdoDetect("ol"))
-OsDetect.register_default(OS_ROBOSTACK, RoboStack())
+OsDetect.register_default(OS_CONDA, Conda())
 OsDetect.register_default(OS_TIZEN, FdoDetect("tizen"))
 OsDetect.register_default(OS_SAILFISHOS, FdoDetect("sailfishos"))
 OsDetect.register_default(OS_OSX, OSX())
