@@ -194,7 +194,7 @@ class ManifestManager(object):
         :returns: complete list of package names in ROS environment, ``[str]``
         """
         self._update_location_cache()
-        return self._location_cache.keys()
+        return list(self._location_cache.keys())
 
     def get_path(self, name):
         """
