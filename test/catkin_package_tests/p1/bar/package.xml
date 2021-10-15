@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>bar</name>
+  <version>1.2.3</version>
+  <description>
+    I AM THE VERY MODEL OF A MODERN MAJOR GENERAL
+  </description>
+  <maintainer email="someone@example.com">Someone</maintainer>
+
+  <license>MIT</license>
+
+  <url type="website">http://wiki.ros.org/bar</url>
+  <url type="bugtracker">http://www.github.com/my_org/bar/issues</url>
+  <author>Jane Doe</author>
+  <author email="jane.doe@example.com">Jane Doe</author>
+
+  <depend>liburdfdom-dev</depend>
+  <exec_depend>foo</exec_depend>
+  <test_depend>gtest</test_depend>
+  <export />
+</package>
