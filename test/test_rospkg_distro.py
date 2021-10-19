@@ -315,7 +315,7 @@ def test_load_distro_simple():
 
     assert distro.release_name == 'simple', distro.release_name
     assert distro.version == '1', distro.version
-    assert yaml.load(open(p)) == distro.raw_data, distro.raw_data
+    assert yaml.safe_load(open(p)) == distro.raw_data, distro.raw_data
     assert set(distro.variants.keys()) == set(['base'])
     assert set(distro.stacks.keys()) == set(['stack1'])
 
@@ -334,7 +334,7 @@ def test_load_distro_diamondback():
 
     assert distro.release_name == 'diamondback', distro.release_name
     assert distro.version == 'r8596', distro.version
-    assert yaml.load(open(p)) == distro.raw_data, distro.raw_data
+    assert yaml.safe_load(open(p)) == distro.raw_data, distro.raw_data
     assert set(distro.variants.keys()) == set(diamondback_variants)
     assert set(distro.stacks.keys()) == set(diamondback_stacks), set(distro.stacks.keys()) ^ set(diamondback_stacks)
 
@@ -350,7 +350,7 @@ def test_load_distro_diamondback():
 
 def test__load_variants():
     from rospkg.distro import _load_variants
-    raw_data = yaml.load("""variants:
+    raw_data = yaml.safe_load("""variants:
 - ros-base:
     stacks: [ros, ros_comm]
 - ros-full:

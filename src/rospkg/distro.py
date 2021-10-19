@@ -192,14 +192,14 @@ def load_distro(source_uri):
         if os.path.isfile(source_uri):
             # load rosdistro file
             with open(source_uri) as f:
-                raw_data = yaml.load(f.read())
+                raw_data = yaml.safe_load(f.read())
         else:
             try:
                 request = urlopen(source_uri)
             except Exception as e:
                 raise ResourceNotFound('%s (%s)' % (str(e), source_uri))
             try:
-                raw_data = yaml.load(request)
+                raw_data = yaml.safe_load(request)
             except ValueError:
                 raise ResourceNotFound(source_uri)
         if not type(raw_data) == dict:
