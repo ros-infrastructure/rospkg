@@ -69,6 +69,29 @@ def print_without_newline(argtext):
     print(argtext, end='')
 
 
+def get_version_from_package_name(package):
+    rosstack = RosStack()
+    try:
+        version = rosstack.get_stack_version(package)
+    except ResourceNotFound as e:
+        try:
+            # hack to make it work with wet packages
+            mm = ManifestManager(PACKAGE_FILE)
+            path = mm.get_path(package)
+            package_manifest = os.path.join(path, 'package.xml')
+            if os.path.exists(package_manifest):
+                from xml.etree.ElementTree import ElementTree
+                try:
+                    root = ElementTree(None, package_manifest)
+                    version = root.findtext('version')
+                except Exception:
+                    pass
+        except ResourceNotFound as e:
+            print('Cannot locate [%s]' % package)
+            sys.exit(1)
+    return version
+
+
 def main():
     parser = argparse.ArgumentParser(
         description='rosversion -d: Output the version of the given package\n'
@@ -84,6 +107,9 @@ def main():
     group.add_argument(
         '-d', '--distro', action='store_true',
         help='Output the ROS distribution name')
+    group.add_argument(
+        '-a', '--all', action='store_true',
+        help='Show all ROS package names and their versions')
 
     args = parser.parse_args()
 
@@ -99,26 +125,15 @@ def main():
         printer(distro_name)
         sys.exit(0)
 
-    rosstack = RosStack()
-    try:
-        version = rosstack.get_stack_version(args.package)
-    except ResourceNotFound as e:
-        try:
-            # hack to make it work with wet packages
-            mm = ManifestManager(PACKAGE_FILE)
-            path = mm.get_path(args.package)
-            package_manifest = os.path.join(path, 'package.xml')
-            if os.path.exists(package_manifest):
-                from xml.etree.ElementTree import ElementTree
-                try:
-                    root = ElementTree(None, package_manifest)
-                    version = root.findtext('version')
-                except Exception:
-                    pass
-        except ResourceNotFound as e:
-            print('Cannot locate [%s]' % args.package)
-            sys.exit(1)
+    if args.all:
+        rospack = RosPack()
+        for package in rospack.list():
+            printer(
+                '{}: {}'.format(
+                    package, get_version_from_package_name(package)))
+        sys.exit(0)
 
+    version = get_version_from_package_name(args.package)
     if version is None:
         version = '<unversioned>'
     printer(version)
