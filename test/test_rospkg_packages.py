@@ -314,12 +314,14 @@ def test_get_package_name():
     from rospkg import __version__
     from rospkg import get_package_name
 
-    # test dir is a subdirectory of this package
     test_dir = get_package_test_path()
-    assert get_package_name(test_dir) in ['rospkg', 'rospkg-%s' % __version__], get_package_name(test_dir)
 
     test_dir_foo = os.path.join(test_dir, 'p1', 'foo')
     assert 'foo' == get_package_name(test_dir_foo)
+
+    # baz dir is a subdirectory of foo package
+    test_dir_foo_baz = os.path.join(test_dir_foo, 'baz')
+    assert 'foo' == get_package_name(test_dir_foo_baz)
 
     # test with path outside of our hierarchy
     assert get_package_name(tempfile.tempdir) is None
