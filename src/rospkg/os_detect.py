@@ -298,10 +298,7 @@ _osx_codename_map = {
 
 
 def _osx_codename(major, minor):
-    if major == 10:
-        key = '%s.%s' % (major, minor)
-    else:
-        key = '%s' % (major)        
+    key = '%s.%s' % (major, minor) if major == '10' else '%s' % (major)
     if key not in _osx_codename_map:
          raise OsNotDetected("unrecognized version: %s" % key)
     return _osx_codename_map[key]
@@ -311,26 +308,19 @@ class OSX(OsDetector):
     """
     Detect OS X
     """
-    def __init__(self, sw_vers_file="/usr/bin/sw_vers"):
-        self._sw_vers_file = sw_vers_file
-
     def is_os(self):
-        return os.path.exists(self._sw_vers_file)
+        return platform.version() == 'Darwin'
+
+    def get_version(self):
+        if self.is_os():
+            return platform.mac_ver()[0]
+        raise OsNotDetected('called in incorrect OS')
 
     def get_codename(self):
         if self.is_os():
             version = self.get_version()
-            import distutils.version  # To parse version numbers
-            try:
-                ver = distutils.version.StrictVersion(version).version
-            except ValueError:
-                raise OsNotDetected("invalid version string: %s" % (version))
-            return _osx_codename(*ver[0:2])
-        raise OsNotDetected('called in incorrect OS')
-
-    def get_version(self):
-        if self.is_os():
-            return _read_stdout([self._sw_vers_file, '-productVersion'])
+            major, minor = version.split('.')[:2]
+            return _osx_codename(major, minor)
         raise OsNotDetected('called in incorrect OS')
 
 
