@@ -34,8 +34,10 @@ from __future__ import absolute_import
 
 import os
 
-import mock
-from mock import patch
+try:
+    from unittest.mock import Mock, patch
+except ImportError:
+    from mock import Mock, patch
 
 
 class TrueOs():
@@ -108,9 +110,9 @@ def test_LsbDetect():
     else:
         import platform as distro
 
-    distro.linux_distribution = mock.Mock()
+    distro.linux_distribution = Mock()
     distro.linux_distribution.return_value = ('Ubuntu', '10.04', 'lucid')
-    distro.dist = mock.Mock()
+    distro.dist = Mock()
     distro.dist.return_value = ('Ubuntu', '10.04', 'lucid')
 
     detect = LsbDetect('Ubuntu')
