@@ -45,11 +45,11 @@ Setup
 
 ::
 
-    pip install nose
+    pip install pytest
     pip install mock
 
 
-rospkg uses `Python nose <http://readthedocs.org/docs/nose/en/latest/>`_ 
+rospkg uses `pytest <http://docs.pytest.org>`_ 
 for testing, which is a fairly simple and straightfoward test
 framework.  You just have to write a function start with the name
 ``test`` and use normal ``assert`` statements for your tests.
@@ -62,7 +62,7 @@ You can run the tests, including coverage, as follows:
 ::
 
     cd rospkg
-    nosetests test/*.py --with-coverage --cover-package=rospkg
+    pytest test --cov=rospkg
 
 
 Documentation
