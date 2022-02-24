@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import os
-import sys
 
 from setuptools import setup
 
@@ -38,9 +37,6 @@ kwargs = {
         """,
     'license': 'BSD'
 }
-
-if sys.version_info[0] == 2 and sys.version_info[1] < 7:
-    kwargs['install_requires'].append('argparse')
 
 if 'SKIP_PYTHON_MODULES' in os.environ:
     kwargs['packages'] = []
