@@ -6,7 +6,6 @@ syntax: glob
 *~
 *.log
 .coverage
-nosetests.xml
 src/rospkg.egg-info
 syntax: regexp
 (target|build|dist)/.*
