@@ -250,7 +250,7 @@ class Conda(OsDetector):
     Detect Conda.
     """
     def is_os(self):
-        return "ROS_OS_OVERRIDE" in os.environ and
+        return "ROS_OS_OVERRIDE" in os.environ and \
             (os.environ["ROS_OS_OVERRIDE"].lower().startswith("robostack") or
              os.environ["ROS_OS_OVERRIDE"].lower().startswith("conda"))
 
