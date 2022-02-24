@@ -32,8 +32,8 @@ jobs:
             python -m pip install pyparsing==2.4.7 'PyYAML<6.0'
           fi
           python -m pip install --upgrade pip setuptools
-          python -m pip install nose coverage mock
+          python -m pip install mock pytest pytest-cov
           python setup.py build develop
       - name: Run tests
         run: |
-          python -m nose --with-coverage --cover-package=rospkg --with-xunit test
+          python -m pytest --cov=rospkg test
