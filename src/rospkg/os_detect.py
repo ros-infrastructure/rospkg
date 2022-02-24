@@ -138,7 +138,9 @@ class LsbDetect(OsDetector):
     """
     def __init__(self, lsb_name, get_version_fn=None):
         self.lsb_name = lsb_name
-        if hasattr(distro, "linux_distribution"):
+        if distro.__name__ == "distro":
+            self.lsb_info = (distro.id(), distro.version(), distro.codename())
+        elif hasattr(distro, "linux_distribution"):
             self.lsb_info = distro.linux_distribution(full_distribution_name=0)
         elif hasattr(distro, "dist"):
             self.lsb_info = distro.dist()

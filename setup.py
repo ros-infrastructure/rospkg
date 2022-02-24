@@ -10,7 +10,7 @@ if (
     'SKIP_PYTHON_MODULES' not in os.environ and
     'SKIP_PYTHON_SCRIPTS' not in os.environ
 ):
-    install_requires.append("distro; python_version >= '3.8'")
+    install_requires.append("distro >= 1.4.0; python_version >= '3.8'")
 
 kwargs = {
     'name': 'rospkg',

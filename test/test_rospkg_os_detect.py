@@ -110,10 +110,20 @@ def test_LsbDetect():
     else:
         import platform as distro
 
-    distro.linux_distribution = Mock()
-    distro.linux_distribution.return_value = ('Ubuntu', '10.04', 'lucid')
-    distro.dist = Mock()
-    distro.dist.return_value = ('Ubuntu', '10.04', 'lucid')
+    # Mock different interfaces based on the module used.
+    if distro.__name__ == 'distro':
+        distro.id = Mock()
+        distro.id.return_value = 'Ubuntu'
+        distro.version = Mock()
+        distro.version.return_value = '10.04'
+        distro.codename = Mock()
+        distro.codename.return_value = 'lucid'
+    elif hasattr(distro, 'linux_distribution'):
+        distro.linux_distribution = Mock()
+        distro.linux_distribution.return_value = ('Ubuntu', '10.04', 'lucid')
+    elif hasattr(distro, 'dist'):
+        distro.dist = Mock()
+        distro.dist.return_value = ('Ubuntu', '10.04', 'lucid')
 
     detect = LsbDetect('Ubuntu')
     assert detect.is_os(), "should be Ubuntu"
