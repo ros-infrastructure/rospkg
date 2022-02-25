@@ -1,3 +1,49 @@
+1.4.0 (2022-02-24)
+------------------
+- Add OS_RASPBIAN definition.
+  - https://github.com/ros-infrastructure/rospkg/pull/244
+- Add Conda OS detection.
+  - https://github.com/ros-infrastructure/rospkg/pull/224
+  - Fix syntax error in Conda detector
+  - https://github.com/ros-infrastructure/rospkg/pull/249
+- Avoid use of deprectated distro.linux_distribution() function.
+  - https://github.com/ros-infrastructure/rospkg/pull/248
+- Enable tests on python 3.10, bump actions/setup-python version.
+  - https://github.com/ros-infrastructure/rospkg/pull/246
+- Run tests with pytest instead of nose.
+  - https://github.com/ros-infrastructure/rospkg/pull/247
+- Drop support for python < 2.6.
+  - https://github.com/ros-infrastructure/rospkg/pull/242
+- Only add pypi dependency on distro with python >= 3.8.
+  - https://github.com/ros-infrastructure/rospkg/pull/245
+- Use unittest.mock where possible.
+  - https://github.com/ros-infrastructure/rospkg/pull/240
+- Update debian codename mapping.
+  - https://github.com/ros-infrastructure/rospkg/pull/238
+- Refactor CI platforms.
+  - https://github.com/ros-infrastructure/rospkg/pull/237
+- Fix test for riscv machines.
+  - https://github.com/ros-infrastructure/rospkg/pull/234
+- Add macOS Monterey to OS detection.
+  - https://github.com/ros-infrastructure/rospkg/pull/229
+- Remove legacy rosbuild files.
+  - https://github.com/ros-infrastructure/rospkg/pull/231
+- Add rosversion option to show all ROS package names and their versions.
+  - https://github.com/ros-infrastructure/rospkg/pull/221
+- Address problems with CI
+  - Require PyYAML < 6.0 for Python 2.
+  - Drop Travis CI configuration and Python 3.4.
+  - Use yaml.safe_load
+  - https://github.com/ros-infrastructure/rospkg/pull/228
+- Update release distributions. 
+  - Drop support for EOL Ubuntu distros.
+  - Drop support for EOL Debian distros.
+  - Add Ubuntu Jammy and Debian Bullseye for python3 releases.
+  - https://github.com/ros-infrastructure/rospkg/pull/227
+  - https://github.com/ros-infrastructure/rospkg/pull/236
+- Return list from ManifestManager.list().
+  - https://github.com/ros-infrastructure/rospkg/pull/220
+
 1.3.0 (2021-03-31)
 -------------------
 - Fix for detecting big sur (and newer) versions of macOS
