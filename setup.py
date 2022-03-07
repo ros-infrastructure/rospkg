@@ -26,6 +26,7 @@ kwargs = {
     'install_requires': install_requires,
     'author': 'Ken Conley',
     'author_email': 'kwc@willowgarage.com',
+    'maintainer': 'ROS Infrastructure Team',
     'url': 'http://wiki.ros.org/rospkg',
     'keywords': ['ROS'],
     'classifiers': [
