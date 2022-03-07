@@ -27,12 +27,7 @@ jobs:
           python-version: ${{matrix.python}}
       - name: Install dependencies
         run: |
-          if test ${{matrix.python}} = 2.7; then
-            python -m pip install pyparsing==2.4.7 'PyYAML<6.0'
-          fi
-          python -m pip install --upgrade pip setuptools
-          python -m pip install mock pytest pytest-cov
-          python setup.py build develop
+          python -m pip install -U -e .[test] pytest-cov -c .github/workflows/constraints.txt
       - name: Run tests
         run: |
           python -m pytest --cov=rospkg test
