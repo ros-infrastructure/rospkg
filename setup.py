@@ -24,6 +24,11 @@ kwargs = {
         'console_scripts': ['rosversion=rospkg.rosversion:main'],
     },
     'install_requires': install_requires,
+    'extras_require': {
+        'test': [
+            "mock; python_version < '3.3'",
+            'pytest',
+        ]},
     'author': 'Ken Conley',
     'author_email': 'kwc@willowgarage.com',
     'url': 'http://wiki.ros.org/rospkg',
