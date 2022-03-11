@@ -27,7 +27,7 @@ jobs:
           python-version: ${{matrix.python}}
       - name: Install dependencies
         run: |
-          python -m pip install -U -e .[test] pytest-cov -c .github/workflows/constraints.txt
+          python -m pip install -U -e .[test] pytest-cov -c constraints.txt
       - name: Run tests
         run: |
           python -m pytest --cov=rospkg test
