@@ -35,4 +35,4 @@ jobs:
           python setup.py build develop
       - name: Run tests
         run: |
-          python -m pytest --cov=rospkg test
+          python -m pytest --cov test
