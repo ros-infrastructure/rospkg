@@ -27,6 +27,12 @@ kwargs = {
     'author': 'Ken Conley',
     'author_email': 'kwc@willowgarage.com',
     'maintainer': 'ROS Infrastructure Team',
+    'project_urls': {
+        'Source code':
+        'https://github.com/ros-infrastructure/rospkg',
+        'Issue tracker':
+        'https://github.com/ros-infrastructure/rospkg/issues',
+    },
     'url': 'http://wiki.ros.org/rospkg',
     'keywords': ['ROS'],
     'classifiers': [
