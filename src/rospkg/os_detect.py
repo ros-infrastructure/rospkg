@@ -181,6 +181,7 @@ class Debian(LsbDetect):
                 '12': 'bookworm',
                 '13': 'trixie',
                 'unstable': 'sid',
+                'rodete': 'bookworm',
             }.get(v, '')
 
 
