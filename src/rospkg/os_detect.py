@@ -317,7 +317,8 @@ _osx_codename_map = {
  '10.14': 'mojave',
  '10.15': 'catalina',
  '11': 'big sur',
- '12': 'monterey'
+ '12': 'monterey',
+ '13': 'ventura'
 }
 
 
