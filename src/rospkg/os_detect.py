@@ -181,6 +181,7 @@ class Debian(LsbDetect):
                 '12': 'bookworm',
                 '13': 'trixie',
                 'unstable': 'sid',
+                'rodete': 'bookworm',
             }.get(v, '')
 
 
@@ -719,6 +720,7 @@ OsDetect.register_default(OS_SAILFISHOS, FdoDetect("sailfishos"))
 OsDetect.register_default(OS_OSX, OSX())
 OsDetect.register_default(OS_POP, LsbDetect("Pop"))
 OsDetect.register_default(OS_QNX, QNX())
+OsDetect.register_default(OS_RASPBIAN, FdoDetect("raspbian"))
 OsDetect.register_default(OS_RHEL, FdoDetect("rhel"))
 OsDetect.register_default(OS_ROCKY, FdoDetect("rocky"))
 OsDetect.register_default(OS_SLACKWARE, Slackware())
