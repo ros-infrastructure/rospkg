@@ -1,3 +1,18 @@
+1.5.0 (2023-03-20)
+------------------
+- Add ventura in the _osx_codename_map
+  - https://github.com/ros-infrastructure/rospkg/pull/256
+- Use FdoDetect to identify Raspbian systems
+  - https://github.com/ros-infrastructure/rospkg/pull/257
+- Report Debian 'rodete' as the current Debian testing codename
+  - https://github.com/ros-infrastructure/rospkg/pull/258
+- List 'ROS Infrastructure Team' as the package maintainer
+  - https://github.com/ros-infrastructure/rospkg/pull/252
+- Declare test dependencies in [test] extra
+  - https://github.com/ros-infrastructure/rospkg/pull/251
+- Declare cov/junit module name
+  - https://github.com/ros-infrastructure/rospkg/pull/250
+
 1.4.0 (2022-02-24)
 ------------------
 - Add OS_RASPBIAN definition.
@@ -35,7 +50,7 @@
   - Drop Travis CI configuration and Python 3.4.
   - Use yaml.safe_load
   - https://github.com/ros-infrastructure/rospkg/pull/228
-- Update release distributions. 
+- Update release distributions.
   - Drop support for EOL Ubuntu distros.
   - Drop support for EOL Debian distros.
   - Add Ubuntu Jammy and Debian Bullseye for python3 releases.
