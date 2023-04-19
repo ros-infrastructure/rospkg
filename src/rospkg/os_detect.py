@@ -265,6 +265,25 @@ class Conda(OsDetector):
             return ""
         raise OsNotDetected('called in incorrect OS')
 
+class OpenEuler(OsDetector):
+    """
+    Detect OpenEuler OS.
+    """
+    def __init__(self, release_file="/etc/openEuler-release"):
+        self._release_info = read_os_release()
+        self._release_file = release_file
+    def is_os(self):
+        return os.path.exists(self._release_file)
+    def get_version(self):
+        if self.is_os():
+            return self._release_info["VERSION_ID"]
+        raise OsNotDetected("called in incorrect OS")
+    def get_codename(self):
+        if self.is_os():
+            return ""
+        raise OsNotDetected('called in incorrect OS')
+
+
 
 class OpenSuse(OsDetector):
     """
@@ -655,6 +674,7 @@ OS_BUILDROOT = 'buildroot'
 OS_MANJARO = 'manjaro'
 OS_CENTOS = 'centos'
 OS_EULEROS = 'euleros'
+OS_OPENEULER = 'openeuler'
 OS_CYGWIN = 'cygwin'
 OS_DEBIAN = 'debian'
 OS_ELEMENTARY = 'elementary'
@@ -695,6 +715,7 @@ OsDetect.register_default(OS_BUILDROOT, FdoDetect("buildroot"))
 OsDetect.register_default(OS_MANJARO, Manjaro())
 OsDetect.register_default(OS_CENTOS, FdoDetect("centos"))
 OsDetect.register_default(OS_EULEROS, FdoDetect("euleros"))
+OsDetect.register_default(OS_OPENEULER, OpenEuler())
 OsDetect.register_default(OS_CYGWIN, Cygwin())
 OsDetect.register_default(OS_DEBIAN, Debian())
 OsDetect.register_default(OS_ELEMENTARY, LsbDetect("elementary"))
