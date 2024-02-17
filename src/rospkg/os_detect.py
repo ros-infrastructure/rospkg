@@ -319,7 +319,7 @@ _osx_codename_map = {
  '11': 'big sur',
  '12': 'monterey',
  '13': 'ventura',
- '14': 'sonoma'
+ '14': 'sonoma',
 }
 
 
