@@ -275,7 +275,7 @@ class OpenEuler(OsDetector):
     def is_os(self):
         return os.path.exists(self._release_file)
     def get_version(self):
-        if self.is_os():
+        if (self.is_os() and "VERSION_ID" in self._release_info):
             return self._release_info["VERSION_ID"]
         raise OsNotDetected("called in incorrect OS")
     def get_codename(self):
