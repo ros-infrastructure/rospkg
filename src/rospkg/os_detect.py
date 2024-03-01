@@ -180,8 +180,9 @@ class Debian(LsbDetect):
                 '11': 'bullseye',
                 '12': 'bookworm',
                 '13': 'trixie',
+                '14': 'forky',
                 'unstable': 'sid',
-                'rodete': 'bookworm',
+                'rodete': 'trixie',
             }.get(v, '')
 
 
