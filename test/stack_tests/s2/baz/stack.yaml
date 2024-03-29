@@ -1,8 +1,9 @@
+---
 Catkin-ProjectName: baz
 Version: 1.7.3-yaml
 Depends: catkin, rospack
 Description: baz
-Author: No One 
+Author: No One
 Maintainer: No One <kwc@willowgarage.com>
 Homepage: http://www.ros.org
 
