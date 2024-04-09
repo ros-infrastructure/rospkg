@@ -38,8 +38,9 @@ def test_get_ros_root():
     from rospkg import get_ros_root
     assert get_ros_root(env={}) is None
 
-    env = {'ROS_ROOT': '/fake/path'}
-    assert '/fake/path' == get_ros_root(env=env)
+    fake_path = os.path.normpath('/fake/path')
+    env = {'ROS_ROOT': fake_path}
+    assert fake_path == get_ros_root(env=env)
 
     real_ros_root = get_ros_root()
 
@@ -142,8 +143,8 @@ def test_compute_package_paths():
     assert compute_package_paths(None, 'bar') == ['bar'], compute_package_paths(None, 'bar')
     assert compute_package_paths('foo', '') == ['foo']
     assert compute_package_paths('foo', 'bar') == ['foo', 'bar']
-    assert compute_package_paths('foo', 'bar:bz') == ['foo', 'bar', 'bz']
-    assert compute_package_paths('foo', 'bar:bz::blah') == ['foo', 'bar', 'bz', 'blah']
+    assert compute_package_paths('foo', os.path.pathsep.join(('bar', 'bz'))) == ['foo', 'bar', 'bz']
+    assert compute_package_paths('foo', os.path.pathsep.join(('bar', 'bz', '', 'blah'))) == ['foo', 'bar', 'bz', 'blah']
 
 
 def test_resolve_path():

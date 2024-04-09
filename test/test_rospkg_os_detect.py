@@ -33,6 +33,7 @@
 from __future__ import absolute_import
 
 import os
+import sys
 
 try:
     from unittest.mock import Mock, patch
@@ -75,7 +76,7 @@ class FalseOs(object):
 
 def test__read_stdout():
     from rospkg.os_detect import _read_stdout
-    assert 'hello' == _read_stdout(['echo', 'hello'])
+    assert 'hello' == _read_stdout([sys.executable, '-c', "print('hello')"])
     assert _read_stdout(['bad-command-input-for-rospkg-os-detect']) is None
 
 
