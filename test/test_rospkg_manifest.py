@@ -177,7 +177,9 @@ def test_parse_manifest():
     from rospkg.manifest import MANIFEST_FILE, parse_manifest
     d = get_test_dir()
     p = os.path.join(d, 'example1', MANIFEST_FILE)
-    with open(p, 'r') as f:
+    # Open in binary mode to match the parse_manifest_file function
+    # This is particularly important on Windows
+    with open(p, 'rb') as f:
         contents = f.read()
     _subtest_parse_example1(parse_manifest(MANIFEST_FILE, contents, p))
 
