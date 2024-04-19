@@ -1,3 +1,20 @@
+1.5.1 (2024-04-19)
+------------------
+- Make tests portable enough to run on Windows
+  - https://github.com/ros-infrastructure/rospkg/pull/268
+- Switch to ros-infrastructure centralized CI
+  - https://github.com/ros-infrastructure/rospkg/pull/267
+- Add detection logic for Fedora Asahi Remix
+  - https://github.com/ros-infrastructure/rospkg/pull/265
+- Update debian codename mapping
+  - https://github.com/ros-infrastructure/rospkg/pull/266
+- Add macOS Sonoma to _osx_codename_map
+  - https://github.com/ros-infrastructure/rospkg/pull/262
+- Update deb platforms for release
+  - https://github.com/ros-infrastructure/rospkg/pull/263
+- Update CI testing matrix
+  - https://github.com/ros-infrastructure/rospkg/pull/264
+
 1.5.0 (2023-03-20)
 ------------------
 - Add ventura in the _osx_codename_map
