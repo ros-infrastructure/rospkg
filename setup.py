@@ -26,7 +26,6 @@ kwargs = {
     'install_requires': install_requires,
     'extras_require': {
         'test': [
-            "mock; python_version < '3.3'",
             'pytest',
         ]},
     'author': 'Ken Conley',
@@ -43,6 +42,7 @@ kwargs = {
     'classifiers': [
         'Programming Language :: Python',
         'License :: OSI Approved :: BSD License'],
+    'python_requires': '>=3.6',
     'description': 'ROS package library',
     'long_description': """\
         Library for retrieving information about ROS packages and stacks.
