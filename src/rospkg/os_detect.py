@@ -32,9 +32,6 @@ Library for detecting the current OS, including detecting specific
 Linux distributions.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-
 import codecs
 # to be removed after Ubuntu Xenial is out of support
 import sys
