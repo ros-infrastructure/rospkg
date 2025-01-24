@@ -1,3 +1,14 @@
+1.6.0 (2025-01-24)
+------------------
+- Add 'Duke' to Debian codename mapping
+  - https://github.com/ros-infrastructure/rospkg/pull/273
+- Raise minimum required Python version to 3.6
+  - https://github.com/ros-infrastructure/rospkg/pull/272
+- Add macOS 15 to _osx_codename_map
+  - https://github.com/ros-infrastructure/rospkg/pull/271
+- Fix test_tripwire_uname_get_machine on macOS
+  - https://github.com/ros-infrastructure/rospkg/pull/270
+
 1.5.1 (2024-04-19)
 ------------------
 - Make tests portable enough to run on Windows
