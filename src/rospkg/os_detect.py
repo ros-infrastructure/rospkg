@@ -320,6 +320,7 @@ _osx_codename_map = {
  '13': 'ventura',
  '14': 'sonoma',
  '15': 'sequoia',
+ '26': 'tahoe',
 }
 
 
