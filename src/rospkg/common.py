@@ -50,7 +50,7 @@ class ResourceNotFound(Exception):
         self.ros_paths = ros_paths
 
     def __str__(self):
-        s = self.args[0]  # python 2.6
+        s = self.args[0]
         if self.ros_paths:
             for i, p in enumerate(self.ros_paths):
                 s = s + '\nROS path [%s]=%s' % (i, p)
