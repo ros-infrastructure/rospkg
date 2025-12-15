@@ -1,3 +1,14 @@
+1.6.1 (2025-12-15)
+------------------
+- Add openEuler support to os_detect.py
+  - https://github.com/ros-infrastructure/rospkg/pull/274
+- Add macOS 'Tahoe' to _osx_codename_map
+  - https://github.com/ros-infrastructure/rospkg/pull/275
+- Add a GitHub Actions job to smoke test os_detect.py
+  - https://github.com/ros-infrastructure/rospkg/pull/276
+- Drop more artifacts of Python 2
+  - https://github.com/ros-infrastructure/rospkg/pull/277
+
 1.6.0 (2025-01-24)
 ------------------
 - Add 'Duke' to Debian codename mapping
