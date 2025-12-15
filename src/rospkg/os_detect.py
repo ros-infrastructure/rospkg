@@ -49,9 +49,6 @@ def _read_stdout(cmd):
     try:
         pop = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         (std_out, std_err) = pop.communicate()
-        # Python 2.6 compatibility
-        if isinstance(std_out, str):
-            return std_out.strip()
         return std_out.decode(encoding='UTF-8').strip()
     except:
         return None
