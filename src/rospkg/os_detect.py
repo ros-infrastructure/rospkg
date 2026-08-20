@@ -166,7 +166,7 @@ class Debian(LsbDetect):
     def get_codename(self):
         if self.is_os():
             v = self.get_version().split('.', 1)[0]
-            return {
+            name = {
                 '7': 'wheezy',
                 '8': 'jessie',
                 '9': 'stretch',
@@ -176,9 +176,13 @@ class Debian(LsbDetect):
                 '13': 'trixie',
                 '14': 'forky',
                 '15': 'duke',
-                'unstable': 'sid',
+                'rodete': 'rodete',
+                'unstable': 'unstable',
+            }.get(v) or super(Debian, self).get_codename() or ''
+            return {
                 'rodete': 'trixie',
-            }.get(v, '')
+                'unstable': 'sid',
+            }.get(name, name)
 
 
 class FdoDetect(OsDetector):
