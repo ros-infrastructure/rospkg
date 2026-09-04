@@ -674,6 +674,7 @@ OS_NEON = 'neon'
 OS_OPENEMBEDDED = 'openembedded'
 OS_OPENSUSE = 'opensuse'
 OS_OPENSUSE13 = 'opensuse'
+OS_SLES = 'sles'
 OS_ORACLE = 'oracle'
 OS_CONDA = 'conda'
 OS_TIZEN = 'tizen'
@@ -721,6 +722,7 @@ OsDetect.register_default(OS_OPENSUSE13, OpenSuse(brand_file='/etc/SUSE-brand', 
 OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse-tumbleweed"))
 OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse-leap"))
 OsDetect.register_default(OS_OPENSUSE, FdoDetect("opensuse"))
+OsDetect.register_default(OS_SLES, FdoDetect("sles"))
 OsDetect.register_default(OS_ORACLE, FdoDetect("ol"))
 OsDetect.register_default(OS_CONDA, Conda())
 OsDetect.register_default(OS_TIZEN, FdoDetect("tizen"))
