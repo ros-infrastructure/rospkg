@@ -322,6 +322,7 @@ _osx_codename_map = {
  '14': 'sonoma',
  '15': 'sequoia',
  '26': 'tahoe',
+ '27': 'golden gate',
 }
 
 
