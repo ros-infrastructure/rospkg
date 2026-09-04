@@ -1,3 +1,14 @@
+1.6.2 (2026-09-04)
+------------------
+- Fix handling of Debian codename detection
+  - https://github.com/ros-infrastructure/rospkg/pull/280
+- Fix test_tripwire_uname_get_machine on loongarch64
+  - https://github.com/ros-infrastructure/rospkg/pull/279
+- Add macOS 27 "Golden Gate" to the OSX codename map
+  - https://github.com/ros-infrastructure/rospkg/pull/281
+- Add "OS_SLES" SUSE Linux Enterprise Server platform
+  - https://github.com/ros-infrastructure/rospkg/pull/282
+
 1.6.1 (2025-12-15)
 ------------------
 - Add openEuler support to os_detect.py
