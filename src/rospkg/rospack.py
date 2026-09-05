@@ -44,6 +44,7 @@ from .manifest import InvalidManifest, parse_manifest_file
 from .stack import InvalidStack, parse_stack_file
 
 _cache_lock = Lock()
+path_cache = {}
 
 
 def list_by_path(manifest_name, path, cache):
@@ -68,7 +69,12 @@ def list_by_path(manifest_name, path, cache):
             continue  # leaf
         if PACKAGE_FILE in files:
             # parse package.xml and decide if it matches the search criteria
-            root = ElementTree(None, os.path.join(d, PACKAGE_FILE))
+            tmp_path = os.path.join(d, PACKAGE_FILE)
+            if tmp_path in path_cache:
+                root = path_cache[tmp_path]
+            else:
+                root = ElementTree(None, os.path.join(d, PACKAGE_FILE))
+                path_cache[tmp_path] = root
             is_metapackage = root.find('./export/metapackage') is not None
             if (
                 (manifest_name == STACK_FILE and is_metapackage) or
