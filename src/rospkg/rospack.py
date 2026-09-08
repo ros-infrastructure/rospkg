@@ -37,6 +37,7 @@ try:
     from xml.etree.cElementTree import ElementTree
 except ImportError:
     from xml.etree.ElementTree import ElementTree
+from xml.etree.ElementTree import ParseError
 
 from .common import MANIFEST_FILE, PACKAGE_FILE, ResourceNotFound, STACK_FILE
 from .environment import get_ros_paths
@@ -68,14 +69,26 @@ def list_by_path(manifest_name, path, cache):
             continue  # leaf
         if PACKAGE_FILE in files:
             # parse package.xml and decide if it matches the search criteria
-            root = ElementTree(None, os.path.join(d, PACKAGE_FILE))
+            package_xml_path = os.path.join(d, PACKAGE_FILE)
+            try:
+                root = ElementTree(None, package_xml_path)
+            except ParseError as e:
+                raise InvalidManifest("Invalid manifest file [%s]: malformed XML: %s" % (package_xml_path, e)) from e
+            except OSError as e:
+                raise InvalidManifest("Invalid manifest file [%s]: unable to read file: %s" % (package_xml_path, e)) from e
+
             is_metapackage = root.find('./export/metapackage') is not None
             if (
                 (manifest_name == STACK_FILE and is_metapackage) or
                 (manifest_name == MANIFEST_FILE and not is_metapackage) or
                 manifest_name == PACKAGE_FILE
             ):
-                resource_name = root.findtext('name').strip(' \n\r\t')
+                name_elem = root.findtext('name')
+                if name_elem is None:
+                    raise InvalidManifest("Invalid manifest file [%s]: missing <name> element" % package_xml_path)
+                resource_name = name_elem.strip(' \n\r\t')
+                if not resource_name:
+                    raise InvalidManifest("Invalid manifest file [%s]: empty <name> element" % package_xml_path)
                 if resource_name not in resources:
                     resources.append(resource_name)
                     if cache is not None:
@@ -525,7 +538,20 @@ def get_package_name(path):
     if os.path.exists(os.path.join(path, MANIFEST_FILE)):
         return os.path.basename(os.path.abspath(path))
     elif os.path.exists(os.path.join(path, PACKAGE_FILE)):
-        root = ElementTree(None, os.path.join(path, PACKAGE_FILE))
-        return root.findtext('name')
+        package_xml_path = os.path.join(path, PACKAGE_FILE)
+        try:
+            root = ElementTree(None, package_xml_path)
+        except ParseError as e:
+            raise InvalidManifest("Invalid manifest file [%s]: malformed XML: %s" % (package_xml_path, e)) from e
+        except OSError as e:
+            raise InvalidManifest("Invalid manifest file [%s]: unable to read file: %s" % (package_xml_path, e)) from e
+
+        name_elem = root.findtext('name')
+        if name_elem is None:
+            raise InvalidManifest("Invalid manifest file [%s]: missing <name> element" % package_xml_path)
+        resource_name = name_elem.strip(' \n\r\t')
+        if not resource_name:
+            raise InvalidManifest("Invalid manifest file [%s]: empty <name> element" % package_xml_path)
+        return resource_name
     else:
         return None
