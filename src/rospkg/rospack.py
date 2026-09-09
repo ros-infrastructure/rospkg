@@ -240,8 +240,13 @@ class ManifestManager(object):
             # assign key before recursive call to prevent infinite case
             self._depends_cache[name] = s = set()
 
-            for p in names:
-                s.update(self.get_depends(p, implicit))
+            try:
+                for p in names:
+                    s.update(self.get_depends(p, implicit))
+            except (ResourceNotFound, InvalidManifest):
+                # Cycles may leave other entries based on this unfinished traversal.
+                self._depends_cache.clear()
+                raise
             # add in our own deps
             s.update(names)
             # cache the return value as a list
@@ -365,13 +370,18 @@ class RosPack(ManifestManager):
         # set the key before recursive call to prevent infinite case
         self._rosdeps_cache[package] = s = set()
 
-        # take the union of all dependencies
-        packages = self.get_depends(package, implicit=True)
-        for p in packages:
-            s.update(self.get_rosdeps(p, implicit=False))
-        # add in our own deps
-        m = self.get_manifest(package)
-        s.update([d.name for d in m.rosdeps])
+        try:
+            # take the union of all dependencies
+            packages = self.get_depends(package, implicit=True)
+            for p in packages:
+                s.update(self.get_rosdeps(p, implicit=False))
+            # add in our own deps
+            m = self.get_manifest(package)
+            s.update([d.name for d in m.rosdeps])
+        except (ResourceNotFound, InvalidManifest):
+            # Cycles may leave other entries based on this unfinished traversal.
+            self._rosdeps_cache.clear()
+            raise
         # cache the return value as a list
         s = list(s)
         self._rosdeps_cache[package] = s
