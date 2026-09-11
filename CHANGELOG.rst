@@ -1,3 +1,10 @@
+1.6.3 (2026-09-11)
+------------------
+- Clear dependency cache after failed recursive lookup
+  - https://github.com/ros-infrastructure/rospkg/pull/283
+- Raise appropriate errors on invalid manifests
+  - https://github.com/ros-infrastructure/rospkg/pull/284
+
 1.6.2 (2026-09-04)
 ------------------
 - Fix handling of Debian codename detection
