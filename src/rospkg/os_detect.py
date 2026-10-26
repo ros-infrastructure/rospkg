@@ -133,7 +133,7 @@ class LsbDetect(OsDetector):
     def __init__(self, lsb_name, get_version_fn=None):
         self.lsb_name = lsb_name
         if distro.__name__ == "distro":
-            self.lsb_info = (distro.id(), distro.version(), distro.codename())
+            self.lsb_info = (distro.id(), distro.version(), distro.codename(), distro.name())
         elif hasattr(distro, "linux_distribution"):
             self.lsb_info = distro.linux_distribution(full_distribution_name=0)
         elif hasattr(distro, "dist"):
@@ -228,22 +228,18 @@ class FdoDetect(OsDetector):
         raise OsNotDetected("called in incorrect OS")
 
 
-class OpenEmbedded(OsDetector):
+class OpenEmbedded(LsbDetect):
     """
     Detect OpenEmbedded.
     """
+    def __init__(self, get_version_fn=None):
+        super(OpenEmbedded, self).__init__('openembedded', get_version_fn)
+
     def is_os(self):
-        return "ROS_OS_OVERRIDE" in os.environ and os.environ["ROS_OS_OVERRIDE"] == "openembedded"
-
-    def get_version(self):
-        if self.is_os():
-            return ""
-        raise OsNotDetected('called in incorrect OS')
-
-    def get_codename(self):
-        if self.is_os():
-            return ""
-        raise OsNotDetected('called in incorrect OS')
+        if self.lsb_info is None:
+            return False
+        # lsb_info[4] = distro.name() = 'openembedded'
+        return self.lsb_info[3].lower() == self.lsb_name.lower()
 
 
 class Conda(OsDetector):
